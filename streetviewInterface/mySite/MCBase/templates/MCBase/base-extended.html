@@ -1,0 +1,38 @@
+<!-- This file contains the base django template used for all webpages -->
+<!-- use with: extends "base.html"  -->
+
+
+<html>
+  <head>
+    {% load staticfiles %}
+    <title>{% block title %}{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="{% static 'MCBase/js/jquery-2.1.4.min.js' %}"></script>
+    <script src="{% static 'MCBase/js/jquery-ui-1.11.4.custom/jquery-ui.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'MCBase/js/jquery-ui-1.11.4.custom/jquery-ui.css' %}">
+    <script src="{% static 'MCBase/bootstrap-3.3.5-dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'MCBase/js/base.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'MCBase/bootstrap-3.3.5-dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'MCBase/css/base.css' %}">
+    {% block javascript %}{% endblock %}
+  </head>
+
+  <body>
+
+  <!-- navbar -->
+  {% load MCBase_templatetags %}
+  {% load_base_navbar %}
+
+  <!-- authentication modal -->
+  {% include "MCBase/base-socialAuthModal.html" %}
+
+  <!-- main content -->
+  <div>
+    {% block body_block %}{% endblock %}
+  </div>
+
+
+
+  </body>
+</html>

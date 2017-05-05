@@ -1,0 +1,36 @@
+<!-- this file should be included in template base.html -->
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static 'MCBase/css/base-socialAuthModal.css' %}">
+
+<div id="social-auth-modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <div id="socialAuthModal-title" class="center-text">Use google, facebook, or twitter to log in. It only takes seconds!</div>
+      </div>
+      <div class="modal-body">
+
+        <!-- login with social media -->
+        <div class="row center-text">
+          <a class="socialAuthModal-link" href="{% url 'social:begin' backend='google-oauth2' %}">
+            <img height="150" src="{% static 'MCBase/images/google-icon.png'%}" alt="Log in with google!">
+          </a>
+
+          <a class="socialAuthModal-link" href="{% url 'social:begin' backend='facebook' %}">
+            <img height="150" src="{% static 'MCBase/images/facebook-icon.png'%}" alt="Log in with facebook!">
+          </a>
+
+          <a class="socialAuthModal-link" href="{% url 'social:begin' backend='twitter' %}">
+            <img height="150" src="{% static 'MCBase/images/twitter-icon.png'%}" alt="Log in with twitter!">
+          </a>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
