@@ -1,0 +1,7 @@
+streetviewInterface/venv/
+streetviewInterface/mySite/mySite/secret_keys_and_passwords.py
+.DS_Store
+*.pyc
+__pycache__
+streetviewInterface/migrations/
+db.sqlite3
