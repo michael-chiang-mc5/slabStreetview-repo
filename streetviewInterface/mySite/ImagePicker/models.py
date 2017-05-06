@@ -19,4 +19,4 @@ class StreetviewImage(models.Model):
     image = models.ImageField('img', upload_to=settings.MEDIA_ROOT)
 
     def __str__(self):
-        return str(self.image)
+        return str("heading="+str(self.heading))
