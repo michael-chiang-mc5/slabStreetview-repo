@@ -24,4 +24,4 @@ urlpatterns = [
     url('', include('social.apps.django_app.urls', namespace='social')),
     url('', include('myContent.urls', namespace='myContent')),
     url(r'^ImagePicker/', include('ImagePicker.urls', namespace='ImagePicker')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # TODO: disable this in production

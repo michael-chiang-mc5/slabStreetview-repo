@@ -2,7 +2,10 @@
 {% load staticfiles %}
 
 {% block javascript %}
-<script src="{% static 'ImagePicker/js/list.js' %}"></script>
+<style>
+
+</style>
+
 {% endblock %}
 
 {% block title %}
@@ -13,18 +16,40 @@
   <div class="content">
     <h1>List of all images</h1>
 
-    {% for streetviewImage in streetviewImages %}
 
-      <div class="streetviewImage">
 
-        <img src=
-          "//maps.googleapis.com/maps/api/streetview?size=640x640&amp;location={{streetviewImage.latitude}},{{ streetviewImage.longitude}}&amp;fov=90&amp;heading={{streetviewImage.heading}}&amp;pitch={{ streetviewImage.pitch }}&amp;key=AIzaSyBrwkUADkwqTvlC-HbKC_jZuqC3xBxUNLo" width="640" height="640px">
-        </div>
 
-      <br />
-      <br />
+    <table>
+      {% for streetviewImage in streetviewImages %}
 
-    {% endfor %}
+      <tr>
+
+          <!-- image -->
+          <td>
+            <div class="streetviewImage">
+              <img src="{{ streetviewImage.image.url }}" width="500" height="500" >
+            </div>
+          </td>
+
+          <!-- info -->
+          <td>
+            hi
+            <br />
+            hihi
+            <br />
+          </td>
+
+
+
+      </tr>
+
+      {% endfor %}
+
+    </table>
+
+
+
+
 
   </div>
 {% endblock %}

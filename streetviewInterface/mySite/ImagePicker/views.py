@@ -12,8 +12,11 @@ def index(request):
     #return render(request, 'ImagePicker/index4.html',context)
 
 def listImage(request):
-    return HttpResponse("asdf")
-
+    #return savePoint(request)    
+    streetviewImages = StreetviewImage.objects.all()
+    context = {'streetviewImages':streetviewImages}
+    #return HttpResponse("asdf")
+    return render(request, 'ImagePicker/listImage.html',context)
 
 # Takes POST data
 # saves mapPoint
@@ -50,8 +53,9 @@ def savePoint(request):
                                            pitch=pitch)
     streetviewImage_left.save()
     fi = str(streetviewImage_left.pk) + ".jpg"
-    data = urllib.request.urlretrieve(url_left, os.path.join(settings.MEDIA_ROOT,fi))
-    streetviewImage_left.image.name = fi
+    fi_path = os.path.join(settings.MEDIA_ROOT,fi)
+    data = urllib.request.urlretrieve(url_left, fi_path)
+    streetviewImage_left.image = fi # this should be set with respect to MEDIA_ROOT
     streetviewImage_left.save()
 
     # right image TODO
