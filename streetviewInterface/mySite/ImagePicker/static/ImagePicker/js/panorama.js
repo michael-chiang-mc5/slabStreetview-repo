@@ -45,6 +45,7 @@ function initMap() {
   panorama.addListener('links_changed', function() {
     var links =  panorama.getLinks();
 
+    // an alternative method of getting heading is panorama.getPhotographerPov()
     heading_val = links[0].heading;
     latitude_val
     longitude_val
@@ -69,7 +70,7 @@ function processSVData(data, status) {
       title: data.location.description
     });
 
-    // set global var so we can package it with heading and send it to server later
+    // set global var so we can package it with heading and send  it to server later
     latitude_val = data.location.latLng.lat()
     longitude_val = data.location.latLng.lng()
 
