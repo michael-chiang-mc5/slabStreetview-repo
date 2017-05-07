@@ -5,14 +5,8 @@ import os
 import urllib.request
 from django.conf import settings
 
-# Create your views here.
-def index(request):
-    context = {}
-    return getHeading(request)
-    #return render(request, 'ImagePicker/index4.html',context)
-
 def listImage(request):
-    #return savePoint(request)    
+    #return savePoint(request)
     streetviewImages = StreetviewImage.objects.all()
     context = {'streetviewImages':streetviewImages}
     #return HttpResponse("asdf")
@@ -27,53 +21,48 @@ def savePoint(request):
     #fi = "1.jpg"
     #data = urllib.request.urlretrieve(url, os.path.join(savLoc,fi))
 
+    if request.method != 'POST':
+        return HttpResponse("Must be POST")
 
-    latitude=42.34554965704973
-    longitude=-71.09832376428187
-    photographerHeading=90
-    panoID="asdf"
+    latitude = float(request.POST.get("latitude"))
+    longitude = float(request.POST.get("longitude"))
+    photographerHeading = float(request.POST.get("photographerHeading"))
     mapPoint = MapPoint(latitude=latitude, \
                         longitude=longitude, \
-                        photographerHeading=photographerHeading, \
-                        panoID=panoID)
+                        photographerHeading=photographerHeading)
     mapPoint.save()
 
 
     xdim = 640
-    ydim = 640
-    fov=90
+    ydim = 400
+    fov=140
     pitch=0
-    url_left =   "http://maps.googleapis.com/maps/api/streetview?size=%dx%d&location=%f,%f&fov=%d&heading=%f&pitch=%f&key=AIzaSyBrwkUADkwqTvlC-HbKC_jZuqC3xBxUNLo" \
-                 % (xdim,ydim,latitude,longitude,fov,photographerHeading+90,pitch)
 
+    saveImage(xdim,ydim,latitude,longitude,fov,photographerHeading+90,pitch,mapPoint)
+    saveImage(xdim,ydim,latitude,longitude,fov,photographerHeading-90,pitch,mapPoint)
+
+    return HttpResponse("done")
+
+def saveImage(xdim,ydim,latitude,longitude,fov,heading,pitch,mapPoint):
+    url =   "http://maps.googleapis.com/maps/api/streetview?size=%dx%d&location=%f,%f&fov=%d&heading=%f&pitch=%f&key=AIzaSyBrwkUADkwqTvlC-HbKC_jZuqC3xBxUNLo" \
+                 % (xdim,ydim,latitude,longitude,fov,heading,pitch)
     # left image
-    streetviewImage_left = StreetviewImage(mapPoint=mapPoint, \
-                                           heading=photographerHeading+90, \
+    streetviewImage = StreetviewImage(mapPoint=mapPoint, \
+                                           heading=heading, \
                                            fov=fov, \
                                            pitch=pitch)
-    streetviewImage_left.save()
-    fi = str(streetviewImage_left.pk) + ".jpg"
+    streetviewImage.save()
+    fi = str(streetviewImage.pk) + ".jpg"
     fi_path = os.path.join(settings.MEDIA_ROOT,fi)
-    data = urllib.request.urlretrieve(url_left, fi_path)
-    streetviewImage_left.image = fi # this should be set with respect to MEDIA_ROOT
-    streetviewImage_left.save()
-
-    # right image TODO
-
-
-    return HttpResponse(streetviewImage_left)
+    data = urllib.request.urlretrieve(url, fi_path)
+    streetviewImage.image = fi # this should be set with respect to MEDIA_ROOT
+    streetviewImage.save()
 
 
 
 
 # Given GPS coordinates, return the heading value perpendicular to the road
-def getHeading(request):
-    context = {}
+def index(request):
+    mapPoints = MapPoints.objects.all()
+    context = {'mapPoints':mapPoints}
     return render(request, 'ImagePicker/panorama.html',context)
-
-
-base = "https://maps.googleapis.com/maps/api/streetview?size=1200x800&location="
-loc="457 West Robinwood Street, Detroit, Michigan 48203"
-add="&key="
-key="AIzaSyBrwkUADkwqTvlC-HbKC_jZuqC3xBxUNLo"
-url = base+loc+add+key

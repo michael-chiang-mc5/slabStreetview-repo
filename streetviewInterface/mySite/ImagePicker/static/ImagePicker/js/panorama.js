@@ -41,20 +41,35 @@ function initMap() {
     //alert(event.latLng)
   });
 
-  // Set heading to be orthogonal to street orientation
+  // Detects when panorama changes
+  // Sets heading to be orthogonal to street orientation
+  // sends data to storePoint
   panorama.addListener('links_changed', function() {
     var links =  panorama.getLinks();
 
     // an alternative method of getting heading is panorama.getPhotographerPov()
-    heading_val = links[0].heading;
-    latitude_val
-    longitude_val
+    photographerHeading_val = links[0].heading;
 
-    alert(latitude_val+", "+longitude_val+", "+heading_val)
+
     // TODO: ajax call with latitude_val, longitude_val, heading_val
+    $.ajax({
+      type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
+      url         : '/ImagePicker/savePoint/', // the url where we want to POST
+      data        : {'photographerHeading':photographerHeading_val,
+                     'latitude':latitude_val,
+                     'longitude':longitude_val,
+                     'csrfmiddlewaretoken':csrf_token}, // our data object
+      success: function(data, textStatus, jqXHR) {
+        alert("sucess!")
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert("image was not saved")
+      }
+    });
+
 
     panorama.setPov({
-        heading: heading_val + 90,
+        heading: photographerHeading_val + 90,
         pitch: 0,
         zoom: 1
     });
@@ -77,7 +92,7 @@ function processSVData(data, status) {
     panorama.setPano(data.location.pano);
     panorama.setVisible(true);
 
-    // Check if this is a twice-clicked point
+    // This shows view if marker is clicked
     /*
     marker.addListener('click', function() {
       var markerPanoID = data.location.pano;

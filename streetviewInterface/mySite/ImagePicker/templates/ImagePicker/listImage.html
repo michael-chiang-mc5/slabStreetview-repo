@@ -27,12 +27,14 @@
           <!-- image -->
           <td>
             <div class="streetviewImage">
-              <img src="{{ streetviewImage.image.url }}" width="500" height="500" >
+              <img src="{{ streetviewImage.image.url }}" width="500" height="300" >
             </div>
           </td>
 
           <!-- info -->
           <td>
+            {{ streetviewImage.image.name }}
+            <br />
             {{ streetviewImage.mapPoint }}
             <br />
             {{ streetviewImage }}
