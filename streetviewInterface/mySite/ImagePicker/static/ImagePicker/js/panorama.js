@@ -19,6 +19,8 @@ var heading_val
 function initMap() {
   sv = new google.maps.StreetViewService();
 
+
+
   panorama = new google.maps.StreetViewPanorama(document.getElementById("pano"));
 
   // Set the initial Street View camera to the center of the map
@@ -28,10 +30,20 @@ function initMap() {
 
   // Set up the map.
   map = new google.maps.Map(document.getElementById('map'), {
-    center: usc,
+    center: {lat: 34.022352, lng: -118.285117},
     zoom: 16,
     streetViewControl: false
   });
+
+  // fill in markers
+  for(count = 0; count < 10; count++){
+    var marker = new google.maps.Marker({
+      position: initial_mapPoints[count],
+      map: map,
+    });
+  }
+
+
 
   // Look for a nearby Street View panorama when the map is clicked.
   // getPanoramaByLocation will return the nearest pano when the
@@ -60,7 +72,6 @@ function initMap() {
                      'longitude':longitude_val,
                      'csrfmiddlewaretoken':csrf_token}, // our data object
       success: function(data, textStatus, jqXHR) {
-        alert("sucess!")
       },
       error: function (jqXHR, textStatus, errorThrown) {
         alert("image was not saved")

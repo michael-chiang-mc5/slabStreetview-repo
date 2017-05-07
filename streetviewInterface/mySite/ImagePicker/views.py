@@ -63,6 +63,6 @@ def saveImage(xdim,ydim,latitude,longitude,fov,heading,pitch,mapPoint):
 
 # Given GPS coordinates, return the heading value perpendicular to the road
 def index(request):
-    mapPoints = MapPoints.objects.all()
+    mapPoints = MapPoint.objects.all()
     context = {'mapPoints':mapPoints}
     return render(request, 'ImagePicker/panorama.html',context)

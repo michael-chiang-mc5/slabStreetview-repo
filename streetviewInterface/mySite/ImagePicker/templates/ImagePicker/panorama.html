@@ -25,8 +25,18 @@
 
 
   <script>
-    csrf_token = "{{ csrf_token }}"
+    csrf_token = "{{ csrf_token }}";
+
+    var initial_mapPoints = []
+    {% for mapPoint in mapPoints %}
+      initial_mapPoints[{{ forloop.counter }} - 1] = {  lat:{{ mapPoint.latitude }},
+                                                        lng:{{ mapPoint.longitude }}  }
+    {% endfor %}
   </script>
+
+  {% for mapPoint in mapPoints %}
+  {% endfor %}
+
   <script src="{% static 'ImagePicker/js/panorama.js' %}"></script>
 
 {% endblock %}
