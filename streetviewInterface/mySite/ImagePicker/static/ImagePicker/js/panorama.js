@@ -36,7 +36,7 @@ function initMap() {
   });
 
   // fill in markers
-  for(count = 0; count < 10; count++){
+  for(count = 0; count < initial_mapPoints.length; count++){
     var marker = new google.maps.Marker({
       position: initial_mapPoints[count],
       map: map,
@@ -60,8 +60,8 @@ function initMap() {
     var links =  panorama.getLinks();
 
     // an alternative method of getting heading is panorama.getPhotographerPov()
-    photographerHeading_val = links[0].heading;
-
+    //photographerHeading_val = links[0].heading;
+    photographerHeading_val = panorama.getPhotographerPov().heading;
 
     // TODO: ajax call with latitude_val, longitude_val, heading_val
     $.ajax({
