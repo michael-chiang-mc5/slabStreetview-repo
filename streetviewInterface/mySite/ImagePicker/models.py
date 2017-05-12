@@ -15,7 +15,7 @@ class StreetviewImage(models.Model):
     heading = models.FloatField() # photographerHeading +- 90
     fov = models.IntegerField()
     pitch = models.FloatField()
-    image = models.ImageField('img', upload_to=settings.MEDIA_ROOT)
+    image = models.ImageField('img', upload_to=settings.MEDIA_URL)
 
     def __str__(self):
         return str("heading="+str(self.heading))
