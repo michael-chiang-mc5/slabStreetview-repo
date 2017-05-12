@@ -6,3 +6,4 @@ __pycache__
 migrations/
 db.sqlite3
 streetviewInterface/mySite/media/
+ssh_key.pem

@@ -1,0 +1,85 @@
+###
+# Steps independent of GPU
+###
+
+git clone https://github.com/tianzhi0549/CTPN.git
+sudo apt-get update
+sudo apt-get install libprotobuf-dev libleveldb-dev libsnappy-dev libopencv-dev libhdf5-serial-dev protobuf-compiler
+sudo apt-get install --no-install-recommends libboost-all-dev
+sudo apt-get install libatlas-base-dev
+sudo apt-get install the python-dev
+sudo apt-get install libgflags-dev libgoogle-glog-dev liblmdb-dev
+sudo apt install python-pip
+sudo pip install numpy
+sudo pip install Cython
+
+
+needed for demo:
+sudo apt-get install libopencv-dev python-opencv
+sudo pip install scikit-image
+sudo pip install protobuf
+sudo apt-get install python-yaml
+
+# copy model to:
+scp -i ssh_key.pem scp_files/ctpn_trained_model.caffemodel ubuntu@ec2-54-215-239-2.us-west-1.compute.amazonaws.com:~/CTPN/models/
+
+# Edit caffe/makefile.config
+INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/include/hdf5/serial/
+LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/lib/x86_64-linux-gnu/hdf5/serial/
+WITH_PYTHON_LAYER := 1   # uncomment
+CUDNN := 1 # uncomment
+
+# installing CUDA
+sudo apt-get -y dist-upgrade  
+sudo apt-get install -y gcc g++ gfortran build-essential git wget linux-image-generic libopenblas-dev python-dev python-pip python-nose python-numpy python-scipy python3-dev python3-pip python3-nose python3-numpy python3-scipy
+
+
+# Install CUDA
+sudo wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/cuda-repo-ubuntu1404_7.0-28_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu1404_7.0-28_amd64.deb
+sudo apt-get update
+sudo apt-get install -y cuda
+echo -e "\nexport PATH=/usr/local/cuda/bin:$PATH\n\nexport LD_LIBRARY_PATH=/usr/local/cuda/lib64" >> ~/.bashrc
+
+
+# Install CUDNN
+scp -i ssh_key.pem scp_files/cudnn-7.0-linux-x64-v3.0.8-prod.tgz ubuntu@ec2-54-215-239-2.us-west-1.compute.amazonaws.com:~/CUDA     # copy local file to server
+tar -zxvf cudnn-7.0-linux-x64-v3.0.8-prod.tgz 			# untar file
+sudo cp -P include/cudnn.h /usr/local/cuda/include/cudnn.h
+sudo cp -P lib64/libcudnn* /usr/local/cuda/lib64/
+sudo chmod a+r /usr/local/cuda/lib64/libcudnn*
+
+
+# at this point you should be able to make and run
+make -j && make pycaffe
+make # run in CTPN folder, NOT in caffe folder
+ssh -X -i "ssh_key.pem" ubuntu@ec2-54-215-239-2.us-west-1.compute.amazonaws.com     # to display
+python tools/demo.py
+
+
+
+
+
+
+
+
+
+
+# add paging space if need more ram:
+sudo /bin/dd if=/dev/zero of=/var/swap.2 bs=1M count=9000
+sudo /sbin/mkswap /var/swap.2
+sudo chmod 600 /var/swap.2
+sudo /sbin/swapon /var/swap.2
+
+# remember to remove when you are done
+sudo /sbin/swapoff /var/swap.2
+sudo rm /var/swap.2
+
+
+
+
+—
+
+Instructions:
+https://github.com/BVLC/caffe/wiki/Install-Caffe-on-EC2-from-scratch-(Ubuntu,-CUDA-7,-cuDNN-3)
+http://yshean.logdown.com/posts/275342-installing-caffe-on-ec2-instance
