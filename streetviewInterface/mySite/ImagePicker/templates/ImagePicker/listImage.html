@@ -3,6 +3,37 @@
 
 {% block javascript %}
 <style>
+  .image_container {
+      border: 1px solid #DDDDDD;
+      width: 640px;
+      height: 400px;
+      position:relative;
+  }
+  .tag {
+      float: left;
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: 500px;
+      height: 300px;
+      background-color: red;
+      opacity: 0.5;
+      z-index: 1000;
+
+  }
+  .grayscale {
+  	filter: grayscale(100%);
+    position:relative;
+  }
+
+  .grayscale:hover {
+    filter: none;
+  }
+
+  .image_container:hover .tag {
+    opacity: 0.1;
+  }
+
 
 </style>
 
@@ -26,8 +57,12 @@
 
           <!-- image -->
           <td>
-            <div class="streetviewImage">
-              <img src="/{{ streetviewImage.image.url }}" width="500" height="300" >
+            <div class="image_container">
+              <!-- bounding box overlay -->
+              {% for box in streetviewImage.boundingbox_set.all %}
+                <div style="left:{{ box.x1 }}px;top:{{ box.y1 }};width:{{ box.width }}px;height:{{ box.height }}px" class="tag"></div>
+              {% endfor %}
+              <img class="grayscale" src="/{{ streetviewImage.image.url }}" width="640" height="400" >
             </div>
           </td>
 

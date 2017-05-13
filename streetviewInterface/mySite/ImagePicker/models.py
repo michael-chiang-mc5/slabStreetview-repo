@@ -30,3 +30,7 @@ class BoundingBox(models.Model):
 
     def __str__(self):
         return str([self.x1, self.y1, self.x2, self.y2])
+    def width(self):
+        return self.x2 - self.x1
+    def height(self):
+        return self.y2 - self.y1
