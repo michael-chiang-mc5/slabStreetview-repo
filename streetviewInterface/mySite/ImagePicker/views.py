@@ -76,8 +76,9 @@ def listTextDetectorMetadata(request):
 def listBoundingBox(request):
     boundingBoxes = BoundingBox.objects.all()
     response = HttpResponse(content_type='text/plain; charset=utf8')
-    response.write("image_url\tx1\ty1\tx2\ty2\tnms\n")
+    response.write("pk\timage_url\tx1\ty1\tx2\ty2\tnms\n")
     for boundingBox in boundingBoxes:
+        response.write(str(boundingBox.streetviewImage.pk)+"\t")
         response.write("http://"+request.META['HTTP_HOST']+"/"+boundingBox.streetviewImage.image.url)
         response.write("\t"+str(boundingBox.x1)+"\t"+str(boundingBox.y1)+"\t"+str(boundingBox.x2)+"\t"+str(boundingBox.y2)+"\t"+str(boundingBox.nms))
         response.write("\n")
