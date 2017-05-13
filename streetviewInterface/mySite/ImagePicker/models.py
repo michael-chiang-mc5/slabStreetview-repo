@@ -19,3 +19,14 @@ class StreetviewImage(models.Model):
 
     def __str__(self):
         return str("heading="+str(self.heading))
+
+class BoundingBox(models.Model):
+    streetviewImage = models.ForeignKey(StreetviewImage) # each image can have multiple bounding boxes
+    x1 = models.IntegerField()
+    x2 = models.IntegerField()
+    y1 = models.IntegerField()
+    y2 = models.IntegerField()
+    nms = models.FloatField()
+
+    def __str__(self):
+        return str([self.x1, self.y1, self.x2, self.y2])

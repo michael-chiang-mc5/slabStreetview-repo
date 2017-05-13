@@ -39,6 +39,13 @@
             <br />
             {{ streetviewImage }}
             <br />
+            ~~~~~ Bounding boxes ~~~~
+            <br />
+            {% for box in streetviewImage.boundingbox_set.all %}
+              {{ box }}
+              <br />
+            {% endfor %}
+
           </td>
 
 

@@ -53,8 +53,15 @@ sudo chmod a+r /usr/local/cuda/lib64/libcudnn*
 # at this point you should be able to make and run
 make -j && make pycaffe
 make # run in CTPN folder, NOT in caffe folder
-ssh -X -i "ssh_key.pem" ubuntu@ec2-54-215-239-2.us-west-1.compute.amazonaws.com     # to display
+ssh -X -i "ssh_key.pem" ubuntu@ec2-54-193-43-143.us-west-1.compute.amazonaws.com     # to display
 python tools/demo.py
+
+
+
+
+
+scp -i ssh_key.pem scp_files/108.jpg ubuntu@ec2-54-193-43-143.us-west-1.compute.amazonaws.com:/home/ubuntu/CTPN/demo_images
+
 
 
 

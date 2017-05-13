@@ -4,6 +4,8 @@ from .models import *
 import os
 import urllib.request
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+import ast
 
 def listImage(request):
     #return savePoint(request)
@@ -58,8 +60,36 @@ def saveImage(xdim,ydim,latitude,longitude,fov,heading,pitch,mapPoint):
     streetviewImage.image = fi # this should be set with respect to MEDIA_ROOT
     streetviewImage.save()
 
+def listTextDetectorMetadata(request):
+    streetviewImages_withoutBoundingBoxes = StreetviewImage.objects.filter(boundingbox__isnull=True)
 
+    response = HttpResponse(content_type='text/plain; charset=utf8')
+    for streetviewImage in streetviewImages_withoutBoundingBoxes:
+        response.write(str(streetviewImage.pk) + "\t")
+        response.write("http://")
+        response.write(request.META['HTTP_HOST']+"/")
+        response.write(streetviewImage.image.url)
+        response.write("\n")
 
+    return response
+
+# POST data "json-str" should be python dictionary serialized to string
+# should have fields: pk, box
+# pk is the primary key of StreetviewImage object
+# box should be (5,n)-matrix.
+# box[i] gives ith bounding box
+# box[i][j] gives x1,y1,x2,y2,nms for j=0,1,2,3,4
+@csrf_exempt
+def postBoundaryBox(request):
+    json_str = request.POST.get("json-str")
+    d = ast.literal_eval(json_str)
+    pk = d['pk'] # this is the pk of the Streetview object
+    boxes = d['box']
+    BoundingBox.objects.filter(streetviewImage=pk).delete() # delete previous bounding boxes
+    for box in boxes:
+        boundingBox = BoundingBox(streetviewImage=StreetviewImage.objects.get(pk=pk),x1=box[0], y1=box[1], x2=box[2], y2=box[3], nms=box[4])
+        boundingBox.save()
+    return HttpResponse("done")
 
 # Given GPS coordinates, return the heading value perpendicular to the road
 def index(request):
