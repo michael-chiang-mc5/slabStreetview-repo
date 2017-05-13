@@ -56,11 +56,14 @@ make # run in CTPN folder, NOT in caffe folder
 ssh -X -i "ssh_key.pem" ubuntu@ec2-54-193-43-143.us-west-1.compute.amazonaws.com     # to display
 python tools/demo.py
 
+# running python script
+scp -i ssh_key.pem scp_files/textDetector.py ubuntu@ec2-54-219-179-142.us-west-1.compute.amazonaws.com:/home/ubuntu/CTPN/tools/
 
 
 
 
-scp -i ssh_key.pem scp_files/108.jpg ubuntu@ec2-54-193-43-143.us-west-1.compute.amazonaws.com:/home/ubuntu/CTPN/demo_images
+
+
 
 
 
