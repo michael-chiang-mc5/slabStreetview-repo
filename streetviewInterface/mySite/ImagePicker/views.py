@@ -6,6 +6,8 @@ import urllib.request
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 import ast
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 def listImage(request):
     #return savePoint(request)
@@ -62,7 +64,6 @@ def saveImage(xdim,ydim,latitude,longitude,fov,heading,pitch,mapPoint):
 
 def listTextDetectorMetadata(request):
     streetviewImages_withoutBoundingBoxes = StreetviewImage.objects.filter(boundingbox__isnull=True)
-
     response = HttpResponse(content_type='text/plain; charset=utf8')
     for streetviewImage in streetviewImages_withoutBoundingBoxes:
         response.write(str(streetviewImage.pk) + "\t")
@@ -70,7 +71,16 @@ def listTextDetectorMetadata(request):
         response.write(request.META['HTTP_HOST']+"/")
         response.write(streetviewImage.image.url)
         response.write("\n")
+    return response
 
+def listBoundingBox(request):
+    boundingBoxes = BoundingBox.objects.all()
+    response = HttpResponse(content_type='text/plain; charset=utf8')
+    response.write("image_url\tx1\ty1\tx2\ty2\tnms\n")
+    for boundingBox in boundingBoxes:
+        response.write("http://"+request.META['HTTP_HOST']+"/"+boundingBox.streetviewImage.image.url)
+        response.write("\t"+str(boundingBox.x1)+"\t"+str(boundingBox.y1)+"\t"+str(boundingBox.x2)+"\t"+str(boundingBox.y2)+"\t"+str(boundingBox.nms))
+        response.write("\n")
     return response
 
 # POST data "json-str" should be python dictionary serialized to string
@@ -90,6 +100,23 @@ def postBoundaryBox(request):
         boundingBox = BoundingBox(streetviewImage=StreetviewImage.objects.get(pk=pk),x1=box[0], y1=box[1], x2=box[2], y2=box[3], nms=box[4])
         boundingBox.save()
     return HttpResponse("done")
+
+def deleteAllBoundingBox(request):
+    BoundingBox.objects.all().delete()
+    return HttpResponseRedirect(reverse('ImagePicker:adminPanel'))
+
+def deleteAllStreetviewImages(request):
+    StreetviewImage.objects.all().delete()
+    return HttpResponseRedirect(reverse('ImagePicker:adminPanel'))
+
+def deleteAllMapPoints(request):
+    MapPoint.objects.all().delete()
+    return HttpResponseRedirect(reverse('ImagePicker:adminPanel'))
+
+def adminPanel(request):
+    context = {}
+    return render(request, 'ImagePicker/adminPanel.html',context)
+
 
 # Given GPS coordinates, return the heading value perpendicular to the road
 def index(request):

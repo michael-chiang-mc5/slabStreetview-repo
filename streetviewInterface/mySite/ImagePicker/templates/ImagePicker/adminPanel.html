@@ -1,0 +1,30 @@
+{% extends "MCBase/base.html" %}
+{% load staticfiles %}
+
+{% block javascript %}
+<style>
+
+</style>
+
+{% endblock %}
+
+{% block title %}
+  List
+{% endblock %}
+
+{% block body_block %}
+  <div class="content">
+    <h1>Admin panel</h1>
+
+
+    <a href="{% url 'ImagePicker:deleteAllBoundingBox' %}">Delete bounding boxes</a>
+    <br />
+    <a href="{% url 'ImagePicker:deleteAllStreetviewImages' %}">Delete all images</a>
+    <br />
+    <a href="{% url 'ImagePicker:deleteAllMapPoints' %}">Delete all map points</a>
+
+
+
+
+  </div>
+{% endblock %}
