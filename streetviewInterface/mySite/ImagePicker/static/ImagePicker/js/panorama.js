@@ -9,6 +9,7 @@ var search_radius = 49
 
 var map;
 var panorama;
+var panorama2;
 var sv
 
 var latitude_val
@@ -22,6 +23,7 @@ function initMap() {
 
 
   panorama = new google.maps.StreetViewPanorama(document.getElementById("pano"));
+  panorama2 = new google.maps.StreetViewPanorama(document.getElementById("pano2"));
 
   // Set the initial Street View camera to the center of the map
   sv.getPanorama(
@@ -84,6 +86,11 @@ function initMap() {
         pitch: 0,
         zoom: 1
     });
+    panorama2.setPov({
+        heading: photographerHeading_val - 90,
+        pitch: 0,
+        zoom: 1
+    });
   });
 
 }
@@ -102,6 +109,9 @@ function processSVData(data, status) {
 
     panorama.setPano(data.location.pano);
     panorama.setVisible(true);
+    panorama2.setPano(data.location.pano);
+    panorama2.setVisible(true);
+
 
     // This shows view if marker is clicked
     /*
