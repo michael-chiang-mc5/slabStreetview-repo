@@ -21,6 +21,8 @@ def listImage(request):
 # downloads associated streetview images to point and saves streetviewImage (2 per mapPoint for right and left)
 def savePoint(request):
     #url = "http://maps.googleapis.com/maps/api/streetview?size=640x640&location=42.34554965704973,-71.09832376428187&fov=90&heading=270.0&pitch=0.0&key=AIzaSyBrwkUADkwqTvlC-HbKC_jZuqC3xBxUNLo"
+    #url = "http://maps.googleapis.com/maps/api/streetview?size=640x640&location=34.14583813149605,-118.13731629652199&fov=90&heading=179.3621063232422&pitch=0.0&key=AIzaSyBrwkUADkwqTvlC-HbKC_jZuqC3xBxUNLo"
+
     #savLoc = "/Users/mcah5a/Desktop/projects/slabStreetview-repo/streetviewInterface/mySite/media/"
     #fi = "1.jpg"
     #data = urllib.request.urlretrieve(url, os.path.join(savLoc,fi))
@@ -38,8 +40,8 @@ def savePoint(request):
 
 
     xdim = 640
-    ydim = 400
-    fov=140
+    ydim = 640
+    fov=22.5
     pitch=0
 
     saveImage(xdim,ydim,latitude,longitude,fov,photographerHeading+90,pitch,mapPoint)

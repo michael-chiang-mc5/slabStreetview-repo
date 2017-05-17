@@ -84,12 +84,12 @@ function initMap() {
     panorama.setPov({
         heading: photographerHeading_val + 90,
         pitch: 0,
-        zoom: 1
+        zoom: 2
     });
     panorama2.setPov({
         heading: photographerHeading_val - 90,
         pitch: 0,
-        zoom: 1
+        zoom: 3
     });
   });
 
