@@ -10,6 +10,8 @@ from utils.timer import Timer
 
 NET_DEF_FILE="models/deploy.prototxt"
 MODEL_FILE="models/ctpn_trained_model.caffemodel"
+scaling_method = 2
+
 
 caffe.set_mode_gpu()
 caffe.set_device(cfg.TEST_GPU_ID)
@@ -34,15 +36,14 @@ for line in data: # each line is pk, image_url
     im=cv2.imread(image_save_path)
     dimy = im.shape[0]
     dimx = im.shape[1]
-    im, f=resize_im(im, cfg.SCALE, cfg.MAX_SCALE)
-    text_lines=text_detector.detect(im)
 
-    # get resize scaling factor
-    scale = cfg.SCALE
-    max_scale = cfg.MAX_SCALE
-    f=float(scale)/min(dimy, dimx)
-    if max_scale!=None and f*max(dimy, dimx)>max_scale:
-        f=float(max_scale)/max(dimy, dimx)
+    if scaling_method == 1:
+        im, f=resize_im(im, cfg.SCALE, cfg.MAX_SCALE)
+    elif scaling_method == 2:
+        f=1.2
+        im=cv2.resize(im, (0, 0), fx=f, fy=f)
+
+    text_lines=text_detector.detect(im)
 
     # apply scaling factor
     for i in range(len(text_lines)):

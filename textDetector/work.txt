@@ -30,7 +30,7 @@ WITH_PYTHON_LAYER := 1   # uncomment
 CUDNN := 1 # uncomment
 
 # installing CUDA
-sudo apt-get -y dist-upgrade  
+sudo apt-get -y dist-upgrade
 sudo apt-get install -y gcc g++ gfortran build-essential git wget linux-image-generic libopenblas-dev python-dev python-pip python-nose python-numpy python-scipy python3-dev python3-pip python3-nose python3-numpy python3-scipy
 
 
@@ -57,8 +57,8 @@ ssh -X -i "ssh_key.pem" ubuntu@ec2-54-193-43-143.us-west-1.compute.amazonaws.com
 python tools/demo.py
 
 # running python script
-scp -i ssh_key.pem scp_files/textDetector.py ubuntu@ec2-54-219-179-142.us-west-1.compute.amazonaws.com:/home/ubuntu/CTPN/tools/
-
+scp -i ssh_key.pem scp_files/textDetector.py ubuntu@ec2-54-183-230-146.us-west-1.compute.amazonaws.com:/home/ubuntu/CTPN/tools/
+scp -i ssh_key.pem scp_files/cfg.py ubuntu@ec2-54-183-230-146.us-west-1.compute.amazonaws.com:/home/ubuntu/CTPN/tools/
 
 
 
