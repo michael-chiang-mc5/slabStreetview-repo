@@ -88,6 +88,22 @@ def listTextDetectorMetadata(request):
 
 def listBoundingBox(request):
     boundingBoxes = BoundingBox.objects.all()
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(boundingBoxes, 100)
+    try:
+        boundingBoxes_page = paginator.page(page)
+    except PageNotAnInteger:
+        boundingBoxes_page = paginator.page(1)
+    except EmptyPage:
+        boundingBoxes_page = paginator.page(paginator.num_pages)
+
+    context = {'boundingBoxes':boundingBoxes_page}
+
+    return render(request, 'ImagePicker/listBoundingBox.html',context)
+
+def listBoundingBoxMetadata(request):
+    boundingBoxes = BoundingBox.objects.all()
     response = HttpResponse(content_type='text/plain; charset=utf8')
     response.write("pk\timage_url\tx1\ty1\tx2\ty2\tnms\n")
     for boundingBox in boundingBoxes:
