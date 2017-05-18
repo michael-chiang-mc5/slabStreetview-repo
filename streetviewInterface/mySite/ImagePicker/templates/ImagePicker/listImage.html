@@ -47,6 +47,28 @@
   <div class="content">
     <h1>List of all images</h1>
 
+    <!-- Paginator -->
+    {% if streetviewImages.has_other_pages %}
+      <ul class="pagination">
+        {% if streetviewImages.has_previous %}
+          <li><a href="?page={{ streetviewImages.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in streetviewImages.paginator.page_range %}
+          {% if streetviewImages.number == i %}
+            <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+          {% else %}
+            <li><a href="?page={{ i }}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if streetviewImages.has_next %}
+          <li><a href="?page={{ streetviewImages.next_page_number }}">&raquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+      </ul>
+    {% endif %}
 
 
 
@@ -94,6 +116,28 @@
 
 
 
+    <!-- Paginator -->
+    {% if streetviewImages.has_other_pages %}
+      <ul class="pagination">
+        {% if streetviewImages.has_previous %}
+          <li><a href="?page={{ streetviewImages.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in streetviewImages.paginator.page_range %}
+          {% if streetviewImages.number == i %}
+            <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+          {% else %}
+            <li><a href="?page={{ i }}">{{ i }}</a></li>
+          {% endif %}
+        {% endfor %}
+        {% if streetviewImages.has_next %}
+          <li><a href="?page={{ streetviewImages.next_page_number }}">&raquo;</a></li>
+        {% else %}
+          <li class="disabled"><span>&raquo;</span></li>
+        {% endif %}
+      </ul>
+    {% endif %}
 
   </div>
 {% endblock %}

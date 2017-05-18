@@ -8,12 +8,23 @@ from django.views.decorators.csrf import csrf_exempt
 import ast
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def listImage(request):
     #return savePoint(request)
     streetviewImages = StreetviewImage.objects.all()
-    context = {'streetviewImages':streetviewImages}
-    #return HttpResponse("asdf")
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(streetviewImages, 10)
+    try:
+        streetviewImages_page = paginator.page(page)
+    except PageNotAnInteger:
+        streetviewImages_page = paginator.page(1)
+    except EmptyPage:
+        streetviewImages_page = paginator.page(paginator.num_pages)
+
+    context = {'streetviewImages':streetviewImages_page}
+
     return render(request, 'ImagePicker/listImage.html',context)
 
 # Takes POST data
