@@ -94,8 +94,11 @@
             <br />
             {{ streetviewImage.mapPoint }}
             <br />
+            panoID = {{ streetviewImage.mapPoint.panoID }}
+            <br />
             {{ streetviewImage }}
             <br />
+            <br />            
             ~~~~~ Bounding boxes ~~~~
             <br />
             {% for box in streetviewImage.boundingbox_set.all %}

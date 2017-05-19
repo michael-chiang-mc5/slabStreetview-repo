@@ -64,6 +64,7 @@ function initMap() {
     // an alternative method of getting heading is panorama.getPhotographerPov()
     //photographerHeading_val = links[0].heading;
     photographerHeading_val = panorama.getPhotographerPov().heading;
+    panoID_val = panorama.getPano();
 
     // TODO: ajax call with latitude_val, longitude_val, heading_val
     $.ajax({
@@ -72,6 +73,7 @@ function initMap() {
       data        : {'photographerHeading':photographerHeading_val,
                      'latitude':latitude_val,
                      'longitude':longitude_val,
+                     'panoID':panoID_val,
                      'csrfmiddlewaretoken':csrf_token}, // our data object
       success: function(data, textStatus, jqXHR) {
       },

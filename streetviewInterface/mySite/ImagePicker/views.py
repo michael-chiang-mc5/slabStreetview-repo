@@ -43,9 +43,11 @@ def savePoint(request):
 
     latitude = float(request.POST.get("latitude"))
     longitude = float(request.POST.get("longitude"))
+    panoID = str(request.POST.get("panoID"))
     photographerHeading = float(request.POST.get("photographerHeading"))
     mapPoint = MapPoint(latitude=latitude, \
                         longitude=longitude, \
+                        panoID=panoID, \
                         photographerHeading=photographerHeading)
     mapPoint.save()
 
