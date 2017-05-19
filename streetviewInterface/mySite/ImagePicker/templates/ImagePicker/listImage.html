@@ -1,13 +1,11 @@
-{% extends "MCBase/base.html" %}
+{% extends "MCBase/base-extended.html" %}
 {% load staticfiles %}
 
 {% block javascript %}
 <style>
   .image_container {
-      border: 1px solid #DDDDDD;
-      width: 640px;
-      height: 640px;
       position:relative;
+      margin-bottom: 20px;
   }
   .tag {
       float: left;
@@ -84,7 +82,7 @@
               {% for box in streetviewImage.boundingbox_set.all %}
                 <div style="left:{{ box.x1 }}px;top:{{ box.y1 }};width:{{ box.width }}px;height:{{ box.height }}px" class="tag"></div>
               {% endfor %}
-              <img class="grayscale" src="/{{ streetviewImage.image.url }}" width="640" height="640" >
+              <img class="grayscale" src="/{{ streetviewImage.image.url }}" width="{{ streetviewImage.image.width }}" height="{{ streetviewImage.image.height }}" >
             </div>
           </td>
 
@@ -98,7 +96,7 @@
             <br />
             {{ streetviewImage }}
             <br />
-            <br />            
+            <br />
             ~~~~~ Bounding boxes ~~~~
             <br />
             {% for box in streetviewImage.boundingbox_set.all %}
