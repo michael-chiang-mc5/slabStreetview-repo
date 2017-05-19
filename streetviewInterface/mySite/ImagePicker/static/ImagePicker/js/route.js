@@ -106,13 +106,34 @@ function initMap() {
 
     mapPoint_count++
 
-    if (distanceGPS(panorama.location.latLng,end_latLng) > search_radius ) {
-      panorama.setPano(links[best_i].pano);
-      panorama.setVisible(true);
-    } else {
-      $("#distance-traveled").html("Distance: "+ distanceGPS(panorama.location.latLng,start_latLng)+" meters")
-      $("#points-saved").html("MapPoints saved: "+ mapPoint_count)
-    }
+    $.ajax({
+      type        : 'POST',
+      url         : '/ImagePicker/savePoint/',
+      data        : {'photographerHeading':photographerHeading_val,
+                     'latitude':panorama.location.latLng.lat(),
+                     'longitude':panorama.location.latLng.lng(),
+                     'panoID':panoID_val,
+                     'csrfmiddlewaretoken':csrf_token}, // our data object
+      success: function(data, textStatus, jqXHR) {
+        if (distanceGPS(panorama.location.latLng,end_latLng) > search_radius ) {
+          panorama.setPano(links[best_i].pano);
+          panorama.setVisible(true);
+        } else {
+          $("#distance-traveled").html("Distance: "+ distanceGPS(panorama.location.latLng,start_latLng)+" meters")
+          $("#points-saved").html("MapPoints saved: "+ mapPoint_count)
+        }
+
+
+
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        alert("image was not saved")
+      }
+    });
+
+
+
+
 
 
 
