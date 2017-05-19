@@ -155,3 +155,8 @@ def index(request):
     mapPoints = MapPoint.objects.all()
     context = {'mapPoints':mapPoints}
     return render(request, 'ImagePicker/panorama.html',context)
+
+def routePicker(request):
+    mapPoints = MapPoint.objects.all()
+    context = {'mapPoints':mapPoints}
+    return render(request, 'ImagePicker/route.html',context)

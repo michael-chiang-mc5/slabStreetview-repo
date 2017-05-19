@@ -26,6 +26,7 @@ function initMap() {
   panorama2 = new google.maps.StreetViewPanorama(document.getElementById("pano2"));
 
   // Set the initial Street View camera to the center of the map
+  // TODO don't think I need this
   sv.getPanorama(
     {location: usc, radius: search_radius}
   );

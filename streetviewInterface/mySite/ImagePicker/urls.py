@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     url(r'^picker/$', views.index, name='index'),
+    url(r'^routePicker/$', views.routePicker, name='routePicker'),    
     url(r'^savePoint/$', views.savePoint, name='savePoint'),
     url(r'^listImage/$',  views.listImage, name='listImage'), #
     url(r'^listTextDetectorMetadata/$',  views.listTextDetectorMetadata, name='listTextDetectorMetadata'), #

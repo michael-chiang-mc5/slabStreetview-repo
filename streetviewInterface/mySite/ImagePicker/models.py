@@ -5,7 +5,7 @@ class MapPoint(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     photographerHeading = models.FloatField()
-    panoID = models.TextField()
+    panoID = models.TextField() # unstable across browser sessions
     def __str__(self):
         return str('lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))
 

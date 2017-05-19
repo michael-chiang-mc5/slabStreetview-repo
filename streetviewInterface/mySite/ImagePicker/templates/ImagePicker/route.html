@@ -1,0 +1,88 @@
+<!-- see: https://developers.google.com/maps/documentation/javascript/examples/streetview-events -->
+
+
+
+{% extends "MCBase/base-extended.html" %}
+{% load staticfiles %}
+
+{% block javascript %}
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #pano, #pano1, #pano2 {
+      width: 100%;
+      height: 100%;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+
+  <script>
+    csrf_token = "{{ csrf_token }}";
+
+    var initial_mapPoints = []
+    {% for mapPoint in mapPoints %}
+      initial_mapPoints[{{ forloop.counter }} - 1] = {  lat:{{ mapPoint.latitude }},
+                                                        lng:{{ mapPoint.longitude }}  }
+    {% endfor %}
+  </script>
+
+  {% for mapPoint in mapPoints %}
+  {% endfor %}
+
+  <script src="{% static 'ImagePicker/js/route.js' %}"></script>
+
+{% endblock %}
+
+{% block title %}
+  panorama
+{% endblock %}
+
+{% block body_block %}
+
+<table style="width:100%;height:85%">
+  <tr>
+    <td style="width:75%">  <div id="map"></div></td>
+    <td>
+      <table style="width:100%;height:100%">
+        <tr> <td>
+          Left-click to set start coordinates. Right-click to set end coordinates.
+          <br /> <br />
+          <input type="radio" name="route_point" id="radio_start" checked="checked"><span id="start_latLng">Start: EMPTY</span></input>
+          <br />
+          <input type="radio" name="route_point" id="radio_end"><span id="end_latLng">End: EMPTY</span></input>
+
+          <br /> <br />
+
+          <button id="calculate_route" type="button">Calculate route!</button>
+
+          <div id="distance-traveled">Distance: EMPTY</div>
+          <div id="points-saved">MapPoints: EMPTY</div>
+
+        </td></tr>
+        <tr> <td><div id="pano"></div></td></tr>
+      </table>
+    </td>
+  </tr>
+
+</table>
+
+
+
+
+
+  <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrwkUADkwqTvlC-HbKC_jZuqC3xBxUNLo&callback=initMap"
+      async defer>
+  </script>
+
+
+
+{% endblock %}
