@@ -65,7 +65,15 @@
 
           <!-- info -->
           <td>
-            original image: {{ boundingBox.streetviewImage.image.url }}
+            <p>
+              original image: {{ boundingBox.streetviewImage.image.url }}
+            </p>
+            <p>
+              OCR: <br />
+              {% for ocrText in boundingBox.ocrtext_set.all %}
+                {{ ocrText }}
+              {% endfor %}
+            </p>
           </td>
 
 

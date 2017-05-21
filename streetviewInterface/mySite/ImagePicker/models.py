@@ -34,3 +34,10 @@ class BoundingBox(models.Model):
         return self.x2 - self.x1
     def height(self):
         return self.y2 - self.y1
+
+class OcrText(models.Model):
+    boundingBox = models.ForeignKey(BoundingBox) # each image can have multiple bounding boxes
+    method = models.TextField()
+    text = models.TextField()
+    def __str__(self):
+        return str(self.method)+': '+str(self.text)
