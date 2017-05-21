@@ -91,6 +91,11 @@ def saveConcatImage(xdim,ydim,latitude,longitude,fov,heading,pitch,mapPoint):
     I_concatenate = concatenateImage(I_concatenate,I4,'right')
     I_concatenate = concatenateImage(I_concatenate,I5,'right')
 
+    # crop x-dimension ( 3600x620  to 2500x620    ) so that textDetector doesn't run out of memory
+    final_dimx = 2500
+    width, height = I_concatenate.size
+    I_concatenate = I_concatenate.crop((    round(width/2- final_dimx/2) , 0, round(width/2+ final_dimx/2), height))
+
     # save StreetviewImage object
     streetviewImage = StreetviewImage(mapPoint=mapPoint, \
                                            heading=heading, \
