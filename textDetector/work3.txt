@@ -1,0 +1,175 @@
+#!/bin/bash
+
+mkdir lib
+sudo apt-get update
+sudo apt-get install git
+git clone https://github.com/tianzhi0549/CTPN.git
+sudo apt-get -y install libprotobuf-dev libleveldb-dev libsnappy-dev libopencv-dev libhdf5-serial-dev protobuf-compiler
+sudo apt-get -y install --no-install-recommends libboost-all-dev
+sudo apt-get -y install libatlas-base-dev
+sudo apt-get -y install python-dev # the?
+sudo apt-get -y install libgflags-dev libgoogle-glog-dev liblmdb-dev
+sudo apt-get -y install python-pip
+sudo pip install numpy
+sudo pip install Cython
+sudo apt-get -y install cmake # this should be v3.4
+sudo apt-get -y install libreadline-dev
+sudo apt-get install -y linux-source linux-image-extra-`uname -r` linux-headers-`uname -r` linux-image-`uname -r`
+sudo apt-get -y dist-upgrade
+sudo apt-get install -y gcc g++ gfortran build-essential git wget linux-image-generic libopenblas-dev python-dev python-pip python-nose python-numpy python-scipy python3-dev python3-pip python3-nose python3-numpy python3-scipy
+sudo apt-get -y install luajit
+sudo apt-get -y install zip unzip
+sudo apt-get install -y git curl wget g++ automake autoconf autoconf-archive libtool libboost-all-dev libevent-dev libdouble-conversion-dev libgoogle-glog-dev libgflags-dev liblz4-dev liblzma-dev libsnappy-dev make zlib1g-dev binutils-dev libjemalloc-dev $extra_packages flex bison libkrb5-dev libsasl2-dev libnuma-dev pkg-config libssl-dev libedit-dev libmatio-dev libpython-dev libpython3-dev python-numpy
+sudo apt-get install liblapack-dev
+sudo apt-get install liblmdb-dev
+
+# update gcc
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt-get update
+sudo apt-get install gcc-4.9 g++-4.9
+sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.9
+
+
+# install cuda
+cd ~/lib
+sudo wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/cuda-repo-ubuntu1404_7.0-28_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu1404_7.0-28_amd64.deb
+sudo apt-get update
+sudo apt-get install -y cuda
+echo -e "\nexport PATH=/usr/local/cuda/bin:$PATH\n\nexport LD_LIBRARY_PATH=/usr/local/cuda/lib64" >> ~/.bashrc
+cd ~/
+
+# Install CUDNN
+# Need to copy in
+# scp -i ssh_key.pem scp_files/cudnn-7.0-linux-x64-v3.0.8-prod.tgz ubuntu@ec2-54-241-155-127.us-west-1.compute.amazonaws.com:~/lib
+cd ~/lib
+tar -zxvf cudnn-7.0-linux-x64-v3.0.8-prod.tgz && mv cuda cudnn_v3
+cd cudnn_v3
+sudo cp -P include/cudnn.h /usr/local/cuda/include/cudnn.h
+sudo cp -P lib64/libcudnn* /usr/local/cuda/lib64/
+sudo chmod a+r /usr/local/cuda/lib64/libcudnn*
+cd ~/
+
+# install torch.
+# confirm installation with th
+cd ~/lib
+git clone https://github.com/torch/distro.git torch/ --recursive
+cd torch/; bash install-deps;
+./install.sh
+source ~/.bashrc
+cd ~/
+
+# cmake 3.4
+# More info https://www.claudiokuenzler.com/blog/611/installing-cmake-3.4.1-ubuntu-14.04-trusty-using-alternatives
+cd ~/lib
+wget http://www.cmake.org/files/v3.4/cmake-3.4.1.tar.gz
+tar -xvzf cmake-3.4.1.tar.gz
+cd cmake-3.4.1/
+./configure
+make
+sudo make install
+sudo update-alternatives --install /usr/bin/cmake cmake /usr/local/bin/cmake 1 --force
+cd ~/
+
+# mstch
+# need cmake 3.4
+cd ~/lib
+git clone https://github.com/no1msd/mstch
+cd mstch/
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+cd ~/
+
+
+
+# zstd
+cd ~/lib
+wget https://github.com/facebook/zstd/archive/v1.0.0.tar.gz
+tar -xvf v1.0.0.tar.gz
+cd zstd-1.0.0
+sudo make install
+cd ~/
+
+3) Install fblualib
+cd ~/lib
+git clone -b v0.35.0  --depth 1 https://github.com/facebook/folly
+git clone -b v0.24.0  --depth 1 https://github.com/facebook/fbthrift
+git clone -b v1.0 https://github.com/facebook/thpp
+git clone -b v1.0 https://github.com/facebook/fblualib
+
+# make folly
+cd ~/lib/folly/folly
+autoreconf -ivf
+./configure
+make
+sudo make install
+sudo ldconfig # reload the lib paths after freshly installed folly. fbthrift needs it.
+cd ~/
+
+# make thrift
+cd ~/lib/fbthrift/thrift
+autoreconf -ivf
+./configure
+make
+sudo make install
+
+# Compile thpp
+# For error:     Invalid gtest-1.7.0.zip file
+#    Make the changes described here: https://github.com/facebook/thpp/commit/953baf6f0ab1011642e105b9ca4a6db9d565d2f3
+# For error: /home/ubuntu/lib/thpp/thpp/../thpp/detail/TensorGeneric.h:191:50: error: too few arguments to function ‘void THFloatTensor_max(THFloatTensor*, THLongTensor*, THFloatTensor*, int, int)’
+#    Edit /home/ubuntu/lib/thpp/thpp/detail/TensorGeneric.h
+#    Add "1" to _max, _min, _sum, _prod
+cd ~/lib/thpp/thpp
+./build.sh
+
+# Compile fblualib
+cd ~/lib/fblualib/fblualib
+./build.sh
+cd ~/
+
+# Install crnn
+# Move model
+#    scp -i ssh_key.pem scp_files/crnn_demo_model.t7 ubuntu@ec2-54-241-155-127.us-west-1.compute.amazonaws.com:~/crnn/model/crnn_demo
+# Need cudnn 7.1
+#    scp -i ssh_key.pem scp_files/cudnn-7.5-linux-x64-v5.1.tgz ubuntu@ec2-54-241-155-127.us-west-1.compute.amazonaws.com:~/lib
+
+cd ~/lib
+tar -zxvf cudnn-7.5-linux-x64-v5.1.tgz && mv cuda cudnn_v5
+cd cudnn_v5
+sudo cp -P include/cudnn.h /usr/local/cuda/include/cudnn.h
+sudo cp -P lib64/libcudnn* /usr/local/cuda/lib64/
+sudo chmod a+r /usr/local/cuda/lib64/libcudnn*
+cd ~/
+
+
+ln -s ~/lib/torch/ ~/torch
+luarocks install cutorch # CUDA support for torc, generates libTHC.so
+luarocks install cunn # CUDA neural net?
+luarocks install cudnn # cudnn support for torch
+
+
+cd ~/
+git clone https://github.com/bgshih/crnn.git
+cd ~/crnn/src
+
+scp -r -i ssh_key.pem scp_files/test_images/ ubuntu@ec2-54-241-155-127.us-west-1.compute.amazonaws.com:~/crnn/data/
+
+
+#########
+## Might need this later
+######
+# sudo apt-get install -y libprotobuf-dev
+# sudo apt-get install libhdf5-serial-dev
+# luarocks install hdf5 # for processing .h5 files.
+# luarocks install loadcaffe
+# luarocks install torch # this might be needed
+#
+#
+##########
+## Get alias running in shell
+###########
+# shopt -s expand_aliases
+# alias sudo='sudo -E env "PATH=$PATH"' # see https://github.com/facebook/fblualib/issues/59, sudo: luarocks: command not found

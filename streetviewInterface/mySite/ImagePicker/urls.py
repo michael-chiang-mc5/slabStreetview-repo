@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     url(r'^picker/$', views.index, name='index'),
-    url(r'^routePicker/$', views.routePicker, name='routePicker'),    
+    url(r'^routePicker/$', views.routePicker, name='routePicker'),
     url(r'^savePoint/$', views.savePoint, name='savePoint'),
     url(r'^listImage/$',  views.listImage, name='listImage'), #
     url(r'^listTextDetectorMetadata/$',  views.listTextDetectorMetadata, name='listTextDetectorMetadata'), #
@@ -16,4 +16,5 @@ urlpatterns = [
     url(r'^deleteAllMapPoints/$',  views.deleteAllMapPoints, name='deleteAllMapPoints'), #
     url(r'^adminPanel/$',  views.adminPanel, name='adminPanel'), #
 
+    url(r'^boundingBox/(?P<boundingBox_pk>[0-9]+)/$',  views.boundingBox, name='boundingBox'), #
 ]
