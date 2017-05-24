@@ -9,7 +9,8 @@ urlpatterns = [
     url(r'^listTextDetectorMetadata/$',  views.listTextDetectorMetadata, name='listTextDetectorMetadata'), #
     url(r'^listBoundingBoxMetadata/$',  views.listBoundingBoxMetadata, name='listBoundingBoxMetadata'), #
     url(r'^listBoundingBox/$',  views.listBoundingBox, name='listBoundingBox'), #
-    url(r'^postBoundaryBox/$',  views.postBoundaryBox, name='postBoundaryBox'), #
+    url(r'^postBoundingBox/$',  views.postBoundingBox, name='postBoundingBox'),
+    url(r'^postOCR/$',  views.postOCR, name='postOCR'), #
 
     url(r'^deleteAllBoundingBox/$',  views.deleteAllBoundingBox, name='deleteAllBoundingBox'), #
     url(r'^deleteAllStreetviewImages/$',  views.deleteAllStreetviewImages, name='deleteAllStreetviewImages'), #

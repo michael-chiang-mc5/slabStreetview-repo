@@ -39,5 +39,6 @@ class OcrText(models.Model):
     boundingBox = models.ForeignKey(BoundingBox) # each image can have multiple bounding boxes
     method = models.TextField()
     text = models.TextField()
+    notes = models.TextField(blank=True)
     def __str__(self):
         return str(self.method)+': '+str(self.text)

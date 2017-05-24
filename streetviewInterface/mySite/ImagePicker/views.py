@@ -229,13 +229,29 @@ def listBoundingBox(request):
 def listBoundingBoxMetadata(request):
     boundingBoxes = BoundingBox.objects.all()
     response = HttpResponse(content_type='text/plain; charset=utf8')
-    response.write("pk\timage_url\tx1\ty1\tx2\ty2\tnms\n")
+    response.write("pk\timage_url")
+    #response.write("\tx1\ty1\tx2\ty2\tnms")
+    response.write("\n")
     for boundingBox in boundingBoxes:
         response.write(str(boundingBox.streetviewImage.pk)+"\t")
-        response.write("http://"+request.META['HTTP_HOST']+"/"+boundingBox.streetviewImage.image.url)
-        response.write("\t"+str(boundingBox.x1)+"\t"+str(boundingBox.y1)+"\t"+str(boundingBox.x2)+"\t"+str(boundingBox.y2)+"\t"+str(boundingBox.nms))
+        #response.write("http://"+request.META['HTTP_HOST']+"/"+boundingBox.streetviewImage.image.url)
+        response.write("http://"+request.META['HTTP_HOST']+reverse('ImagePicker:boundingBox', args=(boundingBox.pk,)))
+        #response.write("\t"+str(boundingBox.x1)+"\t"+str(boundingBox.y1)+"\t"+str(boundingBox.x2)+"\t"+str(boundingBox.y2)+"\t"+str(boundingBox.nms))
         response.write("\n")
     return response
+
+@csrf_exempt
+def postOCR(request):
+    json_str = request.POST.get("json-str")
+    d = ast.literal_eval(json_str)
+    pk = d['pk'] # this is the pk of the boundingBox object
+    method = d['method']
+    text = d['text']
+    notes = d['notes']
+    OcrText.objects.filter(boundingBox=pk,method=method).delete() # delete previous results
+    ocrText = OcrText(boundingBox=BoundingBox.objects.get(pk=pk),method=method,text=text,notes='')
+    ocrText.save()
+    return HttpResponse("done")
 
 # POST data "json-str" should be python dictionary serialized to string
 # should have fields: pk, box
@@ -244,7 +260,7 @@ def listBoundingBoxMetadata(request):
 # box[i] gives ith bounding box
 # box[i][j] gives x1,y1,x2,y2,nms for j=0,1,2,3,4
 @csrf_exempt
-def postBoundaryBox(request):
+def postBoundingBox(request):
     json_str = request.POST.get("json-str")
     d = ast.literal_eval(json_str)
     pk = d['pk'] # this is the pk of the Streetview object
