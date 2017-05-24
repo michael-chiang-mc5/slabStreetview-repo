@@ -230,7 +230,7 @@ def listBoundingBoxMetadata(request):
     boundingBoxes = BoundingBox.objects.all()
     response = HttpResponse(content_type='text/plain; charset=utf8')
     for boundingBox in boundingBoxes:
-        response.write(str(boundingBox.streetviewImage.pk)+"\t")
+        response.write(str(boundingBox.pk)+"\t")
         #response.write("http://"+request.META['HTTP_HOST']+"/"+boundingBox.streetviewImage.image.url)
         response.write("http://"+request.META['HTTP_HOST']+reverse('ImagePicker:boundingBox', args=(boundingBox.pk,)))
         #response.write("\t"+str(boundingBox.x1)+"\t"+str(boundingBox.y1)+"\t"+str(boundingBox.x2)+"\t"+str(boundingBox.y2)+"\t"+str(boundingBox.nms))
