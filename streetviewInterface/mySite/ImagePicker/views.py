@@ -229,9 +229,6 @@ def listBoundingBox(request):
 def listBoundingBoxMetadata(request):
     boundingBoxes = BoundingBox.objects.all()
     response = HttpResponse(content_type='text/plain; charset=utf8')
-    response.write("pk\timage_url")
-    #response.write("\tx1\ty1\tx2\ty2\tnms")
-    response.write("\n")
     for boundingBox in boundingBoxes:
         response.write(str(boundingBox.streetviewImage.pk)+"\t")
         #response.write("http://"+request.META['HTTP_HOST']+"/"+boundingBox.streetviewImage.image.url)
