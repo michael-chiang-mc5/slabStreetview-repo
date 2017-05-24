@@ -210,7 +210,7 @@ def listTextDetectorMetadata(request):
         response.write("\n")
     return response
 
-def listBoundingBox(request):
+def listBoundingBox(request): # TODO: make urls to cropped image 
     boundingBoxes = BoundingBox.objects.all()
 
     page = request.GET.get('page', 1)

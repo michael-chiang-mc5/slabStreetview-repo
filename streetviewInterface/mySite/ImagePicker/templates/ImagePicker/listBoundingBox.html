@@ -71,7 +71,8 @@
             <p>
               OCR: <br />
               {% for ocrText in boundingBox.ocrtext_set.all %}
-                {{ ocrText }}
+                text = {{ ocrText.text }} <br />
+                notes = {{ ocrText.notes }}
               {% endfor %}
             </p>
           </td>
