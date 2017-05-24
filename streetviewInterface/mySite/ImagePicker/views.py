@@ -210,7 +210,7 @@ def listTextDetectorMetadata(request):
         response.write("\n")
     return response
 
-def listBoundingBox(request): # TODO: make urls to cropped image 
+def listBoundingBox(request): # TODO: make urls to cropped image
     boundingBoxes = BoundingBox.objects.all()
 
     page = request.GET.get('page', 1)
@@ -246,7 +246,7 @@ def postOCR(request):
     text = d['text']
     notes = d['notes']
     OcrText.objects.filter(boundingBox=pk,method=method).delete() # delete previous results
-    ocrText = OcrText(boundingBox=BoundingBox.objects.get(pk=pk),method=method,text=text,notes='')
+    ocrText = OcrText(boundingBox=BoundingBox.objects.get(pk=pk),method=method,text=text,notes=notes)
     ocrText.save()
     return HttpResponse("done")
 

@@ -69,12 +69,10 @@
               original image: {{ boundingBox.streetviewImage.image.url }}
             </p>
             <p>
-              OCR: <br />
-              {% for ocrText in boundingBox.ocrtext_set.all %}
-                text = {{ ocrText.text }} <br />
-                notes = {{ ocrText.notes }}
-              {% endfor %}
-            </p>
+              OCR: {{ boundingBox.ocrtext_set.all.first.method }}<br />
+              text: {{ boundingBox.ocrtext_set.all.first.text }}<br />
+              notes: {{ boundingBox.ocrtext_set.all.first.notes }}<br />
+          </p>
           </td>
 
 
