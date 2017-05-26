@@ -123,7 +123,7 @@ function initMap() {
       success: function(data, textStatus, jqXHR) {
         if (distanceGPS(panorama.location.latLng,end_latLng) > search_radius ) {
           panorama.setPano(links[best_i].pano);
-          panorama.setVisible(true);
+          //panorama.setVisible(true);
         } else {
           $("#distance-traveled").html("Distance: "+ distanceGPS(panorama.location.latLng,start_latLng)+" meters")
           $("#points-saved").html("MapPoints saved: "+ mapPoint_count)
@@ -215,7 +215,7 @@ function processSVData(data, status) {
     latitude_val = data.location.latLng.lat()
     longitude_val = data.location.latLng.lng()
     panorama.setPano(data.location.pano);
-    panorama.setVisible(true);
+    //panorama.setVisible(true);
 
 
   } else {
