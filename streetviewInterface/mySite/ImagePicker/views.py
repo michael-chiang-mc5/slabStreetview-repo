@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from PIL import Image
 from math import sqrt
+from collections import Counter, defaultdict
 
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
@@ -63,16 +64,22 @@ def savePoint(request):
     mapPoint.save()
 
 
-    xdim = 640
-    ydim = 640
-    fov_right=35
-    fov_left=22.5
-    pitch=0
-
-    saveConcatImage(xdim,ydim,latitude,longitude,fov_right,photographerHeading+90,pitch,mapPoint)
-    saveConcatImage(xdim,ydim,latitude,longitude,fov_left,photographerHeading-90,pitch,mapPoint)
+    #xdim = 640
+    #ydim = 640
+    #fov_right=35
+    #fov_left=22.5
+    #pitch=0
+    #saveConcatImage(xdim,ydim,latitude,longitude,fov_right,photographerHeading+90,pitch,mapPoint)
+    #saveConcatImage(xdim,ydim,latitude,longitude,fov_left,photographerHeading-90,pitch,mapPoint)
 
     return HttpResponse("done")
+
+
+
+
+
+
+
 
 def saveConcatImage(xdim,ydim,latitude,longitude,fov,heading,pitch,mapPoint):
     saveImage2(xdim,ydim,latitude,longitude,fov,heading-(2*fov-0.5),pitch,'temp1.jpg')
@@ -118,7 +125,7 @@ def saveConcatImage(xdim,ydim,latitude,longitude,fov,heading,pitch,mapPoint):
     #
     streetviewImage.image = fi # this should be set with respect to MEDIA_ROOT
     streetviewImage.save()
-
+    return
 
 def concatenateImage(I_left, I_right, shiftRightOrLeft):
     # get column of right-most pixels for I_left and left-most pixels for I_right
@@ -284,9 +291,59 @@ def adminPanel(request):
     context = {}
     return render(request, 'ImagePicker/adminPanel.html',context)
 
+def deleteDuplicateMapPoints(request):
+    # get values of duplicate panoID
+    #mapPoints = MapPoint.objects.all()
+    #list_str = mapPoints.values_list('panoID')
+    #duplicate = [k for k,v in Counter(list_str).items() if v>1]
+
+    # delete duplicates
+    for panoID in MapPoint.objects.values_list('panoID', flat=True).distinct():
+        MapPoint.objects.filter(pk__in=MapPoint.objects.filter(panoID=panoID).values_list('id', flat=True)[1:]).delete()
+    context = {}
+    return render(request, 'ImagePicker/adminPanel.html',context)
+
+def saveImages(request):
+
+    # get mapPoints without corresponding images
+    mapPoints = MapPoint.objects.filter(streetviewimage=None)
+
+    # delete duplicates
+    #for panoID in MapPoint.objects.values_list('panoID', flat=True).distinct():
+    #    MapPoint.objects.filter(pk__in=MapPoint.objects.filter(panoID=panoID).values_list('id', flat=True)[1:]).delete()
+    #for panoID in mapPoints.values_list('panoID', flat=True).distinct():
+    #    mapPoints.filter(pk__in=mapPoints.filter(panoID=panoID).values_list('id', flat=True)[1:]).delete()
+
+    xdim = 640
+    ydim = 640
+    fov_right=35
+    fov_left=22.5
+    pitch=0
+    for mapPoint in mapPoints:
+        try:
+            saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude,fov_right,mapPoint.photographerHeading+90,pitch,mapPoint)
+            saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude,fov_left,mapPoint.photographerHeading-90,pitch,mapPoint)
+        except:
+            continue
+    context = {}
+
+    #return render(request, 'ImagePicker/adminPanel.html',context)
+    return HttpResponse("done")
 
 # Given GPS coordinates, return the heading value perpendicular to the road
 def index(request):
+    mapPoints = MapPoint.objects.all()
+    mapPoints_noImage = MapPoint.objects.filter(streetviewimage=None)
+
+    panoIdList = MapPoint.objects.values_list('panoID', flat=True)
+    numDuplicate_mapPoints = len(panoIdList) - len(set(panoIdList))
+
+    streetviewImages = StreetviewImage.objects.all()
+
+    context = {'mapPoints':mapPoints, 'mapPoints_noImage':mapPoints_noImage,'numDuplicate_mapPoints':numDuplicate_mapPoints,'streetviewImages':streetviewImages}
+    return render(request, 'ImagePicker/index.html',context)
+
+def picker(request):
     mapPoints = MapPoint.objects.all()
     context = {'mapPoints':mapPoints}
     return render(request, 'ImagePicker/panorama.html',context)

@@ -8,7 +8,7 @@ class MapPoint(models.Model):
     panoID = models.TextField() # unstable across browser sessions
     def __str__(self):
         return str('lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))
-
+        #return self.panoID
 
 class StreetviewImage(models.Model):
     mapPoint = models.ForeignKey(MapPoint) # each mapPoint has two images corresponding to left and right

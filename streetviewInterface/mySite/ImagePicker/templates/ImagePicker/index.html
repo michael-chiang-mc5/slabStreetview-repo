@@ -1,0 +1,46 @@
+<!-- see: https://developers.google.com/maps/documentation/javascript/examples/streetview-events -->
+
+
+
+{% extends "MCBase/base.html" %}
+{% load staticfiles %}
+
+{% block javascript %}
+
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #pano, #pano1, #pano2 {
+      width: 100%;
+      height: 100%;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+
+  <script>
+  </script>
+
+
+{% endblock %}
+
+{% block title %}
+  index
+{% endblock %}
+
+{% block body_block %}
+
+  <h1>Statistics</h1>
+  {{ mapPoints|length }} total MapPoints ({{ mapPoints_noImage|length }} have no associated image)
+  <br />
+  {{ numDuplicate_mapPoints }} duplicates
+  <br />
+  {{ streetviewImages|length }} total images
+
+{% endblock %}

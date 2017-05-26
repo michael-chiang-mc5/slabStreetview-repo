@@ -23,6 +23,9 @@
     <br />
     <a href="{% url 'ImagePicker:deleteAllMapPoints' %}">Delete all map points</a>
     <br />
+    <a href="{% url 'ImagePicker:deleteDuplicateMapPoints' %}">Delete duplicate map points</a>
+    <br />
+
 
 
     <p>~~~~~</p>
@@ -32,8 +35,9 @@
     <p>
       <a href="{% url 'ImagePicker:listBoundingBoxMetadata' %}">Bounding box metadata for OCR</a>
     </p>
-
-
+    <p>
+      <a href="{% url 'ImagePicker:saveImages' %}">Save images from MapPoints</a>
+    </p>
 
   </div>
 {% endblock %}

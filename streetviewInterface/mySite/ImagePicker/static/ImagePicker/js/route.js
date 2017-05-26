@@ -90,14 +90,20 @@ function initMap() {
     // links[i] has properties description, heading, pano
     var best_direction = getDegrees(panorama.location.latLng,end_latLng,0)
     var best_i = 0
+    var best_angle = 9999
     min_distance = 9999
     for (var i in links) {
       var angle_diff = angleDistance(links[i].heading,best_direction)
       if ( angle_diff < min_distance ) {
         min_distance = angle_diff
         best_i = i
+        best_angle = angle_diff
       }
     }
+
+    if (best_angle > 90) {
+      alert("route finder failed. Set a new route")
+    } else {
 
     var marker = new google.maps.Marker({
       position: panorama.location.latLng,
@@ -131,7 +137,7 @@ function initMap() {
       }
     });
 
-
+  }
 
 
 
