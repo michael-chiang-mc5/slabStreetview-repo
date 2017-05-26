@@ -268,6 +268,7 @@ def postBoundingBox(request):
     json_str = request.POST.get("json-str")
     d = ast.literal_eval(json_str)
     pk = d['pk'] # this is the pk of the Streetview object
+    method = d['method']
     boxes = d['box']
     BoundingBox.objects.filter(streetviewImage=pk).delete() # delete previous bounding boxes
     for box in boxes:

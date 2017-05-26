@@ -22,6 +22,7 @@ class StreetviewImage(models.Model):
 
 class BoundingBox(models.Model):
     streetviewImage = models.ForeignKey(StreetviewImage) # each image can have multiple bounding boxes
+    method = models.TextField()
     x1 = models.IntegerField()
     x2 = models.IntegerField()
     y1 = models.IntegerField()
