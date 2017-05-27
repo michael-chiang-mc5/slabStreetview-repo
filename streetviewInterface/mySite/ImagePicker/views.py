@@ -12,6 +12,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from PIL import Image
 from math import sqrt
 from collections import Counter, defaultdict
+from .google_ocr import *
+
 
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
@@ -234,9 +236,9 @@ def listBoundingBox(request): # TODO: make urls to cropped image
     return render(request, 'ImagePicker/listBoundingBox.html',context)
 
 def listBoundingBoxMetadata(request):
-    boundingBoxes = BoundingBox.objects.all()
+    boundingBoxes_withoutOCR = BoundingBox.objects.filter(ocrtext__isnull=True)
     response = HttpResponse(content_type='text/plain; charset=utf8')
-    for boundingBox in boundingBoxes:
+    for boundingBox in boundingBoxes_withoutOCR:
         response.write(str(boundingBox.pk)+"\t")
         #response.write("http://"+request.META['HTTP_HOST']+"/"+boundingBox.streetviewImage.image.url)
         response.write("http://"+request.META['HTTP_HOST']+reverse('ImagePicker:boundingBox', args=(boundingBox.pk,)))
@@ -301,6 +303,15 @@ def deleteDuplicateMapPoints(request):
     # delete duplicates
     for panoID in MapPoint.objects.values_list('panoID', flat=True).distinct():
         MapPoint.objects.filter(pk__in=MapPoint.objects.filter(panoID=panoID).values_list('id', flat=True)[1:]).delete()
+    context = {}
+    return render(request, 'ImagePicker/adminPanel.html',context)
+
+def runGoogleOCR_images(request):
+    # get images without bounding boxes
+    # TODO: since not all images have bounding boxes, a better way is to have a field stating whether bounding boxes have been run. This is important since we are limited by Google on api calls
+    streetviewImages_withoutBoundingBoxes = StreetviewImage.objects.filter(boundingbox__isnull=True)
+    for streetviewImage in streetviewImages_withoutBoundingBoxes:
+        google_ocr(settings.GOOGLE_OCR_API_KEY, streetviewImage)
     context = {}
     return render(request, 'ImagePicker/adminPanel.html',context)
 

@@ -27,7 +27,7 @@ class BoundingBox(models.Model):
     x2 = models.IntegerField()
     y1 = models.IntegerField()
     y2 = models.IntegerField()
-    nms = models.FloatField()
+    nms = models.FloatField(default=1)
 
     def __str__(self):
         return str([self.x1, self.y1, self.x2, self.y2])
