@@ -20,6 +20,7 @@ class StreetviewImage(models.Model):
     def __str__(self):
         return str("heading="+str(self.heading))
 
+
 class BoundingBox(models.Model):
     streetviewImage = models.ForeignKey(StreetviewImage) # each image can have multiple bounding boxes
     method = models.TextField()

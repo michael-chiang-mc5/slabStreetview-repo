@@ -4,14 +4,10 @@
 {% block javascript %}
 <style>
 
-.crop {
-    overflow: hidden;
+table, th, td {
+    border: 1px solid black;
+    padding: 10px;
 }
-
-.mc-container {
-  padding-bottom: 10px;
-}
-
 
 </style>
 
@@ -56,24 +52,25 @@
 
           <!-- image -->
           <td>
-            <div class="mc-container">
-              <div class="crop" style="width:{{ boundingBox.width }};height:{{ boundingBox.height }}">
-                <img style="margin:-{{boundingBox.y1}}px -{{boundingBox.x1}}px" class="grayscale" src="/{{ boundingBox.streetviewImage.image.url }}">
-              </div>
-            </div>
+                <img src="/ImagePicker/boundingBox/{{ boundingBox.pk }}/">
           </td>
 
           <!-- info -->
           <td>
-            <p>
-              original image: {{ boundingBox.streetviewImage.image.url }}
-            </p>
-            <p>
-              OCR: {{ boundingBox.ocrtext_set.all.first.method }}<br />
-              text: {{ boundingBox.ocrtext_set.all.first.text }}<br />
-              notes: {{ boundingBox.ocrtext_set.all.first.notes }}<br />
-          </p>
+              bounding box method: {{ boundingBox.method }}
+              <br />
+              original image: <a href="/{{ boundingBox.streetviewImage.image.url }}">{{ boundingBox.streetviewImage.image.name }}</a>
+              <br />
           </td>
+          {% for ocrText in boundingBox.ocrtext_set.all|dictsort:"method" %}
+            <td>
+                ocr method: {{ ocrText.method }}<br />
+                text: {{ boundingBox.ocrtext_set.all.first.text }}<br />
+                notes: {{ boundingBox.ocrtext_set.all.first.notes }}<br />
+            </td>
+
+
+          {% endfor %}
 
 
 
