@@ -1,6 +1,6 @@
 clear all;
 close all;
-outfilename = websave('data.txt','http://104.131.145.75/ImagePicker/listBoundingBoxMetadata/');
+outfilename = websave('data.txt','http://104.131.145.75/ImagePicker/list_crnn_metadata/');
 data = tdfread(outfilename);
 
 % get unique pk

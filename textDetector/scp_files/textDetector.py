@@ -21,7 +21,7 @@ text_proposals_detector=TextProposalDetector(CaffeModel(NET_DEF_FILE, MODEL_FILE
 text_detector=TextDetector(text_proposals_detector)
 
 interface_url = "http://104.131.145.75/"
-metadata = interface_url + "ImagePicker/listTextDetectorMetadata/"
+metadata = interface_url + "ImagePicker/list_CTPN_metadata/"
 data = urllib.urlopen(metadata)
 #data = ['81\thttp://104.131.145.75/media/81.jpg']
 

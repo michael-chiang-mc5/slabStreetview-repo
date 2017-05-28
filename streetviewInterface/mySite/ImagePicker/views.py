@@ -209,7 +209,7 @@ def saveImage(xdim,ydim,latitude,longitude,fov,heading,pitch,mapPoint):
     streetviewImage.save()
 
 # produces a text file for CTPN
-def listTextDetectorMetadata(request):
+def list_CTPN_metadata(request):
     # only run detector on images without CTPN derived bounding boxes
     streetviewImages = StreetviewImage.objects.exclude( boundingbox__method__contains="CTPN" )
     #streetviewImages_withoutBoundingBoxes = StreetviewImage.objects.filter(boundingbox__isnull=True)
@@ -239,7 +239,7 @@ def listBoundingBox(request): # TODO: make urls to cropped image
     return render(request, 'ImagePicker/listBoundingBox.html',context)
 
 # metadata for CRNN
-def listBoundingBoxMetadata(request):
+def list_crnn_metadata(request):
     #boundingBoxes_withoutOCR = BoundingBox.objects.filter(ocrtext__isnull=True)
     boundingBoxes = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
     response = HttpResponse(content_type='text/plain; charset=utf8')
@@ -282,6 +282,10 @@ def postBoundingBox(request):
         boundingBox = BoundingBox(streetviewImage=StreetviewImage.objects.get(pk=pk),x1=box[0], y1=box[1], x2=box[2], y2=box[3], nms=box[4])
         boundingBox.save()
     return HttpResponse("done")
+
+def deleteAllOcr(request):
+    OcrText.objects.all().delete()
+    return HttpResponseRedirect(reverse('ImagePicker:adminPanel'))
 
 def deleteAllBoundingBox(request):
     BoundingBox.objects.all().delete()
