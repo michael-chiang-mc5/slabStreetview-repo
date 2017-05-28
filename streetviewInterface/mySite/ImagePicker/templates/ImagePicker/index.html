@@ -37,10 +37,35 @@
 {% block body_block %}
 
   <h1>Statistics</h1>
-  {{ mapPoints|length }} total MapPoints ({{ mapPoints_noImage|length }} have no associated image)
+  <p>~~~~~~~~~~~~~</p>
+  {{ mapPoints|length }} total MapPoints
   <br />
-  {{ numDuplicate_mapPoints }} duplicates
+  {{ mapPoints_noImage|length }} have no associated image. <a href="{% url 'ImagePicker:saveImages' %}">Download</a>
   <br />
+  {{ numDuplicate_mapPoints }} duplicates. <a href="{% url 'ImagePicker:deleteDuplicateMapPoints' %}">Delete duplicates</a>
+  <br />
+
+  <p>~~~~~~~~~~~~~</p>
+
   {{ streetviewImages|length }} total images
+  <br />
+  {{ streetviewImages_no_google_BB|length }} have no google bounding boxes.
+  <br />
+  {{ streetviewImages_no_CTPN_BB|length }} have no CTPN bounding boxes.
+  <br />
+
+
+  <p>~~~~~~~~~~~~~</p>
+  {{ boundingBoxes|length }} total bounding boxes (this includes dummy bounding boxes generated for images with no text detected)
+  <br />
+  {{ boundingBoxes_no_google_text|length }} bounding boxes have no google ocr text.
+  <br />
+  {{ boundingBoxes_no_crnn_text|length }} bounding boxes have no crnn text.
+  <br />
+
+
+
+
+
 
 {% endblock %}

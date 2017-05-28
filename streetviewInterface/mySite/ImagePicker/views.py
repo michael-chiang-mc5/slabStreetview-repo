@@ -355,13 +355,21 @@ def saveImages(request):
 def index(request):
     mapPoints = MapPoint.objects.all()
     mapPoints_noImage = MapPoint.objects.filter(streetviewimage=None)
-
     panoIdList = MapPoint.objects.values_list('panoID', flat=True)
     numDuplicate_mapPoints = len(panoIdList) - len(set(panoIdList))
 
     streetviewImages = StreetviewImage.objects.all()
+    streetviewImages_no_google_BB = StreetviewImage.objects.exclude( boundingbox__method__contains="google" )
+    streetviewImages_no_CTPN_BB = StreetviewImage.objects.exclude( boundingbox__method__contains="CTPN" )
 
-    context = {'mapPoints':mapPoints, 'mapPoints_noImage':mapPoints_noImage,'numDuplicate_mapPoints':numDuplicate_mapPoints,'streetviewImages':streetviewImages}
+    boundingBoxes = BoundingBox.objects.all()
+    boundingBoxes_no_google_text = BoundingBox.objects.exclude( ocrtext__method__contains="google" )
+    boundingBoxes_no_crnn_text = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
+
+    context = {'mapPoints':mapPoints, 'mapPoints_noImage':mapPoints_noImage,'numDuplicate_mapPoints':numDuplicate_mapPoints, \
+               'streetviewImages':streetviewImages,'streetviewImages_no_google_BB':streetviewImages_no_google_BB, \
+               'streetviewImages_no_CTPN_BB':streetviewImages_no_CTPN_BB, 'boundingBoxes':boundingBoxes, \
+               'boundingBoxes_no_google_text':boundingBoxes_no_google_text,'boundingBoxes_no_crnn_text':boundingBoxes_no_crnn_text}
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):
