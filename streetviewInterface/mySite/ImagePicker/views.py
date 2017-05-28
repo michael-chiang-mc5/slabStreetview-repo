@@ -311,7 +311,7 @@ def runGoogleOCR_images(request):
     # TODO: since not all images have bounding boxes, a better way is to have a field stating whether bounding boxes have been run. This is important since we are limited by Google on api calls
     streetviewImages_withoutBoundingBoxes = StreetviewImage.objects.filter(boundingbox__isnull=True)
     for streetviewImage in streetviewImages_withoutBoundingBoxes:
-        google_ocr(settings.GOOGLE_OCR_API_KEY, streetviewImage)
+        google_ocr_streetviewImage(settings.GOOGLE_OCR_API_KEY, streetviewImage)
     context = {}
     return render(request, 'ImagePicker/adminPanel.html',context)
 
