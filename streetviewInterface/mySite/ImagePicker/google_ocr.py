@@ -62,6 +62,8 @@ def google_ocr_boundingBox(api_key, boundingBox):
         for idx, resp in enumerate(responses): # response.json()['responses'][i] corresponds to ith image TODO: skip first image
             # Google OCR might not find any text
             if len(resp)!=0:
+                ocrText = OcrText(boundingBox=boundingBox,method='google',text='',notes='')
+                ocrText.save()
                 continue
             # save bounding box object
             t = resp['textAnnotations'][0]  # possible keys: fullTextAnnotation, textAnnotations
@@ -98,9 +100,13 @@ def google_ocr_streetviewImage(api_key, streetviewImage):
         return(response.text)
     else:
         responses = response.json()['responses']
-        for idx, resp in enumerate(responses): # response.json()['responses'][i] corresponds to ith image TODO: skip first image
+        for idx, resp in enumerate(responses): # response.json()['responses'][i] corresponds to ith image. Note we only run on one image
             # Google OCR might not find any text
             if len(resp)==0:
+                boundingBox = BoundingBox(x1=0,x2=0,y1=0,y2=0,method='google',streetviewImage=streetviewImage)
+                boundingBox.save() # it would be better to do the saving in the view, but we need to save to set OcrText.boundingBox
+                ocrText = OcrText(boundingBox=boundingBox,method='google',text='',notes='')
+                ocrText.save()
                 continue
             # save bounding box object
             t = resp['textAnnotations'][0]  # possible keys: fullTextAnnotation, textAnnotations
