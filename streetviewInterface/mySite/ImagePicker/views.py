@@ -238,10 +238,12 @@ def listBoundingBox(request): # TODO: make urls to cropped image
 
     return render(request, 'ImagePicker/listBoundingBox.html',context)
 
+# metadata for CRNN
 def listBoundingBoxMetadata(request):
-    boundingBoxes_withoutOCR = BoundingBox.objects.filter(ocrtext__isnull=True)
+    #boundingBoxes_withoutOCR = BoundingBox.objects.filter(ocrtext__isnull=True)
+    boundingBoxes = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
     response = HttpResponse(content_type='text/plain; charset=utf8')
-    for boundingBox in boundingBoxes_withoutOCR:
+    for boundingBox in boundingBoxes:
         response.write(str(boundingBox.pk)+"\t")
         #response.write("http://"+request.META['HTTP_HOST']+"/"+boundingBox.streetviewImage.image.url)
         response.write("http://"+request.META['HTTP_HOST']+reverse('ImagePicker:boundingBox', args=(boundingBox.pk,)))
