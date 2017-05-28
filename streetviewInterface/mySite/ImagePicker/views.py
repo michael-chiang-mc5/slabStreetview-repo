@@ -208,10 +208,13 @@ def saveImage(xdim,ydim,latitude,longitude,fov,heading,pitch,mapPoint):
     streetviewImage.image = fi # this should be set with respect to MEDIA_ROOT
     streetviewImage.save()
 
+# produces a text file for CTPN
 def listTextDetectorMetadata(request):
-    streetviewImages_withoutBoundingBoxes = StreetviewImage.objects.filter(boundingbox__isnull=True)
+    # only run detector on images without CTPN derived bounding boxes    
+    streetviewImages = StreetviewImage.objects.exclude( boundingbox__method__contains="CTPN" )
+    #streetviewImages_withoutBoundingBoxes = StreetviewImage.objects.filter(boundingbox__isnull=True)
     response = HttpResponse(content_type='text/plain; charset=utf8')
-    for streetviewImage in streetviewImages_withoutBoundingBoxes:
+    for streetviewImage in streetviewImages:
         response.write(str(streetviewImage.pk) + "\t")
         response.write("http://")
         response.write(request.META['HTTP_HOST']+"/")
