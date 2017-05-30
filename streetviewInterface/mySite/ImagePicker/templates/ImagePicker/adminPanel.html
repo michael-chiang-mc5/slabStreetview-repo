@@ -14,6 +14,12 @@
 
 {% block body_block %}
   <div class="content">
+
+    <form id="form1"action="{% url 'ImagePicker:postOCR' %}" method="POST">
+      <input type="hidden" name="json-str" value="qwer">
+    </form>
+    <button type="submit" form="form1" value="Submit">Submit</button>
+
     <h1>Admin panel</h1>
 
     <hr>
