@@ -65,8 +65,8 @@ table, th, td {
           {% for ocrText in boundingBox.ocrtext_set.all|dictsort:"method" %}
             <td>
                 ocr method: {{ ocrText.method }}<br />
-                text: {{ boundingBox.ocrtext_set.all.first.text }}<br />
-                notes: {{ boundingBox.ocrtext_set.all.first.notes }}<br />
+                text: {{ ocrText.text }}<br />
+                notes: {{ ocrText.notes }}<br />
             </td>
 
 
