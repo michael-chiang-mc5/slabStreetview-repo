@@ -253,7 +253,6 @@ def list_crnn_metadata(request):
 
 @csrf_exempt
 def postOCR(request):
-    return HttpResponse(request.POST)
     json_str = request.POST.get("json-str")
     d = ast.literal_eval(json_str)
     pk = d['pk'] # this is the pk of the boundingBox object
