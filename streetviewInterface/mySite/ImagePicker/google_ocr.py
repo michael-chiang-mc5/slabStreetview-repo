@@ -8,6 +8,7 @@ from sys import argv
 import json
 import requests
 from .models import *
+from PIL import Image
 
 
 ENDPOINT_URL = 'https://vision.googleapis.com/v1/images:annotate'
@@ -47,10 +48,10 @@ def request_ocr(api_key, image_filenames):
     return response
 
 def google_ocr_boundingBox(api_key, boundingBox):
-    streetviewImage_url = os.path.join(settings.MEDIA_ROOT,boundingBox.streetviewImage.image.name)
-    img = Image.open(os.path.join(image_url))
+    streetviewImage_url = join(settings.MEDIA_ROOT,boundingBox.streetviewImage.image.name)
+    img = Image.open(streetviewImage_url)
     img = img.crop((boundingBox.x1, boundingBox.y1, boundingBox.x2, boundingBox.y2 ))
-    image_url = os.path.join(settings.MEDIA_ROOT,'temp_googleocr.jpg')
+    image_url = join(settings.MEDIA_ROOT,'temp_googleocr.jpg')
     img.save(image_url)
 
     image_filenames = [image_url]
@@ -61,36 +62,17 @@ def google_ocr_boundingBox(api_key, boundingBox):
         responses = response.json()['responses']
         for idx, resp in enumerate(responses): # response.json()['responses'][i] corresponds to ith image TODO: skip first image
             # Google OCR might not find any text
-            if len(resp)!=0:
+            if len(resp)==0:
                 ocrText = OcrText(boundingBox=boundingBox,method='google',text='',notes='')
                 ocrText.save()
                 continue
             # save bounding box object
             t = resp['textAnnotations'][0]  # possible keys: fullTextAnnotation, textAnnotations
             locale = resp['textAnnotations'][0]['locale']
-            for i,annotation in enumerate(resp['textAnnotations']):
-                if i != 0:
-                    continue
-                # bounding box
-                text = annotation['description']  # possible keys: description, boundingPoly, locale for FIRST element only
-                x1 = min(annotation['boundingPoly']['vertices'][0]['x'], \
-                         annotation['boundingPoly']['vertices'][1]['x'], \
-                         annotation['boundingPoly']['vertices'][2]['x'], \
-                         annotation['boundingPoly']['vertices'][3]['x']  )
-                x2 = max(annotation['boundingPoly']['vertices'][0]['x'], \
-                         annotation['boundingPoly']['vertices'][1]['x'], \
-                         annotation['boundingPoly']['vertices'][2]['x'], \
-                         annotation['boundingPoly']['vertices'][3]['x']  )
-                y1 = min(annotation['boundingPoly']['vertices'][0]['y'], \
-                         annotation['boundingPoly']['vertices'][1]['y'], \
-                         annotation['boundingPoly']['vertices'][2]['y'], \
-                         annotation['boundingPoly']['vertices'][3]['y']  )
-                y2 = max(annotation['boundingPoly']['vertices'][0]['y'], \
-                         annotation['boundingPoly']['vertices'][1]['y'], \
-                         annotation['boundingPoly']['vertices'][2]['y'], \
-                         annotation['boundingPoly']['vertices'][3]['y']  )
-                ocrText = OcrText(boundingBox=boundingBox,method='google',text=text,notes='locale='+locale)
-                ocrText.save()
+            annotation = resp['textAnnotations'][0]
+            text = annotation['description']  # possible keys: description, boundingPoly, locale for FIRST element only
+            ocrText = OcrText(boundingBox=boundingBox,method='google',text=text,notes='locale='+locale)
+            ocrText.save()
 
 def google_ocr_streetviewImage(api_key, streetviewImage):
     image_url = join(settings.MEDIA_ROOT,streetviewImage.image.name)
@@ -111,8 +93,8 @@ def google_ocr_streetviewImage(api_key, streetviewImage):
             # save bounding box object
             t = resp['textAnnotations'][0]  # possible keys: fullTextAnnotation, textAnnotations
             locale = resp['textAnnotations'][0]['locale']
-            for i,annotation in enumerate(resp['textAnnotations']): # skip first annotation? seems to be a composite
-                if i==0:
+            for i,annotation in enumerate(resp['textAnnotations']):
+                if i==0: # skip first annotation. seems to be a composite
                     continue
                 # bounding box
                 text = annotation['description']  # possible keys: description, boundingPoly, locale for FIRST element only
