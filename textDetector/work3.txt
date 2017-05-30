@@ -166,6 +166,15 @@ cd ~/crnn/src
 scp -r -i ssh_key.pem scp_files/test_images/ ubuntu@ec2-54-241-155-127.us-west-1.compute.amazonaws.com:~/crnn/data/
 
 
+#
+# When installing CTPN
+
+# You need to generate caffe.pb.h manually using protoc as follows.
+# In the directory you installed Caffe to
+#    protoc src/caffe/proto/caffe.proto --cpp_out=.
+#    mkdir include/caffe/proto
+#    mv src/caffe/proto/caffe.pb.h include/caffe/proto
+
 #########
 ## Might need this later
 ######
