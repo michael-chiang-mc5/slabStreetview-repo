@@ -295,6 +295,12 @@ def deleteAllStreetviewImages(request):
     StreetviewImage.objects.all().delete()
     return HttpResponseRedirect(reverse('ImagePicker:adminPanel'))
 
+def deleteStreetviewImage(request,streetviewImage_pk):
+    streetviewImage = StreetviewImage.objects.get(pk=streetviewImage_pk)
+    streetviewImage.delete()
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
 def deleteAllMapPoints(request):
     MapPoint.objects.all().delete()
     return HttpResponseRedirect(reverse('ImagePicker:adminPanel'))
