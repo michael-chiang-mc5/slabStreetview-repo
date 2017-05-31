@@ -43,7 +43,7 @@ class BoundingBox(models.Model):
         if self.method=="google":
             return self.x1
         else:
-            new_width = self.width()*1.5
+            new_width = self.width()*1.1
             center_x  = (self.x2+self.x1)/2
             new_x1 = max(center_x - new_width/2,0)
             return new_x1
@@ -51,7 +51,7 @@ class BoundingBox(models.Model):
         if self.method=="google":
             return self.x2
         else:
-            new_width = self.width()*1.5
+            new_width = self.width()*1.1
             center_x  = (self.x2+self.x1)/2
             new_x2 = min(center_x + new_width/2,self.streetviewImage.dimX()-1)
             return new_x2
