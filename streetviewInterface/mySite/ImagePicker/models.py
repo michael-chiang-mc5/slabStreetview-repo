@@ -19,7 +19,10 @@ class StreetviewImage(models.Model):
 
     def __str__(self):
         return str("heading="+str(self.heading))
-
+    def dimY(self):
+        return self.image.height
+    def dimX(self):
+        return self.image.width
 
 class BoundingBox(models.Model):
     streetviewImage = models.ForeignKey(StreetviewImage) # each image can have multiple bounding boxes
@@ -36,6 +39,23 @@ class BoundingBox(models.Model):
         return self.x2 - self.x1
     def height(self):
         return self.y2 - self.y1
+    def rescaled_x1(self):
+        if self.method=="google":
+            return self.x1
+        else:
+            new_width = self.width()*1.5
+            center_x  = (self.x2+self.x1)/2
+            new_x1 = max(center_x - new_width/2,0)
+            return new_x1
+    def rescaled_x2(self):
+        if self.method=="google":
+            return self.x2
+        else:
+            new_width = self.width()*1.5
+            center_x  = (self.x2+self.x1)/2
+            new_x2 = min(center_x + new_width/2,self.streetviewImage.dimX()-1)
+            return new_x2
+
 
 class OcrText(models.Model):
     boundingBox = models.ForeignKey(BoundingBox) # each image can have multiple bounding boxes

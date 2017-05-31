@@ -19,7 +19,7 @@ def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
     image_url = os.path.join(settings.MEDIA_ROOT,boundingBox.streetviewImage.image.name)
     img = Image.open(os.path.join(image_url))
-    img = img.crop((boundingBox.x1, boundingBox.y1, boundingBox.x2, boundingBox.y2 ))
+    img = img.crop((boundingBox.rescaled_x1(), boundingBox.y1, boundingBox.rescaled_x2(), boundingBox.y2 ))
     response = HttpResponse(content_type="image/jpeg")
     img.save(response, "JPEG")
     return response
