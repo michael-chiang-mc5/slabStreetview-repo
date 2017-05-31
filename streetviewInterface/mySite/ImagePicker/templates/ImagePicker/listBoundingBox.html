@@ -1,4 +1,4 @@
-{% extends "MCBase/base.html" %}
+{% extends "MCBase/base-extended.html" %}
 {% load staticfiles %}
 
 {% block javascript %}
@@ -7,6 +7,12 @@
 table, th, td {
     border: 1px solid black;
     padding: 10px;
+}
+
+.mc-image-container {
+  min-width: 300px;
+  max-width: 400px;
+  overflow: auto;
 }
 
 </style>
@@ -52,21 +58,27 @@ table, th, td {
 
           <!-- image -->
           <td>
+            <div class="mc-image-container">
                 <img src="/ImagePicker/boundingBox/{{ boundingBox.pk }}/">
+            </div>
           </td>
 
           <!-- info -->
           <td>
+            <div class="mc-image-container">
               bounding box method: {{ boundingBox.method }}
               <br />
               original image: <a href="/{{ boundingBox.streetviewImage.image.url }}">{{ boundingBox.streetviewImage.image.name }}</a>
               <br />
+            </div>
           </td>
           {% for ocrText in boundingBox.ocrtext_set.all|dictsort:"method" %}
             <td>
+              <div class="mc-image-container">
                 ocr method: {{ ocrText.method }}<br />
                 text: {{ ocrText.text }}<br />
                 notes: {{ ocrText.notes }}<br />
+              </div>
             </td>
 
 
