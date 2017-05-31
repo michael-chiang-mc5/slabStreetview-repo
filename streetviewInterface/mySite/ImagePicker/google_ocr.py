@@ -98,22 +98,34 @@ def google_ocr_streetviewImage(api_key, streetviewImage):
                     continue
                 # bounding box
                 text = annotation['description']  # possible keys: description, boundingPoly, locale for FIRST element only
-                x1 = min(annotation['boundingPoly']['vertices'][0]['x'], \
-                         annotation['boundingPoly']['vertices'][1]['x'], \
-                         annotation['boundingPoly']['vertices'][2]['x'], \
-                         annotation['boundingPoly']['vertices'][3]['x']  )
-                x2 = max(annotation['boundingPoly']['vertices'][0]['x'], \
-                         annotation['boundingPoly']['vertices'][1]['x'], \
-                         annotation['boundingPoly']['vertices'][2]['x'], \
-                         annotation['boundingPoly']['vertices'][3]['x']  )
-                y1 = min(annotation['boundingPoly']['vertices'][0]['y'], \
-                         annotation['boundingPoly']['vertices'][1]['y'], \
-                         annotation['boundingPoly']['vertices'][2]['y'], \
-                         annotation['boundingPoly']['vertices'][3]['y']  )
-                y2 = max(annotation['boundingPoly']['vertices'][0]['y'], \
-                         annotation['boundingPoly']['vertices'][1]['y'], \
-                         annotation['boundingPoly']['vertices'][2]['y'], \
-                         annotation['boundingPoly']['vertices'][3]['y']  )
+                try:
+                    x1 = min(annotation['boundingPoly']['vertices'][0]['x'], \
+                             annotation['boundingPoly']['vertices'][1]['x'], \
+                             annotation['boundingPoly']['vertices'][2]['x'], \
+                             annotation['boundingPoly']['vertices'][3]['x']  )
+                except:
+                    x1 = 0
+                try:
+                    x2 = max(annotation['boundingPoly']['vertices'][0]['x'], \
+                             annotation['boundingPoly']['vertices'][1]['x'], \
+                             annotation['boundingPoly']['vertices'][2]['x'], \
+                             annotation['boundingPoly']['vertices'][3]['x']  )
+                except:
+                    x2 = 0
+                try:
+                    y1 = min(annotation['boundingPoly']['vertices'][0]['y'], \
+                             annotation['boundingPoly']['vertices'][1]['y'], \
+                             annotation['boundingPoly']['vertices'][2]['y'], \
+                             annotation['boundingPoly']['vertices'][3]['y']  )
+                except:
+                    y1 = 0
+                try:
+                    y2 = max(annotation['boundingPoly']['vertices'][0]['y'], \
+                             annotation['boundingPoly']['vertices'][1]['y'], \
+                             annotation['boundingPoly']['vertices'][2]['y'], \
+                             annotation['boundingPoly']['vertices'][3]['y']  )
+                except:
+                    y2 = 0
                 boundingBox = BoundingBox(x1=x1,x2=x2,y1=y1,y2=y2,method='google',streetviewImage=streetviewImage)
                 boundingBox.save() # it would be better to do the saving in the view, but we need to save to set OcrText.boundingBox
                 ocrText = OcrText(boundingBox=boundingBox,method='google',text=text,notes='locale='+locale)
