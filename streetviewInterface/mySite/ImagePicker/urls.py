@@ -12,8 +12,11 @@ urlpatterns = [
     url(r'^listBoundingBox/$',  views.listBoundingBox, name='listBoundingBox'), #
     url(r'^postBoundingBox/$',  views.postBoundingBox, name='postBoundingBox'),
     url(r'^postOCR/$',  views.postOCR, name='postOCR'), #
+    url(r'^postECN/$',  views.postECN, name='postECN'), #
+
     url(r'^saveImages/$',  views.saveImages, name='saveImages'), #
     url(r'^picker/$', views.picker, name='picker'),
+    url(r'^deleteAllScriptIdentification/$',  views.deleteAllScriptIdentification, name='deleteAllScriptIdentification'), #
 
     url(r'^deleteAllBoundingBox/$',  views.deleteAllBoundingBox, name='deleteAllBoundingBox'), #
     url(r'^deleteAllStreetviewImages/$',  views.deleteAllStreetviewImages, name='deleteAllStreetviewImages'), #

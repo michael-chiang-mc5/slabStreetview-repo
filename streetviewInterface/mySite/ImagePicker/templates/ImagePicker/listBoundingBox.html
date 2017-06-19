@@ -72,6 +72,16 @@ table, th, td {
               <br />
             </div>
           </td>
+          {% for scriptIdentification in boundingBox.scriptidentification_set.all|dictsort:"method" %}
+            <td>
+              <div class="mc-image-container">
+                language: {{ scriptIdentification.language }}<br />
+                score: {{ scriptIdentification.score }}<br />
+              </div>
+            </td>
+          {% endfor %}
+
+
           {% for ocrText in boundingBox.ocrtext_set.all|dictsort:"method" %}
             <td>
               <div class="mc-image-container">
@@ -80,8 +90,6 @@ table, th, td {
                 notes: {{ ocrText.notes }}<br />
               </div>
             </td>
-
-
           {% endfor %}
 
 

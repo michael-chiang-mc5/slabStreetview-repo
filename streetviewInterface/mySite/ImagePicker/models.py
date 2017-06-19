@@ -66,9 +66,10 @@ class OcrText(models.Model):
         return str(self.method)+': '+str(self.text)
 
 class ScriptIdentification(models.Model):
-    BoundingBox = models.ForeignKey(BoundingBox)
+    boundingBox = models.ForeignKey(BoundingBox)
     method = models.TextField()
     languageID = models.IntegerField()
+    score = models.FloatField()
     notes = models.TextField(blank=True)
     def __str__(self):
         return ""

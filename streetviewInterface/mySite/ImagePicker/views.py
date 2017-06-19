@@ -263,6 +263,19 @@ def list_ECN_metadata(request):
     return response
 
 @csrf_exempt
+def postECN(request):
+    json_str = request.POST.get("json-str")
+    d = ast.literal_eval(json_str)
+    pk = d['boundingBox_pk'] # this is the pk of the boundingBox object
+    method = d['method']
+    languageID = int(d['languageID'])
+    score = float(d['score'])
+    notes = d['notes']
+    ScriptIdentification.objects.filter(boundingBox=pk,method=method).delete() # delete previous results
+    scriptIdentification = ScriptIdentification(boundingBox=BoundingBox.objects.get(pk=pk),method=method,languageID=languageID,score=score)
+    scriptIdentification.save()
+    return HttpResponse("done")
+
 def postOCR(request):
     json_str = request.POST.get("json-str")
     d = ast.literal_eval(json_str)
@@ -293,6 +306,12 @@ def postBoundingBox(request):
         boundingBox = BoundingBox(streetviewImage=StreetviewImage.objects.get(pk=pk),x1=box[0], y1=box[1], x2=box[2], y2=box[3], nms=box[4],method=method)
         boundingBox.save()
     return HttpResponse("done")
+
+def deleteAllScriptIdentification(request):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
+    ScriptIdentification.objects.all().delete()
+    return HttpResponseRedirect(reverse('ImagePicker:adminPanel'))
 
 def deleteAllOcr(request):
     if not request.user.is_superuser:
