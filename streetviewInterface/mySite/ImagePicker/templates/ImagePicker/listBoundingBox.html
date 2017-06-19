@@ -75,7 +75,8 @@ table, th, td {
           {% for scriptIdentification in boundingBox.scriptidentification_set.all|dictsort:"method" %}
             <td>
               <div class="mc-image-container">
-                language: {{ scriptIdentification.language }}<br />
+                script identification method: {{ scriptIdentification.method }}<br />
+                script: {{ scriptIdentification.language }}<br />
                 score: {{ scriptIdentification.score }}<br />
               </div>
             </td>
