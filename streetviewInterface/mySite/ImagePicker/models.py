@@ -64,3 +64,38 @@ class OcrText(models.Model):
     notes = models.TextField(blank=True)
     def __str__(self):
         return str(self.method)+': '+str(self.text)
+
+class ScriptIdentification(models.Model):
+    BoundingBox = models.ForeignKey(BoundingBox)
+    method = models.TextField()
+    languageID = models.IntegerField()
+    notes = models.TextField(blank=True)
+    def __str__(self):
+        return ""
+    def language(self):
+        if self.languageID == 1:
+            return "arabic"
+        elif self.languageID == 2:
+            return "cambodian"
+        elif self.languageID == 3:
+            return "chinese"
+        elif self.languageID == 4:
+            return "english"
+        elif self.languageID == 5:
+            return "greek"
+        elif self.languageID == 6:
+            return "hebrew"
+        elif self.languageID == 7:
+            return "japanese"
+        elif self.languageID == 8:
+            return "kannada"
+        elif self.languageID == 9:
+            return "korean"
+        elif self.languageID == 10:
+            return "mongolian"
+        elif self.languageID == 11:
+            return "russian"
+        elif self.languageID == 12:
+            return "thai"
+        elif self.languageID == 13:
+            return "tibetan"

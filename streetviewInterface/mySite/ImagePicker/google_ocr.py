@@ -28,9 +28,9 @@ def make_image_data_list(image_filenames):
             img_requests.append({
                     'image': {'content': ctxt},
                     'features': [{
-                        'type': 'TEXT_DETECTION',
-                        'maxResults': 1
-                    }]
+                                    'type': 'TEXT_DETECTION',
+                                    'maxResults': 1 }],
+                    #'imageContext': { 'languageHints': ["",""]} # https://cloud.google.com/vision/docs/languages
             })
     return img_requests
 
