@@ -384,6 +384,12 @@ def runGoogleOCR_boundingBoxes(request):
     return render(request, 'ImagePicker/adminPanel.html',context)
 
 def saveImages(request):
+    if os.fork() == 0:
+        saveImages_async()
+        sys.exit(0)
+    return HttpResponse("thread started")
+
+def saveImages_async():
 
     # get mapPoints without corresponding images
     mapPoints = MapPoint.objects.filter(streetviewimage=None)
