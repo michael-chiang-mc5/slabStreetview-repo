@@ -277,6 +277,7 @@ def postECN(request):
     scriptIdentification.save()
     return HttpResponse("done")
 
+@csrf_exempt
 def postOCR(request):
     json_str = request.POST.get("json-str")
     d = ast.literal_eval(json_str)
