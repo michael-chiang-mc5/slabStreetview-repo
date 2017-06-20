@@ -127,8 +127,10 @@ function initMap() {
                      'csrfmiddlewaretoken':csrf_token}, // our data object
       success: function(data, textStatus, jqXHR) {
         if (distanceGPS(panorama.location.latLng,end_latLng) > search_radius ) {
+          panorama.setVisible(true);
+          $("#distance-traveled").html("Distance: "+ distanceGPS(panorama.location.latLng,start_latLng)+" meters")
+          $("#points-saved").html("MapPoints saved: "+ mapPoint_count)          
           panorama.setPano(links[best_i].pano);
-          //panorama.setVisible(true);
         } else {
           $("#distance-traveled").html("Distance: "+ distanceGPS(panorama.location.latLng,start_latLng)+" meters")
           $("#points-saved").html("MapPoints saved: "+ mapPoint_count)

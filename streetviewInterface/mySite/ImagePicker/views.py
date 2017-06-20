@@ -13,6 +13,7 @@ from PIL import Image
 from math import sqrt
 from collections import Counter, defaultdict
 from .google_ocr import *
+import time
 
 
 def boundingBox(request,boundingBox_pk):
@@ -25,7 +26,6 @@ def boundingBox(request,boundingBox_pk):
     return response
 
 def listImage(request):
-    #return savePoint(request)
     streetviewImages = StreetviewImage.objects.all()
 
     page = request.GET.get('page', 1)
@@ -64,6 +64,7 @@ def savePoint(request):
                         panoID=panoID, \
                         photographerHeading=photographerHeading)
     mapPoint.save()
+    time.sleep(0.5)
 
 
     #xdim = 640
