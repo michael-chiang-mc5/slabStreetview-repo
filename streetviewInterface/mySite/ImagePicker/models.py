@@ -74,7 +74,9 @@ class ScriptIdentification(models.Model):
     def __str__(self):
         return ""
     def language(self):
-        if self.languageID == 1:
+        if self.languageID == 0:
+            return "none"
+        elif self.languageID == 1:
             return "arabic"
         elif self.languageID == 2:
             return "cambodian"
