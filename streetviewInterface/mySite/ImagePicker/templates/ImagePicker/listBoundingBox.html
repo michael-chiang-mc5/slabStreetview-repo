@@ -15,6 +15,17 @@ table, th, td {
   overflow: auto;
 }
 
+.outline {
+  border: 1px solid black;
+  display: inline-block;
+}
+
+.outline p {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
 </style>
 
 {% endblock %}
@@ -27,16 +38,30 @@ table, th, td {
   <div class="content">
     <h1>List of all bounding boxes</h1>
 
+    <div class="outline">
+      <p>
+        total # bounding boxes = {{ total_number }}
+      </p>
+    </div>
+
+    <br />
+    <br />
+
     <!-- filter -->
-    <form action="{% url 'ImagePicker:listBoundingBox' %}" method="POST">
-      {% csrf_token %}
-      boundingBoxes =
-      <input type="text" name="command"><br />
-      <input type="submit" value="Submit"><br />
-      Examples: <br />
-      BoundingBox.objects.exclude(ocrtext__isnull=True)<br />
-      BoundingBox.objects.filter(ocrtext__notes__contains="locale=ko")<br />
-    </form>
+    <div class="outline">
+      <form action="{% url 'ImagePicker:listBoundingBox' %}" method="POST">
+        {% csrf_token %}
+        boundingBoxes =
+        <input type="text" name="command"><br />
+        <input type="submit" value="Submit"><br />
+        Examples: <br />
+        BoundingBox.objects.exclude(ocrtext__isnull=True)<br />
+        BoundingBox.objects.filter(ocrtext__notes__contains="locale=ko")<br />
+      </form>
+    </div>
+
+    <br />
+    <br />
 
     <!-- Paginator -->
     {% if boundingBoxes.has_other_pages %}

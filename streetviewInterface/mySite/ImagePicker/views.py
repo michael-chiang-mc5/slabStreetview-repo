@@ -225,16 +225,12 @@ def list_CTPN_metadata(request):
 
 def listBoundingBox(request): # TODO: make urls to cropped image
     if request.method == 'POST':
+        if not request.user.is_superuser:
+            return HttpResponse("you are not an admin")
         cmd = request.POST.get("command")
-        #return HttpResponse(cmd)
         boundingBoxes = eval(cmd)
     else:
         boundingBoxes = BoundingBox.objects.all()
-
-
-    #BoundingBox.objects.BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
-    #boundingBoxes = BoundingBox.objects.exclude(ocrtext__isnull=True)
-
 
     page = request.GET.get('page', 1)
     paginator = Paginator(boundingBoxes, 100)
@@ -245,7 +241,7 @@ def listBoundingBox(request): # TODO: make urls to cropped image
     except EmptyPage:
         boundingBoxes_page = paginator.page(paginator.num_pages)
 
-    context = {'boundingBoxes':boundingBoxes_page}
+    context = {'boundingBoxes':boundingBoxes_page,'total_number':len(boundingBoxes)}
 
     return render(request, 'ImagePicker/listBoundingBox.html',context)
 
