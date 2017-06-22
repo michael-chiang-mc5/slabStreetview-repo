@@ -224,7 +224,17 @@ def list_CTPN_metadata(request):
     return response
 
 def listBoundingBox(request): # TODO: make urls to cropped image
-    boundingBoxes = BoundingBox.objects.all()
+    if request.method == 'POST':
+        cmd = request.POST.get("command")
+        #return HttpResponse(cmd)
+        boundingBoxes = eval(cmd)
+    else:
+        boundingBoxes = BoundingBox.objects.all()
+
+
+    #BoundingBox.objects.BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
+    #boundingBoxes = BoundingBox.objects.exclude(ocrtext__isnull=True)
+
 
     page = request.GET.get('page', 1)
     paginator = Paginator(boundingBoxes, 100)

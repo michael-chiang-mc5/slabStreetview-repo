@@ -27,6 +27,17 @@ table, th, td {
   <div class="content">
     <h1>List of all bounding boxes</h1>
 
+    <!-- filter -->
+    <form action="{% url 'ImagePicker:listBoundingBox' %}" method="POST">
+      {% csrf_token %}
+      boundingBoxes =
+      <input type="text" name="command"><br />
+      <input type="submit" value="Submit"><br />
+      Examples: <br />
+      BoundingBox.objects.exclude(ocrtext__isnull=True)<br />
+      BoundingBox.objects.filter(ocrtext__notes__contains="locale=ko")<br />
+    </form>
+
     <!-- Paginator -->
     {% if boundingBoxes.has_other_pages %}
       <ul class="pagination">
