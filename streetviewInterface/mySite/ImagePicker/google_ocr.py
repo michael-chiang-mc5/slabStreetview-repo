@@ -30,7 +30,7 @@ def make_image_data_list(image_filenames):
                     'features': [{
                                     'type': 'TEXT_DETECTION',
                                     'maxResults': 1 }],
-                    #'imageContext': { 'languageHints': ["",""]} # https://cloud.google.com/vision/docs/languages
+                    'imageContext': { 'languageHints': ["en","es",'zh','th','ko']} # https://cloud.google.com/vision/docs/languages
             })
     return img_requests
 

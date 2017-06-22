@@ -55,8 +55,18 @@ class BoundingBox(models.Model):
             center_x  = (self.x2+self.x1)/2
             new_x2 = min(center_x + new_width/2,self.streetviewImage.dimX()-1)
             return new_x2
-
-
+    def googleOCR(self):
+        ocrText = OcrText.objects.filter(boundingBox=self).filter(method="google")
+        if len(ocrText) == 0:
+            return None
+        else:
+            return ocrText[0]
+    def crnnOCR(self):
+        ocrText = OcrText.objects.filter(boundingBox=self).filter(method="crnn-lexiconFree")
+        if len(ocrText) == 0:
+            return None
+        else:
+            return ocrText[0]
 class OcrText(models.Model):
     boundingBox = models.ForeignKey(BoundingBox) # each image can have multiple bounding boxes
     method = models.TextField()

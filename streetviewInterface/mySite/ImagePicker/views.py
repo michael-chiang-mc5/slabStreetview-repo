@@ -384,6 +384,20 @@ def runGoogleOCR_boundingBoxes(request):
     context = {}
     return render(request, 'ImagePicker/adminPanel.html',context)
 
+def runGoogleOCR_boundingBox(request,boundingBox_pk):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
+    boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
+    google_ocr_boundingBox(settings.GOOGLE_OCR_API_KEY, boundingBox)
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+def deleteOcrText(request,ocrtext_pk):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
+    ocrText = OcrText.objects.get(pk=ocrtext_pk)
+    ocrText.delete()
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+
 def saveImages(request):
     if os.fork() == 0:
         saveImages_async()

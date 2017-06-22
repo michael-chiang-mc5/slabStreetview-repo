@@ -82,17 +82,28 @@ table, th, td {
             </td>
           {% endfor %}
 
+          {% if boundingBox.crnnOCR %}
+          <td>
+            <div class="mc-image-container">
+                method: {{ boundingBox.crnnOCR.method }}<br />
+                text: {{ boundingBox.crnnOCR.text }}<br />
+                notes: {{ boundingBox.crnnOCR.notes }}<br />
+            </div>
+          </td>
+          {% endif %}
 
-          {% for ocrText in boundingBox.ocrtext_set.all|dictsort:"method" %}
-            <td>
-              <div class="mc-image-container">
-                ocr method: {{ ocrText.method }}<br />
-                text: {{ ocrText.text }}<br />
-                notes: {{ ocrText.notes }}<br />
-              </div>
-            </td>
-          {% endfor %}
-
+          <td>
+            <div class="mc-image-container">
+              {% if boundingBox.googleOCR %}
+                method: {{ boundingBox.googleOCR.method }}<br />
+                text: {{ boundingBox.googleOCR.text }}<br />
+                notes: {{ boundingBox.googleOCR.notes }}<br />
+                <a href="{% url 'ImagePicker:deleteOcrText' ocrtext_pk=boundingBox.googleOCR.pk %}">delete</a>
+              {% else %}
+                <a href="{% url 'ImagePicker:runGoogleOCR_boundingBox' boundingBox_pk=boundingBox.pk %}">run google ocr</a>
+              {% endif %}
+            </div>
+          </td>
 
 
       </tr>
