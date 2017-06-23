@@ -71,7 +71,7 @@ def google_ocr_boundingBox(api_key, boundingBox):
             locale = resp['textAnnotations'][0]['locale']
             annotation = resp['textAnnotations'][0]
             text = annotation['description']  # possible keys: description, boundingPoly, locale for FIRST element only
-            ocrText = OcrText(boundingBox=boundingBox,method='google',text=text,notes='locale='+locale)
+            ocrText = OcrText(boundingBox=boundingBox,method='google',text=text,locale='locale='+locale)
             ocrText.save()
 
 def google_ocr_streetviewImage(api_key, streetviewImage):
