@@ -260,8 +260,7 @@ def list_crnn_metadata(request):
 
 # metadata for ECN
 def list_ECN_metadata(request):
-    boundingBoxes = BoundingBox.objects.filter(scriptidentification__isnull=True)
-    #boundingBoxes = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
+    boundingBoxes = BoundingBox.objects.exclude( ocrtext__method__contains="ECN" )
     response = HttpResponse(content_type='text/plain; charset=utf8')
     for boundingBox in boundingBoxes:
         response.write(str(boundingBox.pk)+"\t")

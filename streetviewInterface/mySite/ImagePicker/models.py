@@ -35,7 +35,7 @@ class BoundingBox(models.Model):
     x2 = models.IntegerField()
     y1 = models.IntegerField()
     y2 = models.IntegerField()
-    score = models.FloatField(blank=True)
+    score = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return str([self.x1, self.y1, self.x2, self.y2])
@@ -77,7 +77,7 @@ class OcrText(models.Model):
     method = models.TextField()
     text = models.TextField()
     locale = models.TextField(blank=True)
-    score = models.FloatField(blank=True)
+    score = models.FloatField(null=True, blank=True)
     notes = models.TextField(blank=True)
     def __str__(self):
         return str(self.method)+': '+str(self.text)
