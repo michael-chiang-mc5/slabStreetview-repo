@@ -14,7 +14,7 @@ from math import sqrt
 from collections import Counter, defaultdict
 from .google_ocr import *
 import time
-
+import sys
 
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
