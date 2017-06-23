@@ -124,12 +124,13 @@ function initMap() {
                      'latitude':panorama.location.latLng.lat(),
                      'longitude':panorama.location.latLng.lng(),
                      'panoID':panoID_val,
+                     'MapPointTag':$("#marker_tag").val(),
                      'csrfmiddlewaretoken':csrf_token}, // our data object
       success: function(data, textStatus, jqXHR) {
         if (distanceGPS(panorama.location.latLng,end_latLng) > search_radius ) {
           panorama.setVisible(true);
           $("#distance-traveled").html("Distance: "+ distanceGPS(panorama.location.latLng,start_latLng)+" meters")
-          $("#points-saved").html("MapPoints saved: "+ mapPoint_count)          
+          $("#points-saved").html("MapPoints saved: "+ mapPoint_count)
           panorama.setPano(links[best_i].pano);
         } else {
           $("#distance-traveled").html("Distance: "+ distanceGPS(panorama.location.latLng,start_latLng)+" meters")

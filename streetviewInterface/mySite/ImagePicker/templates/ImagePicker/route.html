@@ -61,6 +61,15 @@
 
           <br /> <br />
 
+          <!-- filter -->
+          <div class="outline">
+            <form action="/" method="POST">
+              {% csrf_token %}
+              markerTag =
+              <input id="marker_tag" type="text" name="command" size=20><br />
+            </form>
+          </div>
+
           <button id="calculate_route" type="button">Calculate route!</button>
 
           <div id="distance-traveled">Distance: EMPTY</div>
