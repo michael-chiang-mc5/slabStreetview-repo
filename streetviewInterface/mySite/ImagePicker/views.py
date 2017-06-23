@@ -311,7 +311,7 @@ def postBoundingBox(request):
     boxes = d['box']
     BoundingBox.objects.filter(streetviewImage=pk).delete() # delete previous bounding boxes
     for box in boxes:
-        boundingBox = BoundingBox(streetviewImage=StreetviewImage.objects.get(pk=pk),x1=box[0], y1=box[1], x2=box[2], y2=box[3], nms=box[4],method=method)
+        boundingBox = BoundingBox(streetviewImage=StreetviewImage.objects.get(pk=pk),x1=box[0], y1=box[1], x2=box[2], y2=box[3], score=box[4],method=method)
         boundingBox.save()
     return HttpResponse("done")
 
