@@ -269,20 +269,6 @@ def list_ECN_metadata(request):
     return response
 
 @csrf_exempt
-def postECN(request):
-    json_str = request.POST.get("json-str")
-    d = ast.literal_eval(json_str)
-    pk = d['boundingBox_pk'] # this is the pk of the boundingBox object
-    method = d['method']
-    languageID = int(d['languageID'])
-    score = float(d['score'])
-    notes = d['notes']
-    ScriptIdentification.objects.filter(boundingBox=pk,method=method).delete() # delete previous results
-    scriptIdentification = ScriptIdentification(boundingBox=BoundingBox.objects.get(pk=pk),method=method,languageID=languageID,score=score)
-    scriptIdentification.save()
-    return HttpResponse("done")
-
-@csrf_exempt
 def postOCR(request):
     json_str = request.POST.get("json-str")
     d = ast.literal_eval(json_str)
@@ -290,8 +276,10 @@ def postOCR(request):
     method = d['method']
     text = d['text']
     notes = d['notes']
+    locale = d['locale']
+    score = d['score']
     OcrText.objects.filter(boundingBox=pk,method=method).delete() # delete previous results
-    ocrText = OcrText(boundingBox=BoundingBox.objects.get(pk=pk),method=method,text=text,notes=notes)
+    ocrText = OcrText(boundingBox=BoundingBox.objects.get(pk=pk),method=method,text=text,notes=notes,locale=locale,score=score)
     ocrText.save()
     return HttpResponse("done")
 
