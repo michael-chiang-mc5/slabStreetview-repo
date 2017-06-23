@@ -15,6 +15,7 @@ from collections import Counter, defaultdict
 from .google_ocr import *
 import time
 import sys
+import subprocess
 
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
@@ -389,10 +390,13 @@ def deleteOcrText(request,ocrtext_pk):
 
 
 def saveImages(request):
-    if os.fork() == 0:
-        saveImages_async()
-        sys.exit(0)
-    return HttpResponse("thread started")
+    #if os.fork() == 0:
+    #    saveImages_async()
+    #    sys.exit(0)
+    p = subprocess.Popen(['python', 'manage.py', 'saveImages'],
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.STDOUT)
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def saveImages_async():
 
