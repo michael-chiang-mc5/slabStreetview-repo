@@ -10,6 +10,10 @@ class MapPoint(models.Model):
         return str('lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))
         #return self.panoID
 
+class MapPointTag(models.Model):
+    mapPoint = models.ForeignKey(MapPoint)
+    tag = models.TextField()
+
 class StreetviewImage(models.Model):
     mapPoint = models.ForeignKey(MapPoint) # each mapPoint has two images corresponding to left and right
     heading = models.FloatField() # photographerHeading +- 90
@@ -31,7 +35,7 @@ class BoundingBox(models.Model):
     x2 = models.IntegerField()
     y1 = models.IntegerField()
     y2 = models.IntegerField()
-    nms = models.FloatField(default=1)
+    score = models.FloatField(blank=True)
 
     def __str__(self):
         return str([self.x1, self.y1, self.x2, self.y2])
@@ -67,48 +71,28 @@ class BoundingBox(models.Model):
             return None
         else:
             return ocrText[0]
+
 class OcrText(models.Model):
     boundingBox = models.ForeignKey(BoundingBox) # each image can have multiple bounding boxes
     method = models.TextField()
     text = models.TextField()
+    score = models.FloatField(blank=True)
     notes = models.TextField(blank=True)
     def __str__(self):
         return str(self.method)+': '+str(self.text)
 
-class ScriptIdentification(models.Model):
-    boundingBox = models.ForeignKey(BoundingBox)
-    method = models.TextField()
-    languageID = models.IntegerField()
-    score = models.FloatField()
-    notes = models.TextField(blank=True)
-    def __str__(self):
-        return ""
-    def language(self):
-        if self.languageID == 0:
-            return "none"
-        elif self.languageID == 1:
-            return "arabic"
-        elif self.languageID == 2:
-            return "cambodian"
-        elif self.languageID == 3:
-            return "chinese"
-        elif self.languageID == 4:
-            return "english"
-        elif self.languageID == 5:
-            return "greek"
-        elif self.languageID == 6:
-            return "hebrew"
-        elif self.languageID == 7:
-            return "japanese"
-        elif self.languageID == 8:
-            return "kannada"
-        elif self.languageID == 9:
-            return "korean"
-        elif self.languageID == 10:
-            return "mongolian"
-        elif self.languageID == 11:
-            return "russian"
-        elif self.languageID == 12:
-            return "thai"
-        elif self.languageID == 13:
-            return "tibetan"
+
+#            0 "none"
+#            1 "arabic"
+#            2 "cambodian"
+#            3 "chinese"
+#            4 "english"
+#            5 "greek"
+#            6 "hebrew"
+#            7 "japanese"
+#            8 "kannada"
+#            9 "korean"
+#            10 "mongolian"
+#            11 "russian"
+#            12 "thai"
+#            13 "tibetan"
