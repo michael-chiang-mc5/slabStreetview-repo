@@ -124,7 +124,7 @@ function initMap() {
                      'latitude':panorama.location.latLng.lat(),
                      'longitude':panorama.location.latLng.lng(),
                      'panoID':panoID_val,
-                     'MapPointTag':$("#marker_tag").val(),
+                     'mapPointTag':$("#marker_tag").val(),
                      'csrfmiddlewaretoken':csrf_token}, // our data object
       success: function(data, textStatus, jqXHR) {
         if (distanceGPS(panorama.location.latLng,end_latLng) > search_radius ) {

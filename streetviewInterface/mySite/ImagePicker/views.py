@@ -58,12 +58,15 @@ def savePoint(request):
     latitude = float(request.POST.get("latitude"))
     longitude = float(request.POST.get("longitude"))
     panoID = str(request.POST.get("panoID"))
+    mapPointTag_str = str(request.POST.get("mapPointTag"))
     photographerHeading = float(request.POST.get("photographerHeading"))
     mapPoint = MapPoint(latitude=latitude, \
                         longitude=longitude, \
                         panoID=panoID, \
                         photographerHeading=photographerHeading)
     mapPoint.save()
+    mapPointTag = MapPointTag(mapPoint=mapPoint,tag=mapPointTag_str)
+    mapPointTag.save()
     time.sleep(0.5)
 
 
@@ -301,12 +304,6 @@ def postBoundingBox(request):
         boundingBox = BoundingBox(streetviewImage=StreetviewImage.objects.get(pk=pk),x1=box[0], y1=box[1], x2=box[2], y2=box[3], score=box[4],method=method)
         boundingBox.save()
     return HttpResponse("done")
-
-def deleteAllScriptIdentification(request):
-    if not request.user.is_superuser:
-        return HttpResponse("you are not an admin")
-    ScriptIdentification.objects.all().delete()
-    return HttpResponseRedirect(reverse('ImagePicker:adminPanel'))
 
 def deleteAllOcr(request):
     if not request.user.is_superuser:

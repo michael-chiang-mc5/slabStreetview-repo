@@ -68,6 +68,7 @@ function initMap() {
     panoID_val = panorama.getPano();
 
     // TODO: ajax call with latitude_val, longitude_val, heading_val
+    alert($("#marker_tag").val())
     $.ajax({
       type        : 'POST', // define the type of HTTP verb we want to use (POST for our form)
       url         : '/ImagePicker/savePoint/', // the url where we want to POST
@@ -75,6 +76,7 @@ function initMap() {
                      'latitude':latitude_val,
                      'longitude':longitude_val,
                      'panoID':panoID_val,
+                     'mapPointTag':$("#marker_tag").val(),
                      'csrfmiddlewaretoken':csrf_token}, // our data object
       success: function(data, textStatus, jqXHR) {
       },

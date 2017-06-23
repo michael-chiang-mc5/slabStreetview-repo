@@ -107,6 +107,10 @@ table, th, td {
               <br />
               original image: <a href="/{{ boundingBox.streetviewImage.image.url }}">{{ boundingBox.streetviewImage.image.name }}</a>
               <br />
+              tag:
+              {% for tag in boundingBox.streetviewImage.mapPoint.mappointtag_set.all %}
+                {{ tag }} <br />
+              {% endfor %}
             </div>
           </td>
 

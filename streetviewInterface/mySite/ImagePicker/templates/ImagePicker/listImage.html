@@ -78,6 +78,33 @@
 
       <tr>
 
+        <!-- info -->
+        <td>
+          {{ streetviewImage.image.name }}
+          <br />
+          {{ streetviewImage.mapPoint }}
+          <br />
+          panoID = {{ streetviewImage.mapPoint.panoID }}
+          <br />
+          {{ streetviewImage }}
+          <br />
+          <br />
+          ~~~~~ Bounding boxes ~~~~
+          <br />
+          {% for box in streetviewImage.boundingbox_set.all %}
+            {{ box }}
+            <br />
+          {% endfor %}
+          ~~~~~ Tag ~~~~~
+          <br />
+          {% for tag in streetviewImage.mapPoint.mappointtag_set.all %}
+            {{ tag }} <br />
+          {% endfor %}
+          ~~~~ Admin ~~~~
+          <br />
+          <a href="/ImagePicker/deleteStreetviewImage/{{ streetviewImage.pk }}/">Delete (CAREFUL!)</a>
+        </td>
+
           <!-- image -->
           <td>
             <div class="image_container">
@@ -93,27 +120,7 @@
             </div>
           </td>
 
-          <!-- info -->
-          <td>
-            {{ streetviewImage.image.name }}
-            <br />
-            {{ streetviewImage.mapPoint }}
-            <br />
-            panoID = {{ streetviewImage.mapPoint.panoID }}
-            <br />
-            {{ streetviewImage }}
-            <br />
-            <br />
-            ~~~~~ Bounding boxes ~~~~
-            <br />
-            {% for box in streetviewImage.boundingbox_set.all %}
-              {{ box }}
-              <br />
-            {% endfor %}
-            ~~~~ Admin ~~~~
-            <br />
-            <a href="/ImagePicker/deleteStreetviewImage/{{ streetviewImage.pk }}/">Delete (CAREFUL!)</a>
-          </td>
+
 
 
 

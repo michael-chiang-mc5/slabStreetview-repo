@@ -13,6 +13,8 @@ class MapPoint(models.Model):
 class MapPointTag(models.Model):
     mapPoint = models.ForeignKey(MapPoint)
     tag = models.TextField()
+    def __str__(self):
+        return self.tag
 
 class StreetviewImage(models.Model):
     mapPoint = models.ForeignKey(MapPoint) # each mapPoint has two images corresponding to left and right
