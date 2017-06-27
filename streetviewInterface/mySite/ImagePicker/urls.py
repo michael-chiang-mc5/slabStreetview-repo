@@ -32,4 +32,8 @@ urlpatterns = [
     url(r'^runGoogleOCR_boundingBox/(?P<boundingBox_pk>[0-9]+)/$',  views.runGoogleOCR_boundingBox, name='runGoogleOCR_boundingBox'), #
     url(r'^deleteOcrText/(?P<ocrtext_pk>[0-9]+)/$',  views.deleteOcrText, name='deleteOcrText'), #
 
+    url(r'^benchmarkingPanel/$',  views.benchmarkingPanel, name='benchmarkingPanel'), #
+    url(r'^annotateRandomBoundingBox/$',  views.annotateRandomBoundingBox, name='annotateRandomBoundingBox'), #
+    url(r'^postManualOCR/$',  views.postManualOCR, name='postManualOCR'), #
+    url(r'^runGoogleOCR_manualOCR/$',  views.runGoogleOCR_manualOCR, name='runGoogleOCR_manualOCR'), #
 ]

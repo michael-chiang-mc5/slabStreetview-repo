@@ -1,0 +1,29 @@
+{% extends "MCBase/base.html" %}
+{% load staticfiles %}
+
+{% block javascript %}
+<style>
+
+</style>
+
+{% endblock %}
+
+{% block title %}
+  Benchmarking
+{% endblock %}
+
+{% block body_block %}
+  <div class="content">
+
+
+    <h1>Benchmarking panel</h1>
+
+    <hr>
+    <hr>
+
+    <h2>Useful</h2>
+    <a href="{% url 'ImagePicker:annotateRandomBoundingBox' %}">Annotate random</a>    <br />
+    <a href="{% url 'ImagePicker:runGoogleOCR_manualOCR' %}">Google OCR</a>    <br />
+
+  </div>
+{% endblock %}
