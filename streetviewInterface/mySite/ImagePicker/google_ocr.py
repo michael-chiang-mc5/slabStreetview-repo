@@ -50,7 +50,7 @@ def request_ocr(api_key, image_filenames):
 def google_ocr_boundingBox(api_key, boundingBox):
     streetviewImage_url = join(settings.MEDIA_ROOT,boundingBox.streetviewImage.image.name)
     img = Image.open(streetviewImage_url)
-    img = img.crop((boundingBox.x1_expanded, boundingBox.y1_expanded, boundingBox.x2_expanded, boundingBox.y2_expanded ))
+    img = img.crop((boundingBox.x1_expanded(), boundingBox.y1_expanded(), boundingBox.x2_expanded(), boundingBox.y2_expanded() ))
     image_url = join(settings.MEDIA_ROOT,'temp_googleocr.jpg')
     img.save(image_url)
 
