@@ -52,52 +52,12 @@
       </form>
     </div>
 
-
-      {% for boundingBox in boundingBoxes %}
-
-      <tr>
-
-
-
-          <!-- info -->
-          <td>
-            <div class="mc-image-container">
-              bounding box method: {{ boundingBox.method }}
-              <br />
-              original image: <a href="/{{ boundingBox.streetviewImage.image.url }}">{{ boundingBox.streetviewImage.image.name }}</a>
-              <br />
-              tag:
-              {% for tag in boundingBox.streetviewImage.mapPoint.mappointtag_set.all %}
-                {{ tag }} <br />
-              {% endfor %}
-            </div>
-          </td>
-
-          {% for ocrText in boundingBox.ocrtext_set.all|dictsort:"method" %}
-	   <td>
-              <div class="mc-image-container">
-                method: {{ ocrText.method }}<br />
-                text: {{ ocrText.text }}<br />
-                locale: {{ ocrText.locale }}<br />
-                score: {{ ocrText.score }}<br />
-                notes: {{ ocrText.notes }}<br />
-                <a href="{% url 'ImagePicker:deleteOcrText' ocrtext_pk=ocrText.pk %}">delete</a>
-              </div>
-            </td>
-          {% endfor %}
-
-          {% if not boundingBox.googleOCR %}
-          <td>
-            <div class="mc-image-container">
-                <a href="{% url 'ImagePicker:runGoogleOCR_boundingBox' boundingBox_pk=boundingBox.pk %}">run google ocr</a>
-            </div>
-          </td>
-         {% endif %}
-
-      </tr>
-
-     {% endfor %}
-
+    <h3>Expanded image</h3>
+    <div>
+      <a href="/{{ boundingBox.streetviewImage.image.url }}">
+        <img src="/ImagePicker/boundingBox_expanded/{{ boundingBox.pk }}/">
+      </a>
+    </div>
 
 
 

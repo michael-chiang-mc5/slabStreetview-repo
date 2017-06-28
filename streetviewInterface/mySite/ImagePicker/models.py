@@ -45,22 +45,28 @@ class BoundingBox(models.Model):
         return self.x2 - self.x1
     def height(self):
         return self.y2 - self.y1
-    def rescaled_x1(self):
-        if self.method=="google":
-            return self.x1
-        else:
-            new_width = self.width()*1.1
-            center_x  = (self.x2+self.x1)/2
-            new_x1 = max(center_x - new_width/2,0)
-            return new_x1
-    def rescaled_x2(self):
-        if self.method=="google":
-            return self.x2
-        else:
-            new_width = self.width()*1.1
-            center_x  = (self.x2+self.x1)/2
-            new_x2 = min(center_x + new_width/2,self.streetviewImage.dimX()-1)
-            return new_x2
+    def x1_expanded(self):
+        new_width = self.width()+75
+        center_x  = (self.x2+self.x1)/2
+        new_x1 = max(center_x - new_width/2,0)
+        return new_x1
+    def x2_expanded(self):
+        new_width = self.width()+75
+        center_x  = (self.x2+self.x1)/2
+        new_x2 = min(center_x + new_width/2,self.streetviewImage.dimX()-1)
+        return new_x2
+    def y1_expanded(self):
+        new_height = self.height()+15
+        center_y  = (self.y2+self.y1)/2
+        new_y1 = max(center_y - new_height/2,0)
+        return new_y1
+    def y2_expanded(self):
+        new_height = self.height()+15
+        center_y  = (self.y2+self.y1)/2
+        new_y2 = min(center_y + new_height/2,self.streetviewImage.dimY()-1)
+        return new_y2
+
+
     def googleOCR(self):
         ocrText = OcrText.objects.filter(boundingBox=self).filter(method="google")
         if len(ocrText) == 0:

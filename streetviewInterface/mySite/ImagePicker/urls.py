@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^adminPanel/$',  views.adminPanel, name='adminPanel'), #
     url(r'^deleteStreetviewImage/(?P<streetviewImage_pk>[0-9]+)/$',  views.deleteStreetviewImage, name='deleteStreetviewImage'), #
     url(r'^boundingBox/(?P<boundingBox_pk>[0-9]+)/$',  views.boundingBox, name='boundingBox'), #
+    url(r'^boundingBox_expanded/(?P<boundingBox_pk>[0-9]+)/$',  views.boundingBox_expanded, name='boundingBox_expanded'), #
 
     url(r'^runGoogleOCR_boundingBox/(?P<boundingBox_pk>[0-9]+)/$',  views.runGoogleOCR_boundingBox, name='runGoogleOCR_boundingBox'), #
     url(r'^deleteOcrText/(?P<ocrtext_pk>[0-9]+)/$',  views.deleteOcrText, name='deleteOcrText'), #

@@ -22,7 +22,16 @@ def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
     image_url = os.path.join(settings.MEDIA_ROOT,boundingBox.streetviewImage.image.name)
     img = Image.open(os.path.join(image_url))
-    img = img.crop((boundingBox.rescaled_x1(), boundingBox.y1, boundingBox.rescaled_x2(), boundingBox.y2 ))
+    img = img.crop((boundingBox.x1, boundingBox.y1, boundingBox.x2, boundingBox.y2 ))
+    response = HttpResponse(content_type="image/jpeg")
+    img.save(response, "JPEG")
+    return response
+
+def boundingBox_expanded(request,boundingBox_pk):
+    boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
+    image_url = os.path.join(settings.MEDIA_ROOT,boundingBox.streetviewImage.image.name)
+    img = Image.open(os.path.join(image_url))
+    img = img.crop((boundingBox.x1_expanded(), boundingBox.y1_expanded(), boundingBox.x2_expanded(), boundingBox.y2_expanded() ))
     response = HttpResponse(content_type="image/jpeg")
     img.save(response, "JPEG")
     return response
@@ -344,7 +353,10 @@ def adminPanel(request):
     return render(request, 'ImagePicker/adminPanel.html',context)
 
 def benchmarkingPanel(request):
-    context = {}
+    boundingBoxes = BoundingBox.objects.exclude( ocrtext__method__contains = "manual")
+    num_benchmarked = len(BoundingBox.objects.filter( ocrtext__method__contains = "manual"))
+    total = len(BoundingBox.objects.all())
+    context = {'num_benchmarked':num_benchmarked, 'total':total}
     return render(request, 'ImagePicker/benchmarkingPanel.html',context)
 
 def annotateRandomBoundingBox(request):
