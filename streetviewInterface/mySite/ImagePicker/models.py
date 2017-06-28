@@ -56,12 +56,12 @@ class BoundingBox(models.Model):
         new_x2 = min(center_x + new_width/2,self.streetviewImage.dimX()-1)
         return new_x2
     def y1_expanded(self):
-        new_height = self.height()+15
+        new_height = self.height()+20
         center_y  = (self.y2+self.y1)/2
         new_y1 = max(center_y - new_height/2,0)
         return new_y1
     def y2_expanded(self):
-        new_height = self.height()+15
+        new_height = self.height()+20
         center_y  = (self.y2+self.y1)/2
         new_y2 = min(center_y + new_height/2,self.streetviewImage.dimY()-1)
         return new_y2
