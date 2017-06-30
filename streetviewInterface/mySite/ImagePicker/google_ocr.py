@@ -30,7 +30,7 @@ def make_image_data_list(image_filenames):
                     'features': [{
                                     'type': 'TEXT_DETECTION',
                                     'maxResults': 1 }],
-                    'imageContext': { 'languageHints': ["en","es",'zh','th','ko']} # https://cloud.google.com/vision/docs/languages
+                    'imageContext': { 'languageHints': ["en","es",'zh','th','ko']} # language codes: https://cloud.google.com/vision/docs/languages
             })
     return img_requests
 
@@ -63,7 +63,7 @@ def google_ocr_boundingBox(api_key, boundingBox):
         for idx, resp in enumerate(responses): # response.json()['responses'][i] corresponds to ith image TODO: skip first image
             # Google OCR might not find any text
             if len(resp)==0:
-                ocrText = OcrText(boundingBox=boundingBox,method='google',text='',notes='')
+                ocrText = OcrText(boundingBox=boundingBox,method='google',text='',notes='no text detected')
                 ocrText.save()
                 continue
             # save bounding box object
@@ -71,7 +71,7 @@ def google_ocr_boundingBox(api_key, boundingBox):
             locale = resp['textAnnotations'][0]['locale']
             annotation = resp['textAnnotations'][0]
             text = annotation['description']  # possible keys: description, boundingPoly, locale for FIRST element only
-            ocrText = OcrText(boundingBox=boundingBox,method='google',text=text,locale='locale='+locale)
+            ocrText = OcrText(boundingBox=boundingBox,method='google',text=text,locale='locale='+locale, notes=json.dumps(resp, indent=2))
             ocrText.save()
 
 def google_ocr_streetviewImage(api_key, streetviewImage):
@@ -89,7 +89,11 @@ def google_ocr_streetviewImage(api_key, streetviewImage):
                 boundingBox.save() # it would be better to do the saving in the view, but we need to save to set OcrText.boundingBox
                 ocrText = OcrText(boundingBox=boundingBox,method='google',text='',notes='')
                 ocrText.save()
+                streetviewImage.notes = "No google bounding boxes detected"
+                streetviewImage.save()
                 continue
+            streetviewImage.notes = json.dumps(resp, indent=2)
+            streetviewImage.save()
             # save bounding box object
             t = resp['textAnnotations'][0]  # possible keys: fullTextAnnotation, textAnnotations
             locale = resp['textAnnotations'][0]['locale']

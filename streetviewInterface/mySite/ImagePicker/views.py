@@ -341,6 +341,13 @@ def deleteStreetviewImage(request,streetviewImage_pk):
     streetviewImage.delete()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
+def deleteBoundingBox(request,pk):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
+    boundingBox = BoundingBox.objects.get(pk=pk)
+    boundingBox.delete()
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
 
 def deleteAllMapPoints(request):
     if not request.user.is_superuser:
@@ -401,6 +408,15 @@ def runGoogleOCR_images(request):
         google_ocr_streetviewImage(settings.GOOGLE_OCR_API_KEY, streetviewImage)
     context = {}
     return render(request, 'ImagePicker/adminPanel.html',context)
+
+def runGoogleOCR_image(request,pk):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
+    if len(StreetviewImage.objects.filter( boundingbox__method__contains="google", pk__in=[int(pk)] )) > 0:
+        return HttpResponse('google bounding box already generated previously')
+    streetviewImage = StreetviewImage.objects.get(pk=pk)
+    google_ocr_streetviewImage(settings.GOOGLE_OCR_API_KEY, streetviewImage)
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def runGoogleOCR_boundingBoxes(request):
     if not request.user.is_superuser:

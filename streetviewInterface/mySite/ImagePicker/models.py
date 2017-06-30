@@ -22,6 +22,7 @@ class StreetviewImage(models.Model):
     fov = models.IntegerField()
     pitch = models.FloatField()
     image = models.ImageField('img', upload_to=settings.MEDIA_URL)
+    notes = models.TextField(blank=True)
 
     def __str__(self):
         return str("heading="+str(self.heading))

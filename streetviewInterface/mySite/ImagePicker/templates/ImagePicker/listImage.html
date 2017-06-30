@@ -100,8 +100,12 @@
           {% for tag in streetviewImage.mapPoint.mappointtag_set.all %}
             {{ tag }} <br />
           {% endfor %}
+          ~~~~~ Google bounding box ~~~~~
+          <br />
+          {{ streetviewImage.notes }} <br />
           ~~~~ Admin ~~~~
           <br />
+          <a href="/ImagePicker/runGoogleOCR_image/{{ streetviewImage.pk }}">Run google bounding box</a><br />
           <a href="/ImagePicker/deleteStreetviewImage/{{ streetviewImage.pk }}/">Delete (CAREFUL!)</a>
         </td>
 
