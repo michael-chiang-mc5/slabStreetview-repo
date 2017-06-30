@@ -139,6 +139,21 @@ table, th, td {
           </td>
          {% endif %}
 
+         {% if not boundingBox.manualAnnotation %}
+         <td>
+           <div class="mc-image-container">
+             <form action="{% url 'ImagePicker:postManualOCR' %}" method="POST">
+               {% csrf_token %}
+               text &nbsp; &nbsp; = <input type="text" name="text" size=20><br />
+               locale = <input id="marker_tag" type="text" name="locale" size=20><br />
+               notes &nbsp; &nbsp; = <input type="text" name="notes" size=20><br />
+               <input type="hidden" name="pk" value="{{ boundingBox.pk }}"><br />
+               <input type="submit" value="Submit"><br />
+             </form>
+           </div>
+         </td>
+        {% endif %}
+
       </tr>
 
      {% endfor %}

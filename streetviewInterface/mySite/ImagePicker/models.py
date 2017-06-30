@@ -80,7 +80,13 @@ class BoundingBox(models.Model):
             return None
         else:
             return ocrText[0]
-
+    def manualAnnotation(self):
+        ocrText = OcrText.objects.filter(boundingBox=self).filter(method="manual")
+        if len(ocrText) == 0:
+            return None
+        else:
+            return ocrText[0]
+        
 class OcrText(models.Model):
     boundingBox = models.ForeignKey(BoundingBox) # each image can have multiple bounding boxes
     method = models.TextField()

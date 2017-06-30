@@ -384,7 +384,7 @@ def postManualOCR(request):
     OcrText.objects.filter(boundingBox=pk,method=method).delete() # delete previous results
     ocrText = OcrText(boundingBox=BoundingBox.objects.get(pk=pk),notes=notes,method=method,text=text,locale=locale)
     ocrText.save()
-    return HttpResponseRedirect(reverse('ImagePicker:annotateRandomBoundingBox'))
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def deleteDuplicateMapPoints(request):
     # get values of duplicate panoID
@@ -417,6 +417,11 @@ def runGoogleOCR_image(request,pk):
     streetviewImage = StreetviewImage.objects.get(pk=pk)
     google_ocr_streetviewImage(settings.GOOGLE_OCR_API_KEY, streetviewImage)
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+def runGoogleOCR_randomImage(request):
+    streetviewImages = StreetviewImage.objects.exclude( boundingbox__method__contains="google" )
+    streetviewImage = streetviewImages[randint(0, streetviewImages.count() - 1)]
+    return runGoogleOCR_image(request,streetviewImage.pk)
 
 def runGoogleOCR_boundingBoxes(request):
     if not request.user.is_superuser:
