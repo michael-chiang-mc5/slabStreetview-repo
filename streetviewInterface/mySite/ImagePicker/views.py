@@ -255,7 +255,7 @@ def listBoundingBox(request): # TODO: make urls to cropped image
     except EmptyPage:
         boundingBoxes_page = paginator.page(paginator.num_pages)
 
-    context = {'boundingBoxes':boundingBoxes_page,'total_number':len(boundingBoxes)}
+    context = {'boundingBoxes':boundingBoxes_page,'total_number':len(boundingBoxes),'num_images':len(StreetviewImage.objects.filter(boundingbox__in=boundingBoxes).distinct())}
 
     return render(request, 'ImagePicker/listBoundingBox.html',context)
 
