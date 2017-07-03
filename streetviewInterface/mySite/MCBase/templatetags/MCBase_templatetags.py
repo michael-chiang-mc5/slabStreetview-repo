@@ -28,6 +28,12 @@ def load_base_navbar(context):
     return context
 
 # Usage:
+# {{dictionary|keyvalue:key_variable}}
+@register.filter
+def keyvalue(dict, key):
+    return dict[key]
+
+# Usage:
 #  <li class="nav-blog {% active 'url-name' %}"><a href="#">Home</a></li>
 #  <li class="nav-blog {% active '^/regex/' %}"><a href="#">Blog</a></li>
 @register.simple_tag(takes_context=True)

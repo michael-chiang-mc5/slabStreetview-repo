@@ -360,10 +360,31 @@ def adminPanel(request):
     return render(request, 'ImagePicker/adminPanel.html',context)
 
 def benchmarkingPanel(request):
-    boundingBoxes = BoundingBox.objects.exclude( ocrtext__method__contains = "manual")
     num_benchmarked = len(BoundingBox.objects.filter( ocrtext__method__contains = "manual"))
     total = len(BoundingBox.objects.all())
-    context = {'num_benchmarked':num_benchmarked, 'total':total}
+
+    columns = ['english','spanish','chinese','japanese','korean','thai','other']
+
+
+    boundingBoxes = BoundingBox.objects.filter(method="google") # switch this to .all() when you want to benchmark over entire dataset, not just google ocr
+    boundingBoxes_withManual = boundingBoxes.filter(ocrtext__method__contains="manual")
+
+    confusion_matrix = {}
+    for column_manual in columns:
+        tmp = {}
+        for column_ocr in columns:
+            tmp.update({column_ocr:0})
+        confusion_matrix.update({column_manual:tmp})
+
+    for boundingBox in boundingBoxes_withManual:
+        benchmark = boundingBox.benchmark()
+        if benchmark is not None:
+            language_manual = benchmark['language_manual']
+            language_ocr = benchmark['language_ocr']
+            confusion_matrix[language_manual][language_ocr] += 1
+
+
+    context = {'num_benchmarked':num_benchmarked, 'total':total, 'confusion_matrix':confusion_matrix,'columns':columns}
     return render(request, 'ImagePicker/benchmarkingPanel.html',context)
 
 def annotateRandomBoundingBox(request):

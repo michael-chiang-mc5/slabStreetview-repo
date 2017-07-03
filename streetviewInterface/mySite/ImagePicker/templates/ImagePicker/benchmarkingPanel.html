@@ -1,9 +1,19 @@
 {% extends "MCBase/base.html" %}
+{% load MCBase_templatetags %}
 {% load staticfiles %}
 
 {% block javascript %}
 <style>
-
+  table, th, td {
+      border: 1px solid black;
+      padding: 15px;
+  }
+  .green {
+    background-color: #00FF00;
+  }
+  .red {
+    background-color: #F778A1;
+  }
 </style>
 
 {% endblock %}
@@ -22,6 +32,30 @@
       {{ num_benchmarked }} / {{ total }} bounding boxes annotated
     </h2>
 
+    <table>
+
+    <tr>
+      <td></td>
+    {% for row in columns %}
+      <td>
+        {{ row }}
+      </td>
+    {% endfor %}
+    </tr>
+    {% for row in columns %}
+      <tr>
+      <td>{{ row }}</td>
+      {% for column in columns %}
+        <td {% if row == 'other' or column == 'other' %} class="red"
+            {% elif row == column %} class="green"
+            {% endif %}>
+        {{ confusion_matrix|keyvalue:row|keyvalue:column }}
+        </td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+
+    </table>
     <hr>
     <hr>
 
