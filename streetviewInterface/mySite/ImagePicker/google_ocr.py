@@ -97,6 +97,59 @@ def google_ocr_streetviewImage(api_key, streetviewImage):
             for page in pages:
                 for block in page['blocks']:
                     for paragraph in block['paragraphs']:
+                        vertices = paragraph['boundingBox']['vertices']
+                        try:
+                            x1 = min(vertices[0]['x'], vertices[1]['x'], vertices[2]['x'], vertices[3]['x']  )
+                        except:
+                            x1 = 0
+                        try:
+                            x2 = max(vertices[0]['x'], vertices[1]['x'], vertices[2]['x'], vertices[3]['x']  )
+                        except:
+                            x2 = 0
+                        try:
+                            y1 = min(vertices[0]['y'], vertices[1]['y'], vertices[2]['y'],  vertices[3]['y']  )
+                        except:
+                            y1 = 0
+                        try:
+                            y2 = max(vertices[0]['y'], vertices[1]['y'], vertices[2]['y'],  vertices[3]['y']  )
+                        except:
+                            y2 = 0
+                        locale = 'locale='+paragraph['property']['detectedLanguages'][0]['languageCode']
+                        paragraph_text = ''
+                        for word in paragraph['words']:
+                            vertices = word['boundingBox']['vertices']
+                            for symbol in word['symbols']:
+                                paragraph_text = paragraph_text + symbol['text']
+                            paragraph_text = paragraph_text + ' '
+                        boundingBox = BoundingBox(x1=x1,x2=x2,y1=y1,y2=y2,method='google',streetviewImage=streetviewImage)
+                        boundingBox.save() # it would be better to do the saving in the view, but we need to save to set OcrText.boundingBox
+                        ocrText = OcrText(boundingBox=boundingBox,method='google',text=paragraph_text,locale=locale)
+                        ocrText.save()
+
+# This runs google OCR where individual words are segmented
+def google_ocr_streetviewImage_byWord(api_key, streetviewImage):
+    image_url = join(settings.MEDIA_ROOT,streetviewImage.image.name)
+    image_filenames = [image_url]
+    response = request_ocr(api_key, image_filenames)
+    if response.status_code != 200 or response.json().get('error'):
+        return(response.text)
+    else:
+        responses = response.json()['responses']
+        streetviewImage.notes = json.dumps(responses, indent=2)
+        streetviewImage.save()
+        for idx, resp in enumerate(responses): # response.json()['responses'][i] corresponds to ith image. Note we only run on one image
+            # Google OCR might not find any text
+            if len(resp)==0:
+                boundingBox = BoundingBox(x1=0,x2=0,y1=0,y2=0,method='google',streetviewImage=streetviewImage)
+                boundingBox.save() # it would be better to do the saving in the view, but we need to save to set OcrText.boundingBox
+                ocrText = OcrText(boundingBox=boundingBox,method='google',text='',notes='empty')
+                ocrText.save()
+                continue
+            # save bounding box object
+            pages = resp['fullTextAnnotation']['pages']
+            for page in pages:
+                for block in page['blocks']:
+                    for paragraph in block['paragraphs']:
                         for word in paragraph['words']:
                             vertices = word['boundingBox']['vertices']
                             try:
@@ -121,7 +174,7 @@ def google_ocr_streetviewImage(api_key, streetviewImage):
                                 text = text + symbol['text']
                             boundingBox = BoundingBox(x1=x1,x2=x2,y1=y1,y2=y2,method='google',streetviewImage=streetviewImage)
                             boundingBox.save() # it would be better to do the saving in the view, but we need to save to set OcrText.boundingBox
-                            ocrText = OcrText(boundingBox=boundingBox,method='google',text=text,notes=locale)
+                            ocrText = OcrText(boundingBox=boundingBox,method='google',text=text,locale=locale)
                             ocrText.save()
 
 
