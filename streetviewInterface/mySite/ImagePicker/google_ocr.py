@@ -100,31 +100,19 @@ def google_ocr_streetviewImage(api_key, streetviewImage):
                         for word in paragraph['words']:
                             vertices = word['boundingBox']['vertices']
                             try:
-                                x1 = min(vertices[0]['x'], \
-                                         vertices[1]['x'], \
-                                         vertices[2]['x'], \
-                                         vertices[3]['x']  )
+                                x1 = min(vertices[0]['x'], vertices[1]['x'], vertices[2]['x'], vertices[3]['x']  )
                             except:
                                 x1 = 0
                             try:
-                                x2 = max(vertices[0]['x'], \
-                                         vertices[1]['x'], \
-                                         vertices[2]['x'], \
-                                         vertices[3]['x']  )
+                                x2 = max(vertices[0]['x'], vertices[1]['x'], vertices[2]['x'], vertices[3]['x']  )
                             except:
                                 x2 = 0
                             try:
-                                y1 = min(vertices[0]['y'], \
-                                         vertices[1]['y'], \
-                                         vertices[2]['y'], \
-                                         vertices[3]['y']  )
+                                y1 = min(vertices[0]['y'], vertices[1]['y'], vertices[2]['y'],  vertices[3]['y']  )
                             except:
                                 y1 = 0
                             try:
-                                y2 = max(vertices[0]['y'], \
-                                         vertices[1]['y'], \
-                                         vertices[2]['y'], \
-                                         vertices[3]['y']  )
+                                y2 = max(vertices[0]['y'], vertices[1]['y'], vertices[2]['y'],  vertices[3]['y']  )
                             except:
                                 y2 = 0
                             locale = 'locale='+word['property']['detectedLanguages'][0]['languageCode']
