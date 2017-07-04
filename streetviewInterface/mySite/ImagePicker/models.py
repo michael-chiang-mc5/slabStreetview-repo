@@ -40,7 +40,7 @@ class BoundingBox(models.Model):
     y1 = models.IntegerField()
     y2 = models.IntegerField()
     score = models.FloatField(null=True, blank=True)
-    is_set = models.BooleanField(default=True)
+    is_nil = models.BooleanField(default=True)
 
     def __str__(self):
         return str([self.x1, self.y1, self.x2, self.y2])
