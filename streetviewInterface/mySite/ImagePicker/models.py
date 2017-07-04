@@ -170,11 +170,13 @@ class OcrLanguage(models.Model):
         # es = spanish
         # da = danish
         # fil = filipino
+        # pl = polish
         elif 'locale=en' in ocr_locale or \
              'locale=es' in ocr_locale or \
              'locale=da' in ocr_locale or \
+             'locale=pl' in ocr_locale or \
              'locale=fil' in ocr_locale:
-            match,distance,best_language = english_or_spanish(ocr_text)
+            best_language = english_or_spanish(ocr_text)
             if best_language is None:
                 language = 'other'
             else:
