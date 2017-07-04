@@ -106,6 +106,13 @@ def google_ocr_streetviewImage(api_key, streetviewImage):
                             vertices = word['boundingBox']['vertices']
                             for symbol in word['symbols']:
                                 paragraph_text = paragraph_text + symbol['text']
+                                # refine vertices of bounding box
+                                vertices = symbol['boundingBox']['vertices']
+                                x1_tmp,x2_tmp,y1_tmp,y2_tmp = sanitize_vertices(vertices)
+                                x1 = min(x1,x1_tmp)
+                                x2 = max(x2,x2_tmp)
+                                y1 = min(y1,y1_tmp)
+                                y2 = max(y2,y2_tmp)
                             paragraph_text = paragraph_text + ' '
                         boundingBox = BoundingBox(x1=x1,x2=x2,y1=y1,y2=y2,method='google',streetviewImage=streetviewImage)
                         boundingBox.save() # it would be better to do the saving in the view, but we need to save to set OcrText.boundingBox

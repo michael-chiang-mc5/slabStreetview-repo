@@ -166,9 +166,14 @@ class OcrLanguage(models.Model):
         elif 'locale=vi' in ocr_locale:
             language = 'vietnamese'
         # search across spanish/english dictionaries
+        # en = english
+        # es = spanish
+        # da = danish
+        # fil = filipino
         elif 'locale=en' in ocr_locale or \
              'locale=es' in ocr_locale or \
-             'locale=fil' in ocr_locale:    
+             'locale=da' in ocr_locale or \
+             'locale=fil' in ocr_locale:
             match,distance,best_language = english_or_spanish(ocr_text)
             if best_language is None:
                 language = 'other'
