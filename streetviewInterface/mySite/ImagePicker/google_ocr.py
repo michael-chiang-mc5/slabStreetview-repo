@@ -1,5 +1,6 @@
 # Usage: python cloudvisreq.py API_KEY image1.jpg image2.png
 # Code from: https://gist.github.com/dannguyen/a0b69c84ebc00c54c94d
+# language codes: https://cloud.google.com/vision/docs/languages
 
 from base64 import b64encode
 from os import makedirs
@@ -98,22 +99,7 @@ def google_ocr_streetviewImage(api_key, streetviewImage):
                 for block in page['blocks']:
                     for paragraph in block['paragraphs']:
                         vertices = paragraph['boundingBox']['vertices']
-                        try:
-                            x1 = min(vertices[0]['x'], vertices[1]['x'], vertices[2]['x'], vertices[3]['x']  )
-                        except:
-                            x1 = 0
-                        try:
-                            x2 = max(vertices[0]['x'], vertices[1]['x'], vertices[2]['x'], vertices[3]['x']  )
-                        except:
-                            x2 = 0
-                        try:
-                            y1 = min(vertices[0]['y'], vertices[1]['y'], vertices[2]['y'],  vertices[3]['y']  )
-                        except:
-                            y1 = 0
-                        try:
-                            y2 = max(vertices[0]['y'], vertices[1]['y'], vertices[2]['y'],  vertices[3]['y']  )
-                        except:
-                            y2 = 0
+                        x1,x2,y1,y2 = sanitize_vertices(vertices)
                         locale = 'locale='+paragraph['property']['detectedLanguages'][0]['languageCode']
                         paragraph_text = ''
                         for word in paragraph['words']:
@@ -125,6 +111,25 @@ def google_ocr_streetviewImage(api_key, streetviewImage):
                         boundingBox.save() # it would be better to do the saving in the view, but we need to save to set OcrText.boundingBox
                         ocrText = OcrText(boundingBox=boundingBox,method='google',text=paragraph_text,locale=locale)
                         ocrText.save()
+
+def sanitize_vertices(vertices):
+    tmp = {}
+    for idx in range(0,4):
+        tmp.update({idx: {}})
+        for dim in ['x','y']:
+            try:
+                val = vertices[idx][dim]
+            except:
+                val = 0
+            tmp[idx].update({dim:val})
+    x1 = min(tmp[0]['x'], tmp[1]['x'], tmp[2]['x'], tmp[3]['x'])
+    x2 = max(tmp[0]['x'], tmp[1]['x'], tmp[2]['x'], tmp[3]['x'])
+    y1 = min(tmp[0]['y'], tmp[1]['y'], tmp[2]['y'], tmp[3]['y'])
+    y2 = max(tmp[0]['y'], tmp[1]['y'], tmp[2]['y'], tmp[3]['y'])
+    return x1,x2,y1,y2
+
+
+
 
 # This runs google OCR where individual words are segmented
 def google_ocr_streetviewImage_byWord(api_key, streetviewImage):

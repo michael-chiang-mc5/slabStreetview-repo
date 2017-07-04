@@ -40,4 +40,7 @@ urlpatterns = [
     url(r'^annotateRandomBoundingBox/$',  views.annotateRandomBoundingBox, name='annotateRandomBoundingBox'), #
     url(r'^postManualOCR/$',  views.postManualOCR, name='postManualOCR'), #
     url(r'^runGoogleOCR_manualOCR/$',  views.runGoogleOCR_manualOCR, name='runGoogleOCR_manualOCR'), #
+
+    url(r'^runLanguageIdentifiction/$',  views.runLanguageIdentifiction, name='runLanguageIdentifiction'), #
+    url(r'^deleteAllOcrLanguage/$',  views.deleteAllOcrLanguage, name='deleteAllOcrLanguage'), #
 ]

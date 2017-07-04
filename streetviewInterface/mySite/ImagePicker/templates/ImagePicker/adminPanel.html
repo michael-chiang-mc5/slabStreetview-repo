@@ -24,9 +24,11 @@
     <h2>Useful</h2>
     <a href="{% url 'ImagePicker:deleteDuplicateMapPoints' %}">Delete duplicate map points</a>    <br />
     <a href="{% url 'ImagePicker:saveImages' %}">Save images from MapPoints</a>    <br />
-    <a href="{% url 'ImagePicker:runGoogleOCR_images' %}">Run google bounding box, ocr on all images</a>    <br />
-    <a href="{% url 'ImagePicker:runGoogleOCR_boundingBoxes' %}">Run google ocr on bounding boxes</a>    <br />
-    <a href="{% url 'ImagePicker:runGoogleOCR_randomImage' %}">Run google bounding box, ocr on a single random image</a>    <br />
+    <!--<a href="{% url 'ImagePicker:runGoogleOCR_images' %}">Run google bounding box, ocr on all images</a>    <br /> -->
+    <!--<a href="{% url 'ImagePicker:runGoogleOCR_boundingBoxes' %}">Run google ocr on bounding boxes</a>    <br /> -->
+    <a href="{% url 'ImagePicker:runGoogleOCR_randomImage' %}">Run googleOCR on a single random image</a>    <br />
+    <a href="{% url 'ImagePicker:runLanguageIdentifiction' %}">Run dictionary-based language identification</a>    <br />
+
     <p>~~~~~~~~~</p>
 
     <h2>Interface to CTPN, crnn</h2>
@@ -41,6 +43,7 @@
     <a href="{% url 'ImagePicker:deleteAllStreetviewImages' %}">Delete all images</a><br />
     <a href="{% url 'ImagePicker:deleteAllBoundingBox' %}">Delete all bounding boxes</a><br />
     <a href="{% url 'ImagePicker:deleteAllOcr' %}">Delete all OCR text</a>  <br />
+    <a href="{% url 'ImagePicker:deleteAllOcrLanguage' %}">Delete all language detections</a>  <br />
 
   </div>
 {% endblock %}

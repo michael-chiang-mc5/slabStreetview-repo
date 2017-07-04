@@ -111,7 +111,7 @@ table, th, td {
               <br />
               original image: <a href="/{{ boundingBox.streetviewImage.image.url }}">{{ boundingBox.streetviewImage.image.name }}</a>
               <br />
-              x1= {{ boundingBox.x1 }}, x2= {{ boundingBox.x2 }}, y1={{ boundingBox.y1 }}, x4={{ boundingBox.y2 }} <br />
+              x1= {{ boundingBox.x1 }}, x2= {{ boundingBox.x2 }}, y1={{ boundingBox.y1 }}, x2={{ boundingBox.y2 }} <br />
               <a href="{% url 'ImagePicker:deleteBoundingBox' pk=boundingBox.pk %}">Delete (CAREFUL!!)</a><br />
               tag:
               {% for tag in boundingBox.streetviewImage.mapPoint.mappointtag_set.all %}
@@ -128,6 +128,7 @@ table, th, td {
                 locale: {{ ocrText.locale }}<br />
                 score: {{ ocrText.score }}<br />
                 notes: {{ ocrText.notes }}<br />
+                languageIdentification: {{ ocrText.ocrlanguage_set.all.0.language }}<br />
                 <a href="{% url 'ImagePicker:deleteOcrText' ocrtext_pk=ocrText.pk %}">delete</a>
               </div>
             </td>

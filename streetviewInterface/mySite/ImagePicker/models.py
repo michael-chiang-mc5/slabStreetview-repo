@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from .dictionary_search import *
 
 class MapPoint(models.Model):
     latitude = models.FloatField()
@@ -39,6 +40,7 @@ class BoundingBox(models.Model):
     y1 = models.IntegerField()
     y2 = models.IntegerField()
     score = models.FloatField(null=True, blank=True)
+    is_set = models.BooleanField(default=True)
 
     def __str__(self):
         return str([self.x1, self.y1, self.x2, self.y2])
@@ -143,6 +145,40 @@ class OcrText(models.Model):
     notes = models.TextField(blank=True)
     def __str__(self):
         return str(self.method)+': '+str(self.text)
+
+class OcrLanguage(models.Model):
+    ocrText = models.ForeignKey(OcrText)
+    language = models.TextField(blank=True)
+
+    def __str__(self):
+        return str(self.ocrText.pk) + ': ' + self.language
+    def init(ocrText):
+        ocr_text   = ocrText.text
+        ocr_locale = ocrText.locale
+        if 'locale=zh' in ocr_locale: # possible "locale=zh-*"
+            language = 'chinese'
+        elif 'locale=jp' in ocr_locale:
+            language = 'japanese'
+        elif 'locale=ko' in ocr_locale:
+            language = 'korean'
+        elif 'locale=th' in ocr_locale:
+            language = 'thai'
+        elif 'locale=vi' in ocr_locale:
+            language = 'vietnamese'
+        # search across spanish/english dictionaries
+        elif 'locale=en' in ocr_locale or \
+             'locale=es' in ocr_locale or \
+             'locale=fil' in ocr_locale:    
+            match,distance,best_language = english_or_spanish(ocr_text)
+            if best_language is None:
+                language = 'other'
+            else:
+                language = best_language
+        else:
+            language = 'other'
+        ocrLanguage = OcrLanguage(ocrText=ocrText,language=language)
+        ocrLanguage.save()
+        return ocrLanguage
 
 
 #            0 "none"
