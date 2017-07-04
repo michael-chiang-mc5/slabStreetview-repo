@@ -26,42 +26,128 @@
   <div class="content">
 
 
-    <h1>Benchmarking panel</h1>
+    <h1>Benchmarking panel ( {{ num_benchmarked }} / {{ total }} bounding boxes annotated )</h1>
+    <hr />
+    <hr />
+    <h2>Useful</h2>
+    <a href="{% url 'ImagePicker:annotateRandomBoundingBox' %}">Annotate random</a>    <br />
+    <a href="{% url 'ImagePicker:runGoogleOCR_manualOCR' %}">Run google OCR on all annotated </a>    <br />
 
-    <h2>
-      {{ num_benchmarked }} / {{ total }} bounding boxes annotated
-    </h2>
+    <hr />
+    <hr />
+    <h2>Confusion matrix</h2>
 
     <table>
-
-    <tr>
-      <td></td>
-    {% for row in columns %}
-      <td>
-        {{ row }}
-      </td>
-    {% endfor %}
-    </tr>
-    {% for row in columns %}
       <tr>
-      <td>{{ row }}</td>
-      {% for column in columns %}
-        <td {% if row == 'other' or column == 'other' %} class="red"
-            {% elif row == column %} class="green"
-            {% endif %}>
-        {{ confusion_matrix|keyvalue:row|keyvalue:column }}
-        </td>
-      {% endfor %}
+        <td>
+        <td>ocr</td>
       </tr>
-    {% endfor %}
-
+      <tr>
+        <td>manual</td>
+        <td>
+          <table>
+            <tr>
+              <td></td>
+            {% for column in columns %}
+              <td>
+                {{ column }}
+              </td>
+            {% endfor %}
+            </tr>
+            {% for row in columns %}
+              <tr>
+              <td>{{ row }}</td>
+              {% for column in columns %}
+                <td {% if row == 'other' or column == 'other' %} class="red"
+                    {% elif row == column %} class="green"
+                    {% endif %}>
+                {{ confusion_matrix|keyvalue:row|keyvalue:column }}
+                </td>
+              {% endfor %}
+              </tr>
+            {% endfor %}
+          </table>
+        </td>
+      </tr>
     </table>
     <hr>
     <hr>
 
-    <h2>Useful</h2>
-    <a href="{% url 'ImagePicker:annotateRandomBoundingBox' %}">Annotate random</a>    <br />
-    <a href="{% url 'ImagePicker:runGoogleOCR_manualOCR' %}">Google OCR</a>    <br />
+    <h2>Manual sign count</h2>
+    <table>
+      <tr>
+        <td>
+        <td>ocr</td>
+      </tr>
+      <tr>
+        <td>location</td>
+        <td>
+          <table>
+            <tr>
+              <td></td>
+            {% for column in columns %}
+              <td>
+                {{ column }}
+              </td>
+            {% endfor %}
+            </tr>
+            {% for row, location in columns|zip_lists:locations %}
+              <tr>
+              <td>{{ location }}</td>
+              {% for column in columns %}
+                <td {% if row == 'other' or column == 'other' %} class="red"
+                    {% elif row == column %} class="green"
+                    {% endif %}>
+                {{ benchmark_manual|keyvalue:location|keyvalue:column }}
+                </td>
+              {% endfor %}
+              </tr>
+            {% endfor %}
+          </table>
+        </td>
+      </tr>
+    </table>
+    <hr>
+    <hr>
+
+
+    <h2>OCR sign count</h2>
+    <table>
+      <tr>
+        <td>
+        <td>ocr</td>
+      </tr>
+      <tr>
+        <td>location</td>
+        <td>
+          <table>
+            <tr>
+              <td></td>
+            {% for column in columns %}
+              <td>
+                {{ column }}
+              </td>
+            {% endfor %}
+            </tr>
+            {% for row, location in columns|zip_lists:locations %}
+              <tr>
+              <td>{{ location }}</td>
+              {% for column in columns %}
+                <td {% if row == 'other' or column == 'other' %} class="red"
+                    {% elif row == column %} class="green"
+                    {% endif %}>
+                {{ benchmark_ocr|keyvalue:location|keyvalue:column }}
+                </td>
+              {% endfor %}
+              </tr>
+            {% endfor %}
+          </table>
+        </td>
+      </tr>
+    </table>
+    <hr>
+    <hr>
+
 
   </div>
 {% endblock %}

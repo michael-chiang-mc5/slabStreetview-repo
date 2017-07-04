@@ -15,6 +15,7 @@ def get_range( value ):
 def increment( i ):
   return i+1
 
+# Usage: {%for a, b in first_list|zip:second_list %}
 @register.filter()
 def zip_lists(a, b):
   return zip(a, b)

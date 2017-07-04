@@ -363,28 +363,60 @@ def benchmarkingPanel(request):
     num_benchmarked = len(BoundingBox.objects.filter( ocrtext__method__contains = "manual"))
     total = len(BoundingBox.objects.all())
 
-    columns = ['english','spanish','chinese','japanese','korean','thai','other']
+    columns =   ['english','spanish','chinese','japanese'          ,'korean'   ,'thai'    ,'other']
+    locations = ['woodman','pico'   ,'garvey' ,'tokyo(NONEXISTANT)','koreatown','thaitown','other(NONEXISTANT)']
 
-
-    boundingBoxes = BoundingBox.objects.filter(method="google") # switch this to .all() when you want to benchmark over entire dataset, not just google ocr
+    boundingBoxes = BoundingBox.objects.filter(method="CTPN") # switch this to .all() when you want to benchmark over entire dataset, not just google ocr
     boundingBoxes_withManual = boundingBoxes.filter(ocrtext__method__contains="manual")
 
+    # initialize confusion matrix
     confusion_matrix = {}
     for column_manual in columns:
         tmp = {}
         for column_ocr in columns:
             tmp.update({column_ocr:0})
         confusion_matrix.update({column_manual:tmp})
-
+    # populate confusion matrix
     for boundingBox in boundingBoxes_withManual:
         benchmark = boundingBox.benchmark()
-        if benchmark is not None:
+        if benchmark['language_manual'] is not None and benchmark['language_ocr'] is not None:
             language_manual = benchmark['language_manual']
             language_ocr = benchmark['language_ocr']
             confusion_matrix[language_manual][language_ocr] += 1
+    # this is not a great name.
+    # This is a matrix that tells how many signs of a certain language are in a given city
+    benchmark_manual = {}
+    for location in locations:
+        tmp = {}
+        for language in columns:
+            tmp.update({language:0})
+        benchmark_manual.update({location:tmp})
+    # populate final result
+    for boundingBox in boundingBoxes_withManual:
+        benchmark = boundingBox.benchmark()
+        if benchmark['language_manual'] is not None and benchmark['location'] is not None:
+            location = benchmark['location']
+            language = benchmark['language_manual']
+            benchmark_manual[location][language] += 1
 
+    #
+    benchmark_ocr = {}
+    for location in locations:
+        tmp = {}
+        for language in columns:
+            tmp.update({language:0})
+        benchmark_ocr.update({location:tmp})
+    # populate final result
+    for boundingBox in boundingBoxes_withManual:
+        benchmark = boundingBox.benchmark()
+        if benchmark['language_ocr'] is not None and benchmark['location'] is not None:
+            location = benchmark['location']
+            language = benchmark['language_ocr']
+            benchmark_ocr[location][language] += 1
 
-    context = {'num_benchmarked':num_benchmarked, 'total':total, 'confusion_matrix':confusion_matrix,'columns':columns}
+    context = {'num_benchmarked':num_benchmarked, 'total':total, \
+              'confusion_matrix':confusion_matrix, 'benchmark_manual':benchmark_manual, \
+              'benchmark_ocr':benchmark_ocr, 'columns':columns,'locations':locations}
     return render(request, 'ImagePicker/benchmarkingPanel.html',context)
 
 def annotateRandomBoundingBox(request):

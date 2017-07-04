@@ -88,31 +88,51 @@ class BoundingBox(models.Model):
             return ocrText[0]
 
     # benchmarks manual annotation against google ocr
+    # Behavior:
+    #   - There must be exactly 1 manual ocrText annotation otherwise
+    #     language_manual = None
+    #   - ocrText locale annotation must be one of [english, spanish, chinese, japanese, korean, thai] or else
+    #     language_manual = other
     def benchmark(self):
+
+        # manual locale annotation
         ocrText_manual = OcrText.objects.filter(boundingBox=self).filter(method="manual")
-        ocrText_ocr    = OcrText.objects.filter(boundingBox=self).filter(method="google")
-        if len(ocrText_manual) == 1 and len(ocrText_ocr) == 1:
+        if len(ocrText_manual) == 1:
             dictionary_manual = {'english':'english','spanish':'spanish', \
                                  'chinese':'chinese','japanese':'japanese', \
                                  'korean':'korean','thai':'thai'}
-            dictionary_ocr    = {'locale=en':'english','locale=es':'spanish', \
-                                 'locale=zh':'chinese','locale=jp':'japanese', \
-                                 'locale=ko':'korean' ,'locale=th':'thai'}
             manual_locale = ocrText_manual[0].locale
-            ocr_locale    = ocrText_ocr[0].locale
-            if 'locale=zh' in ocr_locale:
-                ocr_locale = 'locale=zh'
             try:
                 language_manual = dictionary_manual[manual_locale]
             except:
                 language_manual = 'other'
+        else:
+            language_manual = None
+
+        # automatic google ocr annotation
+        ocrText_ocr    = OcrText.objects.filter(boundingBox=self).filter(method="google")
+        if len(ocrText_ocr) == 1:
+            dictionary_ocr    = {'locale=en':'english','locale=es':'spanish', \
+                                 'locale=zh':'chinese','locale=jp':'japanese', \
+                                 'locale=ko':'korean' ,'locale=th':'thai'}
+            ocr_locale    = ocrText_ocr[0].locale
+            if 'locale=zh' in ocr_locale:
+                ocr_locale = 'locale=zh'
             try:
                 language_ocr = dictionary_ocr[ocr_locale]
             except:
                 language_ocr = 'other'
-            return {'language_manual':language_manual,'language_ocr':language_ocr}
         else:
-            return None
+            language_ocr = None
+
+        # location tag
+        try:
+            tag = self.streetviewImage.mapPoint.mappointtag_set.all()[0].tag
+        except:
+            tag = None
+
+        # return
+        return {'language_manual':language_manual,'language_ocr':language_ocr,'location':tag}
 
 class OcrText(models.Model):
     boundingBox = models.ForeignKey(BoundingBox) # each image can have multiple bounding boxes

@@ -57,9 +57,10 @@ table, th, td {
         <input type="submit" value="Submit"><br />
         Examples: <br />
         BoundingBox.objects.exclude(ocrtext__isnull=True)<br />
-        BoundingBox.objects.filter(ocrtext__method__contains="ECN").filter(ocrtext__locale__contains="Chinese")<br />
-        BoundingBox.objects.filter(ocrtext__method__contains="google").filter(ocrtext__locale__contains="locale=ko")<br />
-        BoundingBox.objects.filter(ocrtext__method__contains="manual")
+        BoundingBox.objects.filter(ocrtext__method__contains="google",ocrtext__locale__contains="locale=ko")<br />
+        BoundingBox.objects.filter(ocrtext__method__contains="manual")<br />
+        BoundingBox.objects.filter(streetviewImage__mapPoint__mappointtag__tag="thaitown")<br />
+        BoundingBox.objects.filter(method="google").filter(streetviewImage__mapPoint__mappointtag__tag="garvey").filter(ocrtext__method="manual",ocrtext__locale="spanish")
       </form>
     </div>
 
