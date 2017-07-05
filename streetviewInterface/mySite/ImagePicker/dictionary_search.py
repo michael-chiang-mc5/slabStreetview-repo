@@ -46,6 +46,7 @@ def filter_words(text_list):
         for letter in text:
             if letter in '1234567890!@#$%^&*()':
                 omit = True
+        text = text.replace("'","")
         if not omit:
             out.append(text)
     return out

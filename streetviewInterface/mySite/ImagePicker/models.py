@@ -96,6 +96,33 @@ class BoundingBox(models.Model):
     #   - ocrText locale annotation must be one of [english, spanish, chinese, japanese, korean, thai] or else
     #     language_manual = other
     def benchmark(self):
+        if self.method != 'google':
+            raise ValueError('BoundingBox.benchmark can only be run on google-derived bounding boxes')
+
+        # manual locale annotation
+        ocrText_manual = OcrText.objects.filter(boundingBox=self).filter(method="manual")
+        manual_locale = ocrText_manual[0].locale
+        if manual_locale in ['english','spanish','chinese','japanese','korean','thai']:
+            language_manual = manual_locale
+        else:
+            language_manual = 'other'
+
+        # automatic google ocr annotation
+        ocrText_ocr    = OcrText.objects.filter(boundingBox=self).filter(method="google")
+        language_ocr    = ocrText_ocr[0].ocrlanguage_set.all()[0].language
+        if language_ocr not in ['english','spanish','chinese','japanese','korean','thai']:
+            language_ocr = 'other'
+
+        # location tag
+        try:
+            tag = self.streetviewImage.mapPoint.mappointtag_set.all()[0].tag
+        except:
+            tag = None
+
+        # return
+        return {'language_manual':language_manual,'language_ocr':language_ocr,'location':tag}
+
+    def benchmark_deprecated(self):
 
         # manual locale annotation
         ocrText_manual = OcrText.objects.filter(boundingBox=self).filter(method="manual")
@@ -177,6 +204,9 @@ class OcrLanguage(models.Model):
         # ms = malaysia
         # mt = maltese
         # it = italian
+        # fr = french
+        # fy = ???
+        # uz = uzbek
         elif 'locale=en' in ocr_locale or \
              'locale=es' in ocr_locale or \
              'locale=da' in ocr_locale or \
@@ -186,6 +216,13 @@ class OcrLanguage(models.Model):
              'locale=ms' in ocr_locale or \
              'locale=mt' in ocr_locale or \
              'locale=it' in ocr_locale or \
+             'locale=fr' in ocr_locale or \
+             'locale=fy' in ocr_locale or \
+             'locale=uz' in ocr_locale or \
+             'locale=co' in ocr_locale or \
+             'locale=gl' in ocr_locale or \
+             'locale=eu' in ocr_locale or \
+             'locale=pt' in ocr_locale or \
              'locale=fil' in ocr_locale:
             best_language, notes = english_or_spanish(ocr_text)
             language = best_language

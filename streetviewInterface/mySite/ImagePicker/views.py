@@ -364,7 +364,7 @@ def benchmarkingPanel(request):
     columns =   ['english','spanish','chinese','japanese'          ,'korean'   ,'thai'    ,'other']
     locations = ['woodman','pico'   ,'garvey' ,'tokyo(NONEXISTANT)','koreatown','thaitown','other(NONEXISTANT)']
 
-    boundingBoxes = BoundingBox.objects.filter(method="CTPN") # switch this to .all() when you want to benchmark over entire dataset, not just google ocr
+    boundingBoxes = BoundingBox.objects.filter(method="google") # switch this to .all() when you want to benchmark over entire dataset, not just google ocr
     boundingBoxes_withManual = boundingBoxes.filter(ocrtext__method__contains="manual")
 
     # initialize confusion matrix
