@@ -53,7 +53,7 @@ def filter_words(text_list):
 # input:
 #     words: string
 def english_or_spanish(words):
-    words = re.split('&| ',words)
+    words = re.split('&| |,|-',words)
     words = filter_words(words)
 
     dictionary_spanish = load_words('dictionaries/espanol_utf8.txt')
@@ -70,8 +70,8 @@ def english_or_spanish(words):
 
         combined_spanish_distance+=spanish_distance
         combined_english_distance+=english_distance
-        combined_spanish+=spanish_match + ' * '
-        combined_english+=english_match + ' * '
+        combined_spanish+=spanish_match + '('+word+')* '
+        combined_english+=english_match + '('+word+')* '
 
     if combined_spanish_distance<combined_english_distance:
         best_language = 'spanish'

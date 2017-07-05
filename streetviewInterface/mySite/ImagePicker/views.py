@@ -455,7 +455,6 @@ def runLanguageIdentifiction(request):
     p = subprocess.Popen(['python', 'manage.py', 'languageIdentification'],
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.STDOUT)
-    runLanguageIdentifiction_async()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def runLanguageIdentifiction_async():
