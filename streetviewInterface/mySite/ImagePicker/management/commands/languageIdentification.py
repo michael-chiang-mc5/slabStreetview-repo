@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from ImagePicker.views import saveImages_async
+from ImagePicker.views import runLanguageIdentifiction_async
 import sys
 class Command(BaseCommand):
     help = 'runs language identification on google ocr results'
