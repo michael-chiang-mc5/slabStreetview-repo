@@ -6,7 +6,7 @@
 # usa2.txt: USA ENGLISH - 77,000 words
 
 # espanol.txt: SPANISH - 174,000 words
-
+import re
 import editdistance
 import time
 
@@ -33,77 +33,62 @@ def load_words(WORDLIST_FILENAME):
 #            print(letter)
 #            count_space = count_space + 1
 
-def english_or_spanish(ocr_text):
-    words = ocr_text.split(" ")
-    votes = []
-    for word in words:
-        best_match, best_distance, best_language = english_or_spanish_word(word)
-        if best_language is not None:
-            votes.append(best_language)
-    spanish_votes = len([vote for vote in votes if vote == 'spanish'])
-    english_votes = len([vote for vote in votes if vote == 'english'])
-    if spanish_votes>english_votes:
-        return 'spanish'
-    elif spanish_votes<english_votes:
-        return 'english'
-    else:
-        return None
 
-# Output:
-# best_language = spanish, english, or None
-#
-# best_language = None if MIN_LENGTH not satisfied
-#                         edit distance too large
-#                         spanish/english equally good
-def english_or_spanish_word(ocr_text):
+
+
+def filter_words(text_list):
     MIN_LENGTH = 4
-    MAX_DISTANCE_PERCENT = 0.3 # maximum distance cannot exceed MAX_DISTANCE_PERCENT * len(ocr_text)
+    out = []
+    for text in text_list:
+        omit = False
+        if len(text)<MIN_LENGTH:
+            omit = True
+        for letter in text:
+            if letter in '1234567890!@#$%^&*()':
+                omit = True
+        if not omit:
+            out.append(text)
+    return out
 
-    if len(ocr_text)<MIN_LENGTH:
-        return None, None, None
+# input:
+#     words: string
+def english_or_spanish(words):
+    words = re.split('&| ',words)
+    words = filter_words(words)
 
-
-    # test against spanish dictionary
     dictionary_spanish = load_words('dictionaries/espanol_utf8.txt')
-    spanish_match, spanish_distance = score_language(ocr_text.lower(),dictionary_spanish)
-
-    # test against english dictionary
     dictionary_english = load_words('dictionaries/engmix.txt')
-    english_match, english_distance = score_language(ocr_text.lower(),dictionary_english)
 
-    if spanish_match == None and english_match == None:
-        best_match = None
-        best_distance = None
-        best_language = None
-    elif spanish_match == None:
-        best_match = english_match
-        best_distance = english_distance
+    combined_spanish_distance = 0
+    combined_english_distance = 0
+    combined_spanish = "spanish = "
+    combined_english = "english = "
+
+    for word in words:
+        spanish_match, spanish_distance = score_language(word,dictionary_spanish)
+        english_match, english_distance = score_language(word,dictionary_english)
+
+        combined_spanish_distance+=spanish_distance
+        combined_english_distance+=english_distance
+        combined_spanish+=spanish_match + ' * '
+        combined_english+=english_match + ' * '
+
+    if combined_spanish_distance<combined_english_distance:
+        best_language = 'spanish'
+    elif combined_spanish_distance>combined_english_distance:
         best_language = 'english'
     else:
-        if english_distance < spanish_distance:
-            best_match = english_match
-            best_distance = english_distance
-            best_language = 'english'
-        elif english_distance > spanish_distance:
-            best_match = spanish_match
-            best_distance = spanish_distance
-            best_language = 'spanish'
-        else:
-            best_match = english_match + ', ' + spanish_match
-            best_distance = english_distance
-            best_language = None
+        best_language = 'equal english/spanish score'
 
-    # maximum distance cannot exceed MAX_DISTANCE_PERCENT * len(ocr_text)
-    if best_distance > MAX_DISTANCE_PERCENT * len(ocr_text):
-        return None, None, None
-    return best_match, best_distance, best_language
+    notes = combined_spanish + " ////////////// " + combined_english
+    return best_language,notes
 
 def score_language(ocr_text,dictionary):
     start_time = time.time()
     best_distance = 999999999999
     best_match = None
     for word in dictionary:
-        d = editdistance.eval(ocr_text, word)
+        d = editdistance.eval(ocr_text.lower(), word)
         if d<best_distance:
             best_distance = d
             best_match    = word

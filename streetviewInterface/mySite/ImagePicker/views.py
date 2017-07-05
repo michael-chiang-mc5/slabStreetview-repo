@@ -452,10 +452,17 @@ def deleteDuplicateMapPoints(request):
 def runLanguageIdentifiction(request):
     if not request.user.is_superuser:
         return HttpResponse("you are not an admin")
-    ocrTexts = OcrText.objects.filter(ocrlanguage__isnull=True)
+    p = subprocess.Popen(['python', 'manage.py', 'languageIdentification'],
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.STDOUT)
+    runLanguageIdentifiction_async()
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+def runLanguageIdentifiction_async():
+    ocrTexts = OcrText.objects.filter(method='google', ocrlanguage__isnull=True)
     for ocrText in ocrTexts:
         ocrLanguage = OcrLanguage.init(ocrText) # saving done in method
-    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    return HttpResponse("done")
 
 def deleteAllOcrLanguage(request):
     if not request.user.is_superuser:
@@ -522,25 +529,14 @@ def deleteOcrText(request,ocrtext_pk):
 
 
 def saveImages(request):
-    #if os.fork() == 0:
-    #    saveImages_async()
-    #    sys.exit(0)
     p = subprocess.Popen(['python', 'manage.py', 'saveImages'],
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.STDOUT)
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def saveImages_async():
-
     # get mapPoints without corresponding images
     mapPoints = MapPoint.objects.filter(streetviewimage=None)
-
-    # delete duplicates
-    #for panoID in MapPoint.objects.values_list('panoID', flat=True).distinct():
-    #    MapPoint.objects.filter(pk__in=MapPoint.objects.filter(panoID=panoID).values_list('id', flat=True)[1:]).delete()
-    #for panoID in mapPoints.values_list('panoID', flat=True).distinct():
-    #    mapPoints.filter(pk__in=mapPoints.filter(panoID=panoID).values_list('id', flat=True)[1:]).delete()
-
     xdim = 640
     ydim = 640
     fov_right=35

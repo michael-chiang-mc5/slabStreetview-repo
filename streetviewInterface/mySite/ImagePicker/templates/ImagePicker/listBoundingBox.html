@@ -129,6 +129,7 @@ table, th, td {
                 score: {{ ocrText.score }}<br />
                 notes: {{ ocrText.notes }}<br />
                 languageIdentification: {{ ocrText.ocrlanguage_set.all.0.language }}<br />
+                 {{ ocrText.ocrlanguage_set.all.0.notes }}<br />
                 <a href="{% url 'ImagePicker:deleteOcrText' ocrtext_pk=ocrText.pk %}">delete</a>
               </div>
             </td>

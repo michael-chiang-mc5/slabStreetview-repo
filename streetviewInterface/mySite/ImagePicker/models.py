@@ -149,12 +149,14 @@ class OcrText(models.Model):
 class OcrLanguage(models.Model):
     ocrText = models.ForeignKey(OcrText)
     language = models.TextField(blank=True)
+    notes = models.TextField(blank=True)
 
     def __str__(self):
-        return str(self.ocrText.pk) + ': ' + self.language
+        return 'BB_pk='+str(self.ocrText.boundingBox.pk) + ', ' + self.language
     def init(ocrText):
         ocr_text   = ocrText.text
         ocr_locale = ocrText.locale
+        notes = ''
         if 'locale=zh' in ocr_locale: # possible "locale=zh-*"
             language = 'chinese'
         elif 'locale=jp' in ocr_locale:
@@ -171,19 +173,20 @@ class OcrLanguage(models.Model):
         # da = danish
         # fil = filipino
         # pl = polish
+        # nl = dutch
         elif 'locale=en' in ocr_locale or \
              'locale=es' in ocr_locale or \
              'locale=da' in ocr_locale or \
              'locale=pl' in ocr_locale or \
+             'locale=nl' in ocr_locale or \
+             'locale=jv' in ocr_locale or \
              'locale=fil' in ocr_locale:
-            best_language = english_or_spanish(ocr_text)
-            if best_language is None:
-                language = 'other'
-            else:
-                language = best_language
+            best_language, notes = english_or_spanish(ocr_text)
+            language = best_language
         else:
             language = 'other'
-        ocrLanguage = OcrLanguage(ocrText=ocrText,language=language)
+            best_match = ""
+        ocrLanguage = OcrLanguage(ocrText=ocrText,language=language,notes=notes)
         ocrLanguage.save()
         return ocrLanguage
 
