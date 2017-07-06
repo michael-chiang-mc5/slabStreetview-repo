@@ -36,7 +36,6 @@
     <a href="{% url 'ImagePicker:list_crnn_metadata' %}">Bounding box metadata for crnn</a> <br />
     <a href="{% url 'ImagePicker:list_ECN_metadata' %}">Bounding box metadata for ECN script identification</a> <br />
 
-
     <p>~~~~~~~~~</p>
     <h2>Delete data. CAREFUL</h2>
     <a href="{% url 'ImagePicker:deleteAllMapPoints' %}">Delete all map points</a>  <br />
@@ -45,6 +44,11 @@
     <a href="{% url 'ImagePicker:deleteAllOcr' %}">Delete all OCR text</a>  <br />
     <a href="{% url 'ImagePicker:deleteAllOcrLanguage' %}">Delete all language detections</a>  <br />
     <a href="{% url 'ImagePicker:initialize_bfs' %}">Delete crawler queue</a><br />
+    <a href="{% url 'ImagePicker:read_mapPoint' %}">read mapPoint in</a>  <br />
+
+    <p>~~~~~~~~~</p>
+    <h2>I/O</h2>
+    <a href="{% url 'ImagePicker:write_mapPoint' %}">write mapPoint out</a>  <br />
 
   </div>
 {% endblock %}

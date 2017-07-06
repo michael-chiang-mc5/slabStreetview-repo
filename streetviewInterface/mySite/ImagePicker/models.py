@@ -17,6 +17,13 @@ class MapPoint(models.Model):
     tag = models.TextField(blank=True)
     def __str__(self):
         return str('lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))
+    def serialize_csv(self):
+        return str(self.pk)                      + '\t' + \
+               str(self.latitude)                + '\t' + \
+               str(self.longitude)               + '\t' + \
+               str(self.photographerHeading)     + '\t' + \
+               str(self.panoID)                  + '\t' + \
+               str(self.tag)                     
 
 class StreetviewImage(models.Model):
     mapPoint = models.ForeignKey(MapPoint) # each mapPoint has two images corresponding to left and right

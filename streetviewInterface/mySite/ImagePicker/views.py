@@ -18,6 +18,7 @@ import sys
 import subprocess
 from random import randint
 import json
+import csv
 
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
@@ -222,6 +223,41 @@ def saveImage(xdim,ydim,latitude,longitude,fov,heading,pitch,mapPoint):
     data = urllib.request.urlretrieve(url, fi_path)
     streetviewImage.image = fi # this should be set with respect to MEDIA_ROOT
     streetviewImage.save()
+
+def write_mapPoint(request):
+    with open('output/MapPoints.csv', 'w') as csvfile:
+        fieldnames = ['pk', 'latitude', 'longitude', 'photographerHeading', 'panoID', 'tag']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        #writer.writeheader()
+        mapPoints = MapPoint.objects.all()
+        for mapPoint in mapPoints:
+            writer.writerow({'pk':                  mapPoint.pk, \
+                             'latitude':            mapPoint.latitude, \
+                             'longitude':           mapPoint.longitude, \
+                             'photographerHeading': mapPoint.photographerHeading, \
+                             'panoID':              mapPoint.panoID, \
+                             'tag':                 mapPoint.tag, \
+                            })
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+def read_mapPoint(request):
+    with open('output/MapPoints.csv', 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            pk                   = int(row[0])
+            latitude             = float(row[1])
+            longitude            = float(row[2])
+            photographerHeading  = float(row[3])
+            panoID               = str(row[4])
+            tag                  = str(row[5])
+            mapPoint = MapPoint(latitude=latitude, \
+                                longitude=longitude, \
+                                photographerHeading=photographerHeading, \
+                                panoID=panoID, \
+                                tag=tag, \
+                                )
+            mapPoint.save()
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 # produces a text file for CTPN
 def list_CTPN_metadata(request):
@@ -598,6 +634,7 @@ def initialize_bfs(request):
 # saves mapPoint
 # downloads associated streetview images to point and saves streetviewImage (2 per mapPoint for right and left)
 def bfs(request):
+    time.sleep(0.7)
     # TODO: check whether distance from start point exceeds a given limit
 
     # Verify node has never been visited before
@@ -605,23 +642,23 @@ def bfs(request):
     #  - add node to queue if node not already in queue
     panoID = str(request.POST.get("panoID"))
 
-    # since we only add a point to queue if no duplicate occurs
-    # and since points in the queue are fed to bfs
-    # then the input point should not exist in queue
-    if len(MapPoint.objects.filter(panoID__exact=panoID)) != 0:
-        return HttpResponse("error")
+    # If we start from a point that is already in dataset
+    #    - we do not save point
+    #    - should still delete point from queue
+    #    - we should still save links to queue if links do not already exist in queue
+    if len(MapPoint.objects.filter(panoID__exact=panoID)) == 0:
+        # save point
+        latitude = float(request.POST.get("latitude"))
+        longitude = float(request.POST.get("longitude"))
+        mapPointTag_str = str(request.POST.get("mapPointTag"))
+        photographerHeading = float(request.POST.get("photographerHeading"))
+        mapPoint = MapPoint(latitude=latitude, \
+                            longitude=longitude, \
+                            panoID=panoID, \
+                            photographerHeading=photographerHeading, \
+                            tag=mapPointTag_str)
+        mapPoint.save()
 
-    # save point
-    latitude = float(request.POST.get("latitude"))
-    longitude = float(request.POST.get("longitude"))
-    mapPointTag_str = str(request.POST.get("mapPointTag"))
-    photographerHeading = float(request.POST.get("photographerHeading"))
-    mapPoint = MapPoint(latitude=latitude, \
-                        longitude=longitude, \
-                        panoID=panoID, \
-                        photographerHeading=photographerHeading, \
-                        tag=mapPointTag_str)
-    mapPoint.save()
     # delete point from queue
     CrawlerQueueEntry.objects.filter(panoID=panoID).delete()
     # save links to queue

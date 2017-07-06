@@ -9,7 +9,7 @@
  *
  */
 
-var PERCENT_POINTS_TO_DISPLAY = 0.1
+var PERCENT_POINTS_TO_DISPLAY = 0.05
 var search_radius = 20
 
 var map;
@@ -146,7 +146,7 @@ function initMap() {
                      'longitude':panorama.location.latLng.lng(),
                      'panoID':panoID_val,
                      'links':links_pano,
-                     'mapPointTag':$("#marker_tag").val(),
+                     'mapPointTag':"",
                      'csrfmiddlewaretoken':csrf_token}, // our data object
       success: function(data, textStatus, jqXHR) {
         //alert("initial:"+panoID_val+", next:"+data['pano_id']+ ", queue="+data['queue'])
