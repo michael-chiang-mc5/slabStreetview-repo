@@ -53,15 +53,17 @@
     <td>
       <table style="width:100%;height:100%">
         <tr> <td>
-          Left-click to set start coordinates. Right-click to set end coordinates.
-          <br /> <br />
+          1) Set start coordinates<br />
+          2) Set end coordinates<br />
+          3) Set marker tag.<br />
+          4) Click calculate route          <br /> <br />
           <input type="radio" name="route_point" id="radio_start" checked="checked"><span id="start_latLng">Start: EMPTY</span></input>
           <br />
           <input type="radio" name="route_point" id="radio_end"><span id="end_latLng">End: EMPTY</span></input>
 
           <br /> <br />
 
-          <!-- mapPointTag -->
+          <!-- mapPoint.tag -->
           <div class="outline">
             <form action="/" method="POST">
               markerTag =
@@ -87,7 +89,7 @@
 
 
   <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrwkUADkwqTvlC-HbKC_jZuqC3xBxUNLo&callback=initMap"
+      src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap"
       async defer>
   </script>
 

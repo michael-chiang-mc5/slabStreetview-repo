@@ -4,6 +4,8 @@ from . import views
 urlpatterns = [
     url(r'^index/$', views.index, name='index'),
     url(r'^routePicker/$', views.routePicker, name='routePicker'),
+    url(r'^crawler/$', views.crawler, name='crawler'),
+    url(r'^bfs/$', views.bfs, name='bfs'),
     url(r'^savePoint/$', views.savePoint, name='savePoint'),
     url(r'^listImage/$',  views.listImage, name='listImage'), #
     url(r'^list_CTPN_metadata/$',  views.list_CTPN_metadata, name='list_CTPN_metadata'), #

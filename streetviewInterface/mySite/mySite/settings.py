@@ -95,6 +95,7 @@ DATABASES = {
 }
 
 GOOGLE_OCR_API_KEY = secret_google_ocr_api_key
+GOOGLE_MAPS_API_KEY = google_maps_api_key
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = 'media/'
 

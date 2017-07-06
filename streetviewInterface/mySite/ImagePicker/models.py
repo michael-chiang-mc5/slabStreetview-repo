@@ -7,15 +7,9 @@ class MapPoint(models.Model):
     longitude = models.FloatField()
     photographerHeading = models.FloatField()
     panoID = models.TextField() # unstable across browser sessions
+    tag = models.TextField(blank=True)
     def __str__(self):
         return str('lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))
-        #return self.panoID
-
-class MapPointTag(models.Model):
-    mapPoint = models.ForeignKey(MapPoint)
-    tag = models.TextField()
-    def __str__(self):
-        return self.tag
 
 class StreetviewImage(models.Model):
     mapPoint = models.ForeignKey(MapPoint) # each mapPoint has two images corresponding to left and right
@@ -115,7 +109,7 @@ class BoundingBox(models.Model):
 
         # location tag
         try:
-            tag = self.streetviewImage.mapPoint.mappointtag_set.all()[0].tag
+            tag = self.streetviewImage.mapPoint.tag
         except:
             tag = None
 
@@ -156,7 +150,7 @@ class BoundingBox(models.Model):
 
         # location tag
         try:
-            tag = self.streetviewImage.mapPoint.mappointtag_set.all()[0].tag
+            tag = self.streetviewImage.mapPoint.tag
         except:
             tag = None
 

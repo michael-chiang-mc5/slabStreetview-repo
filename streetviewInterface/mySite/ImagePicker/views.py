@@ -74,10 +74,9 @@ def savePoint(request):
     mapPoint = MapPoint(latitude=latitude, \
                         longitude=longitude, \
                         panoID=panoID, \
-                        photographerHeading=photographerHeading)
+                        photographerHeading=photographerHeading, \
+                        tag = mapPointTag_str)
     mapPoint.save()
-    mapPointTag = MapPointTag(mapPoint=mapPoint,tag=mapPointTag_str)
-    mapPointTag.save()
     time.sleep(0.5)
 
 
@@ -575,10 +574,56 @@ def index(request):
 
 def picker(request):
     mapPoints = MapPoint.objects.all()
-    context = {'mapPoints':mapPoints}
+    context = {'mapPoints':mapPoints,'api_key':settings.GOOGLE_MAPS_API_KEY}
     return render(request, 'ImagePicker/panorama.html',context)
 
 def routePicker(request):
     mapPoints = MapPoint.objects.all()
-    context = {'mapPoints':mapPoints}
+    context = {'mapPoints':mapPoints,'api_key':settings.GOOGLE_MAPS_API_KEY}
     return render(request, 'ImagePicker/route.html',context)
+
+def crawler(request):
+    mapPoints = MapPoint.objects.all()
+    context = {'mapPoints':mapPoints,'api_key':settings.GOOGLE_MAPS_API_KEY}
+    return render(request, 'ImagePicker/crawler.html',context)
+
+
+
+# Takes POST data
+# saves mapPoint
+# downloads associated streetview images to point and saves streetviewImage (2 per mapPoint for right and left)
+def bfs(request):
+    if request.method != 'POST':
+        return HttpResponse("Must be POST")
+
+
+    # check if point has already been visited. If yes, return next point to visit from queue
+    panoID = str(request.POST.get("panoID"))
+    if len(MapPoint.objects.filter(panoID__exact=panoID)) > 0:
+        pass
+        return HttpResponse('pano id here ')         # TODO
+
+    # TODO: check whether distance from start point exceeds a given limit
+
+    # at this point, we have verified point has not yet been visited
+    #  - save point
+    #  - add links to queue
+    #  - return next point
+
+    # save point
+
+    latitude = float(request.POST.get("latitude"))
+    longitude = float(request.POST.get("longitude"))
+    mapPointTag_str = str(request.POST.get("mapPointTag"))
+    photographerHeading = float(request.POST.get("photographerHeading"))
+    mapPoint = MapPoint(latitude=latitude, \
+                        longitude=longitude, \
+                        panoID=panoID, \
+                        photographerHeading=photographerHeading, \
+                        tag=mapPointTag_str)
+    mapPoint.save()
+
+    # get links
+    links = request.POST.getlist("links[]")
+
+    return HttpResponse('asdf')

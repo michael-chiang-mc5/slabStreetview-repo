@@ -59,8 +59,8 @@ table, th, td {
         BoundingBox.objects.exclude(ocrtext__isnull=True)<br />
         BoundingBox.objects.filter(ocrtext__method__contains="google",ocrtext__locale__contains="locale=ko")<br />
         BoundingBox.objects.filter(ocrtext__method__contains="manual")<br />
-        BoundingBox.objects.filter(streetviewImage__mapPoint__mappointtag__tag="thaitown")<br />
-        BoundingBox.objects.filter(method="google").filter(streetviewImage__mapPoint__mappointtag__tag="garvey").filter(ocrtext__method="manual",ocrtext__locale="spanish")
+        BoundingBox.objects.filter(streetviewImage__mapPoint__tag="thaitown")<br />
+        BoundingBox.objects.filter(method="google").filter(streetviewImage__mapPoint__tag="garvey").filter(ocrtext__method="manual",ocrtext__locale="spanish")
       </form>
     </div>
 
@@ -113,10 +113,7 @@ table, th, td {
               <br />
               x1= {{ boundingBox.x1 }}, x2= {{ boundingBox.x2 }}, y1={{ boundingBox.y1 }}, x2={{ boundingBox.y2 }} <br />
               <a href="{% url 'ImagePicker:deleteBoundingBox' pk=boundingBox.pk %}">Delete (CAREFUL!!)</a><br />
-              tag:
-              {% for tag in boundingBox.streetviewImage.mapPoint.mappointtag_set.all %}
-                {{ tag }} <br />
-              {% endfor %}
+              tag: {{ boundingBox.streetviewImage.mapPoint.tag }}<br />
             </div>
           </td>
 
