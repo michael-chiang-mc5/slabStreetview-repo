@@ -2,11 +2,18 @@ from django.db import models
 from django.conf import settings
 from .dictionary_search import *
 
+
+class CrawlerQueueEntry(models.Model):
+    panoID = models.TextField()
+    time = models.DateTimeField(auto_now_add=True)
+
+
+
 class MapPoint(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     photographerHeading = models.FloatField()
-    panoID = models.TextField() # unstable across browser sessions
+    panoID = models.TextField(blank=True) # unstable across browser sessions
     tag = models.TextField(blank=True)
     def __str__(self):
         return str('lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))

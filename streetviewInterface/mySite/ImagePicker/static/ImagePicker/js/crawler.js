@@ -66,12 +66,14 @@ function initMap() {
     zoom: 16,
     streetViewControl: false
   });
-  // fill in markers
+  // fill in markers: TODO: too slow
   for(count = 0; count < initial_mapPoints.length; count++){
-    var marker = new google.maps.Marker({
-      position: initial_mapPoints[count],
-      map: map,
-    });
+    if (Math.random() < 0.1) {
+      var marker = new google.maps.Marker({
+        position: initial_mapPoints[count],
+        map: map,
+      });
+    }
   }
 
   // listener for start point
@@ -101,12 +103,13 @@ function initMap() {
     for (var i = 0; i < links.length; i++) {
       links_pano.push(links[i].pano)
     }
-    // mark on map
-    var marker = new google.maps.Marker({
-      position: panorama.location.latLng,
-      map: map,
-    });
-
+    // mark on map: TODO too slow
+    if (Math.random() < 0.1) {
+      var marker = new google.maps.Marker({
+        position: panorama.location.latLng,
+        map: map,
+      });
+    }
 
 
     $.ajax({
@@ -120,9 +123,9 @@ function initMap() {
                      'mapPointTag':$("#marker_tag").val(),
                      'csrfmiddlewaretoken':csrf_token}, // our data object
       success: function(data, textStatus, jqXHR) {
-        alert(data)
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
+        //alert("initial:"+panoID_val+", next:"+data['pano_id']+ ", queue="+data['queue'])
+        panorama.setPano(data['pano_id']);
+      }, error: function (jqXHR, textStatus, errorThrown) {
         alert("fail")
       }
     });

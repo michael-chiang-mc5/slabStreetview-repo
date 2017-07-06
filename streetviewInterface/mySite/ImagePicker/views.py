@@ -17,6 +17,7 @@ import time
 import sys
 import subprocess
 from random import randint
+import json
 
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
@@ -588,42 +589,58 @@ def crawler(request):
     return render(request, 'ImagePicker/crawler.html',context)
 
 
+def initialize_bfs(request):
+    CrawlerQueueEntry.objects.all().delete()
+    # TODO: set MapPoint.panoID = None for all pre-existing
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 # Takes POST data
 # saves mapPoint
 # downloads associated streetview images to point and saves streetviewImage (2 per mapPoint for right and left)
 def bfs(request):
-    if request.method != 'POST':
-        return HttpResponse("Must be POST")
-
-
-    # check if point has already been visited. If yes, return next point to visit from queue
-    panoID = str(request.POST.get("panoID"))
-    if len(MapPoint.objects.filter(panoID__exact=panoID)) > 0:
-        pass
-        return HttpResponse('pano id here ')         # TODO
-
     # TODO: check whether distance from start point exceeds a given limit
 
-    # at this point, we have verified point has not yet been visited
+    # Verify node has never been visited before
     #  - save point
     #  - add links to queue
-    #  - return next point
+    panoID = str(request.POST.get("panoID"))
+    if len(MapPoint.objects.filter(panoID__exact=panoID)) == 0:
+        # save point
+        latitude = float(request.POST.get("latitude"))
+        longitude = float(request.POST.get("longitude"))
+        mapPointTag_str = str(request.POST.get("mapPointTag"))
+        photographerHeading = float(request.POST.get("photographerHeading"))
+        mapPoint = MapPoint(latitude=latitude, \
+                            longitude=longitude, \
+                            panoID=panoID, \
+                            photographerHeading=photographerHeading, \
+                            tag=mapPointTag_str)
+        mapPoint.save()
+        # delete point from queue
+        CrawlerQueueEntry.objects.filter(panoID=panoID).delete()
+        # save links to queue
+        links = request.POST.getlist("links[]")
+        for link in links:
+            if len(MapPoint.objects.filter(panoID=link))==0:
+                cqe = CrawlerQueueEntry(panoID=link)
+                cqe.save()
 
-    # save point
+    # If the first click event, then populate queue
+    # Checking length of queue is not a great way to do this
+    #   because in a finite graph you can have an empty queue after visiting all nodes
+    # A better way to do this is to initialize queue in initialize_bfs, but I am lazy
+    #if len(CrawlerQueueEntry.objects.all()) == 0:
+    #    links = request.POST.getlist("links[]")
+    #    for link in links:
+    #        cqe = CrawlerQueueEntry(panoID=link)
+    #        cqe.save()
 
-    latitude = float(request.POST.get("latitude"))
-    longitude = float(request.POST.get("longitude"))
-    mapPointTag_str = str(request.POST.get("mapPointTag"))
-    photographerHeading = float(request.POST.get("photographerHeading"))
-    mapPoint = MapPoint(latitude=latitude, \
-                        longitude=longitude, \
-                        panoID=panoID, \
-                        photographerHeading=photographerHeading, \
-                        tag=mapPointTag_str)
-    mapPoint.save()
-
-    # get links
-    links = request.POST.getlist("links[]")
-
-    return HttpResponse('asdf')
+    # return panoID of next node to visit
+    next_node = CrawlerQueueEntry.objects.order_by('time').first()
+    if next_node is None:
+        return HttpResponse('terminate')
+    else:
+        data = {}
+        data['pano_id'] = next_node.panoID
+        data['queue']   = list(CrawlerQueueEntry.objects.values_list('panoID').order_by('time'))
+        return HttpResponse(json.dumps(data), content_type = "application/json")
