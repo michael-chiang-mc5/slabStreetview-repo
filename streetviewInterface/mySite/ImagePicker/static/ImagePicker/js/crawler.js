@@ -9,6 +9,7 @@
  *
  */
 
+var PERCENT_POINTS_TO_DISPLAY = 0.1
 var search_radius = 20
 
 var map;
@@ -24,9 +25,34 @@ var start_latLng
 
 // When button is clicked, run search over map
 $(document).ready(function() {
-  $('#calculate_route').click(function() {
+  $('#new_traversal').click(function() {
+    $.ajax({
+      type        : 'GET',
+      url         : '/ImagePicker/initialize_bfs/',
+      success: function(data, textStatus, jqXHR) {
+        bfs(start_latLng);
+      }, error: function (jqXHR, textStatus, errorThrown) {
+        alert("new_traversal failed")
+      }
+    });
+  });
+
+  $('#old_traversal').click(function() {
+    $.ajax({
+      type        : 'GET',
+      url         : '/ImagePicker/get_current_bfs_queue_item/',
+      success: function(data, textStatus, jqXHR) {
+        panorama.setPano(data);
+      }, error: function (jqXHR, textStatus, errorThrown) {
+        alert("old_traversal failed")
+      }
+    });
+  });
+
+  $('#new_and_old_traversal').click(function() {
     bfs(start_latLng);
   });
+
 });
 
 function bfs(latLng) {
@@ -68,7 +94,7 @@ function initMap() {
   });
   // fill in markers: TODO: too slow
   for(count = 0; count < initial_mapPoints.length; count++){
-    if (Math.random() < 0.1) {
+    if (Math.random() < PERCENT_POINTS_TO_DISPLAY) {
       var marker = new google.maps.Marker({
         position: initial_mapPoints[count],
         map: map,
@@ -104,7 +130,7 @@ function initMap() {
       links_pano.push(links[i].pano)
     }
     // mark on map: TODO too slow
-    if (Math.random() < 0.1) {
+    if (Math.random() < PERCENT_POINTS_TO_DISPLAY) {
       var marker = new google.maps.Marker({
         position: panorama.location.latLng,
         map: map,

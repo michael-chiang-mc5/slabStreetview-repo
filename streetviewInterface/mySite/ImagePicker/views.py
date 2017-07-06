@@ -602,38 +602,34 @@ def bfs(request):
 
     # Verify node has never been visited before
     #  - save point
-    #  - add links to queue
+    #  - add node to queue if node not already in queue
     panoID = str(request.POST.get("panoID"))
-    if len(MapPoint.objects.filter(panoID__exact=panoID)) == 0:
-        # save point
-        latitude = float(request.POST.get("latitude"))
-        longitude = float(request.POST.get("longitude"))
-        mapPointTag_str = str(request.POST.get("mapPointTag"))
-        photographerHeading = float(request.POST.get("photographerHeading"))
-        mapPoint = MapPoint(latitude=latitude, \
-                            longitude=longitude, \
-                            panoID=panoID, \
-                            photographerHeading=photographerHeading, \
-                            tag=mapPointTag_str)
-        mapPoint.save()
-        # delete point from queue
-        CrawlerQueueEntry.objects.filter(panoID=panoID).delete()
-        # save links to queue
-        links = request.POST.getlist("links[]")
-        for link in links:
-            if len(MapPoint.objects.filter(panoID=link))==0:
-                cqe = CrawlerQueueEntry(panoID=link)
-                cqe.save()
 
-    # If the first click event, then populate queue
-    # Checking length of queue is not a great way to do this
-    #   because in a finite graph you can have an empty queue after visiting all nodes
-    # A better way to do this is to initialize queue in initialize_bfs, but I am lazy
-    #if len(CrawlerQueueEntry.objects.all()) == 0:
-    #    links = request.POST.getlist("links[]")
-    #    for link in links:
-    #        cqe = CrawlerQueueEntry(panoID=link)
-    #        cqe.save()
+    # since we only add a point to queue if no duplicate occurs
+    # and since points in the queue are fed to bfs
+    # then the input point should not exist in queue
+    if len(MapPoint.objects.filter(panoID__exact=panoID)) != 0:
+        return HttpResponse("error")
+
+    # save point
+    latitude = float(request.POST.get("latitude"))
+    longitude = float(request.POST.get("longitude"))
+    mapPointTag_str = str(request.POST.get("mapPointTag"))
+    photographerHeading = float(request.POST.get("photographerHeading"))
+    mapPoint = MapPoint(latitude=latitude, \
+                        longitude=longitude, \
+                        panoID=panoID, \
+                        photographerHeading=photographerHeading, \
+                        tag=mapPointTag_str)
+    mapPoint.save()
+    # delete point from queue
+    CrawlerQueueEntry.objects.filter(panoID=panoID).delete()
+    # save links to queue
+    links = request.POST.getlist("links[]")
+    for link in links:
+        if len(MapPoint.objects.filter(panoID=link))==0:
+            cqe = CrawlerQueueEntry(panoID=link)
+            cqe.save()
 
     # return panoID of next node to visit
     next_node = CrawlerQueueEntry.objects.order_by('time').first()
@@ -644,3 +640,10 @@ def bfs(request):
         data['pano_id'] = next_node.panoID
         data['queue']   = list(CrawlerQueueEntry.objects.values_list('panoID').order_by('time'))
         return HttpResponse(json.dumps(data), content_type = "application/json")
+
+def get_current_bfs_queue_item(request):
+    next_node = CrawlerQueueEntry.objects.order_by('time').first()
+    if next_node is None:
+        return HttpResponse('terminate')
+    else:
+        return HttpResponse(next_node.panoID)

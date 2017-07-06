@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^routePicker/$', views.routePicker, name='routePicker'),
     url(r'^crawler/$', views.crawler, name='crawler'),
     url(r'^bfs/$', views.bfs, name='bfs'),
+    url(r'^get_current_bfs_queue_item/$', views.get_current_bfs_queue_item, name='get_current_bfs_queue_item'),    
     url(r'^initialize_bfs/$', views.initialize_bfs, name='initialize_bfs'),
     url(r'^savePoint/$', views.savePoint, name='savePoint'),
     url(r'^listImage/$',  views.listImage, name='listImage'), #
