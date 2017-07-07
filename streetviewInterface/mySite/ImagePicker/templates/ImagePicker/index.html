@@ -38,21 +38,21 @@
 
   <h1>Statistics</h1>
   <p>~~~~~~~~~~~~~</p>
-  {{ mapPoints|length }} total MapPoints
-  <li>{{ mapPoints_noImage|length }} have no associated image. <a href="{% url 'ImagePicker:saveImages' %}">Download</a></li>
+  {{ mapPoints }} total MapPoints
+  <li>{{ mapPoints_noImage }} have no associated image. <a href="{% url 'ImagePicker:saveImages' %}">Download</a></li>
   <li>{{ numDuplicate_mapPoints }} duplicates. <a href="{% url 'ImagePicker:deleteDuplicateMapPoints' %}">Delete duplicates</a></li>
 
   <p>~~~~~~~~~~~~~</p>
 
-  {{ streetviewImages|length }} total images
-  <li>{{ streetviewImages_no_google_BB|length }} have no google bounding boxes.</li>
-  <li>{{ streetviewImages_no_CTPN_BB|length }} have no CTPN bounding boxes.</li>
+  {{ streetviewImages }} total images
+  <li>{{ streetviewImages_no_google_BB }} have no google bounding boxes.</li>
+  <li>{{ streetviewImages_no_CTPN_BB }} have no CTPN bounding boxes.</li>
 
 
   <p>~~~~~~~~~~~~~</p>
-  {{ boundingBoxes|length }} total bounding boxes (this includes dummy bounding boxes generated for images with no text detected)
-  <li>{{ boundingBoxes_no_google_text|length }} bounding boxes have no google ocr text.</li>
-  <li>{{ boundingBoxes_no_crnn_text|length }} bounding boxes have no crnn text.</li>
+  {{ boundingBoxes }} total bounding boxes (this includes dummy bounding boxes generated for images with no text detected)
+  <li>{{ boundingBoxes_no_google_text }} bounding boxes have no google ocr text.</li>
+  <li>{{ boundingBoxes_no_crnn_text }} bounding boxes have no crnn text.</li>
 
 
 

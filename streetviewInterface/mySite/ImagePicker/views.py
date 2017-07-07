@@ -605,10 +605,10 @@ def index(request):
     boundingBoxes_no_google_text = BoundingBox.objects.exclude( ocrtext__method__contains="google" )
     boundingBoxes_no_crnn_text = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
 
-    context = {'mapPoints':mapPoints, 'mapPoints_noImage':mapPoints_noImage,'numDuplicate_mapPoints':numDuplicate_mapPoints, \
-               'streetviewImages':streetviewImages,'streetviewImages_no_google_BB':streetviewImages_no_google_BB, \
-               'streetviewImages_no_CTPN_BB':streetviewImages_no_CTPN_BB, 'boundingBoxes':boundingBoxes, \
-               'boundingBoxes_no_google_text':boundingBoxes_no_google_text,'boundingBoxes_no_crnn_text':boundingBoxes_no_crnn_text}
+    context = {'mapPoints':len(mapPoints), 'mapPoints_noImage':len(mapPoints_noImage),'numDuplicate_mapPoints':numDuplicate_mapPoints, \
+               'streetviewImages':len(streetviewImages),'streetviewImages_no_google_BB':len(streetviewImages_no_google_BB), \
+               'streetviewImages_no_CTPN_BB':len(streetviewImages_no_CTPN_BB), 'boundingBoxes':len(boundingBoxes), \
+               'boundingBoxes_no_google_text':len(boundingBoxes_no_google_text),'boundingBoxes_no_crnn_text':len(boundingBoxes_no_crnn_text)}
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):
