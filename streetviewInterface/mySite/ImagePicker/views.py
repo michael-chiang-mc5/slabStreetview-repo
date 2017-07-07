@@ -22,10 +22,9 @@ import csv
 from .views_saveImage import *
 
 def saveImages(request):
-    #p = subprocess.Popen(['python', 'manage.py', 'saveImages'],
-    #                                    stdout=subprocess.PIPE,
-    #                                    stderr=subprocess.STDOUT)
-    saveImages_async()
+    p = subprocess.Popen(['python', 'manage.py', 'saveImages'],
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.STDOUT)
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def boundingBox(request,boundingBox_pk):
