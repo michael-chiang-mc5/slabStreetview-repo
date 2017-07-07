@@ -19,11 +19,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = debug_setting
 
 from mySite.secret_keys_and_passwords import *
 SECRET_KEY = django_secret_key
+DEBUG = debug_setting # SECURITY WARNING: don't run with debug turned on in production!
 
 ALLOWED_HOSTS = ['.michael-chiang.com','127.0.0.1','104.131.145.75']
 
@@ -100,6 +99,7 @@ GOOGLE_OCR_API_KEY = secret_google_ocr_api_key
 GOOGLE_MAPS_API_KEY = google_maps_api_key
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = 'media/'
+AWS_URL = "https://s3-us-west-1.amazonaws.com/slab-streetview/"
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators

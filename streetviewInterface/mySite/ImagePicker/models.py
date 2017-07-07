@@ -32,7 +32,6 @@ class StreetviewImage(models.Model):
     heading = models.FloatField() # photographerHeading +- 90
     fov = models.IntegerField()
     pitch = models.FloatField()
-    image = models.ImageField('img', upload_to=settings.MEDIA_URL)
     notes = models.TextField(blank=True)
 
     def __str__(self):
@@ -41,6 +40,10 @@ class StreetviewImage(models.Model):
         return self.image.height
     def dimX(self):
         return self.image.width
+    def image_name(self):
+        return str(self.pk) + '.jpg'
+    def image_url(self):
+        return settings.AWS_URL + self.image_name()
 
 class BoundingBox(models.Model):
     streetviewImage = models.ForeignKey(StreetviewImage) # each image can have multiple bounding boxes

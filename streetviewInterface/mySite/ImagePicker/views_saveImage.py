@@ -20,9 +20,7 @@ from random import randint
 import json
 import csv
 import boto3
-import boto3.s3
-import sys
-from boto3.s3.key import Key
+
 
 # saves concatenated image from google streetview to local disk
 def saveImages_async():
@@ -35,21 +33,23 @@ def saveImages_async():
         # fov right is wider because we are nearer to the right side of the road.
         for rl in [{'heading':mapPoint.photographerHeading+90,'fov':35}, \
                         {'heading':mapPoint.photographerHeading-90,'fov':22.5}]:
+            # make image, save local
             fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude,rl['fov'],rl['heading'],pitch)
+
+            # save object
             streetviewImage = StreetviewImage(mapPoint=mapPoint, \
                                                    heading=rl['heading'], \
                                                    fov=rl['fov'], \
                                                    pitch=pitch)
-            streetviewImage.save()
-            streetviewImage.image = fi # this should be set with respect to MEDIA_ROOT
+
             streetviewImage.save()
 
-            s3_connection = boto.connect_s3()
-            bucket = s3_connection.get_bucket('your bucket name')
-            key = boto.s3.key.Key(bucket, 'some_file.zip')
-            with open('some_file.zip') as f:
-                key.send_file(f)
-
+            # upload image to s3
+            s3 = boto3.client('s3', \
+                                aws_access_key_id=settings.AWS_ACCESS_KEY,
+                                aws_secret_access_key=settings.AWS_SECRET, \
+                                )
+            s3.upload_file(fi, 'slab-streetview', streetviewImage.image_name())
 
 def saveConcatImage(xdim,ydim,latitude,longitude,fov,heading,pitch):
     #saveImage2(xdim,ydim,latitude,longitude,fov,heading-(2*fov-0.5),pitch,'temp1.jpg')
