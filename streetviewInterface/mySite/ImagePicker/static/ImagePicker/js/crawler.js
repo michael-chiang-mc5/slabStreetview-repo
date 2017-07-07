@@ -9,7 +9,7 @@
  *
  */
 
-var PERCENT_POINTS_TO_DISPLAY = 0.05
+var PERCENT_POINTS_TO_DISPLAY = 0.005
 var search_radius = 20
 
 var map;
@@ -93,6 +93,7 @@ function initMap() {
     streetViewControl: false
   });
   // fill in markers: TODO: too slow
+  /*
   for(count = 0; count < initial_mapPoints.length; count++){
     if (Math.random() < PERCENT_POINTS_TO_DISPLAY) {
       var marker = new google.maps.Marker({
@@ -101,6 +102,7 @@ function initMap() {
       });
     }
   }
+  */
 
   // listener for start point
   //   - adds marker on map
@@ -124,18 +126,19 @@ function initMap() {
     var photographerHeading_val = panorama.getPhotographerPov().heading;
     var panoID_val = panorama.getPano(); // this is unstable across browser sessions
     var links =  panorama.getLinks(); // links[i].pano gives the pano id of ith link
+    var address = panorama.getLocation().description
     // create an array of pano IDs for objects in links
     var links_pano = []
     for (var i = 0; i < links.length; i++) {
       links_pano.push(links[i].pano)
     }
     // mark on map: TODO too slow
-    if (Math.random() < PERCENT_POINTS_TO_DISPLAY) {
+    //if (Math.random() < PERCENT_POINTS_TO_DISPLAY) {
       var marker = new google.maps.Marker({
         position: panorama.location.latLng,
         map: map,
       });
-    }
+    //}
 
 
     $.ajax({
@@ -147,6 +150,7 @@ function initMap() {
                      'panoID':panoID_val,
                      'links':links_pano,
                      'mapPointTag':"",
+                     'address':address,
                      'csrfmiddlewaretoken':csrf_token}, // our data object
       success: function(data, textStatus, jqXHR) {
         //alert("initial:"+panoID_val+", next:"+data['pano_id']+ ", queue="+data['queue'])

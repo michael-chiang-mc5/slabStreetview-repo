@@ -15,6 +15,8 @@ class MapPoint(models.Model):
     photographerHeading = models.FloatField()
     panoID = models.TextField(blank=True) # unstable across browser sessions
     tag = models.TextField(blank=True)
+    num_links = models.IntegerField(null=True,blank=True)
+    address = models.TextField(blank=True)
     def __str__(self):
         return str('lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))
     def serialize_csv(self):
@@ -23,7 +25,7 @@ class MapPoint(models.Model):
                str(self.longitude)               + '\t' + \
                str(self.photographerHeading)     + '\t' + \
                str(self.panoID)                  + '\t' + \
-               str(self.tag)                     
+               str(self.tag)
 
 class StreetviewImage(models.Model):
     mapPoint = models.ForeignKey(MapPoint) # each mapPoint has two images corresponding to left and right
