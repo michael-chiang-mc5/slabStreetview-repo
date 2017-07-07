@@ -99,7 +99,7 @@ GOOGLE_OCR_API_KEY = secret_google_ocr_api_key
 GOOGLE_MAPS_API_KEY = google_maps_api_key
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = 'media/'
-AWS_URL = "https://s3-us-west-1.amazonaws.com/slab-streetview/"
+AWS_URL = "https://s3-us-west-1.amazonaws.com/" + AWS_BUCKET_NAME + "/"
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators

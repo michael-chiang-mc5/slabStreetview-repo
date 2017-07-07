@@ -49,7 +49,7 @@ def saveImages_async():
                                 aws_access_key_id=settings.AWS_ACCESS_KEY,
                                 aws_secret_access_key=settings.AWS_SECRET, \
                                 )
-            s3.upload_file(fi, 'slab-streetview', streetviewImage.image_name())
+            s3.upload_file(fi, settings.AWS_BUCKET_NAME, streetviewImage.image_name())
 
 def saveConcatImage(xdim,ydim,latitude,longitude,fov,heading,pitch):
     #saveImage2(xdim,ydim,latitude,longitude,fov,heading-(2*fov-0.5),pitch,'temp1.jpg')
