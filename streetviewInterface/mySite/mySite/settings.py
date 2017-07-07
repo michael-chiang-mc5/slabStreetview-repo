@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = debug_setting
 
 from mySite.secret_keys_and_passwords import *
 SECRET_KEY = django_secret_key
@@ -94,6 +94,8 @@ DATABASES = {
     }
 }
 
+AWS_ACCESS_KEY = aws_access_key
+AWS_SECRET     = aws_secret
 GOOGLE_OCR_API_KEY = secret_google_ocr_api_key
 GOOGLE_MAPS_API_KEY = google_maps_api_key
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
