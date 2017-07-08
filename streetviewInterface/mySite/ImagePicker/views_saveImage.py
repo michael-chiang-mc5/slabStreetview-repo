@@ -45,18 +45,23 @@ def saveImages_async():
             streetviewImage.save()
 
             # make image, save local
-            fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude,rl['fov'],rl['heading'],pitch)
 
+            if settings.USE_S3:
+                image_name = 'temp6.jpg'
+                fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude,rl['fov'],rl['heading'],pitch,image_name)
+                # upload image to s3
+                s3 = boto3.client('s3', \
+                                    aws_access_key_id=settings.AWS_ACCESS_KEY,
+                                    aws_secret_access_key=settings.AWS_SECRET, \
+                                    )
+                s3.upload_file(fi, settings.AWS_BUCKET_NAME, streetviewImage.image_name())
+                print(streetviewImage.image_name() + ' uploaded to s3')
+            else:
+                image_name = streetviewImage.image_name()
+                fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude,rl['fov'],rl['heading'],pitch,image_name)
+                print(streetviewImage.image_name() + ' saved')
 
-
-            # upload image to s3
-            s3 = boto3.client('s3', \
-                                aws_access_key_id=settings.AWS_ACCESS_KEY,
-                                aws_secret_access_key=settings.AWS_SECRET, \
-                                )
-            s3.upload_file(fi, settings.AWS_BUCKET_NAME, streetviewImage.image_name())
-
-def saveConcatImage(xdim,ydim,latitude,longitude,fov,heading,pitch):
+def saveConcatImage(xdim,ydim,latitude,longitude,fov,heading,pitch,image_name):
     #saveImage2(xdim,ydim,latitude,longitude,fov,heading-(2*fov-0.5),pitch,'temp1.jpg')
     saveImage2(xdim,ydim,latitude,longitude,fov,heading-(fov-0.5),pitch,'temp2.jpg')
     saveImage2(xdim,ydim,latitude,longitude,fov,heading    ,pitch,'temp3.jpg')
@@ -87,7 +92,7 @@ def saveConcatImage(xdim,ydim,latitude,longitude,fov,heading,pitch):
     #width, height = I_concatenate.size
     #I_concatenate = I_concatenate.crop((    round(width/2- final_dimx/2) , 0, round(width/2+ final_dimx/2), height))
 
-    fi_path = os.path.join(settings.MEDIA_ROOT,'temp6.jpg')
+    fi_path = os.path.join(settings.MEDIA_ROOT,image_name)
     I_concatenate.save(fi_path)
     #
     return fi_path
