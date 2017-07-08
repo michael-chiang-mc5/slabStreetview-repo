@@ -48,11 +48,6 @@ $(document).ready(function() {
       }
     });
   });
-
-  $('#new_and_old_traversal').click(function() {
-    bfs(start_latLng);
-  });
-
 });
 
 function bfs(latLng) {
@@ -88,22 +83,18 @@ function initMap() {
 
   // Set up the map.
   map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 34.022352, lng: -118.285117},
-    zoom: 16,
+    //center: {lat: 34.022352, lng: -118.285117}, // usc
+    center: {lat: 34.04464406169281, lng: -118.27687109859778},  // pico/union
+    zoom: 14,
     streetViewControl: false
   });
   // fill in markers: TODO: too slow
-  /*
   for(count = 0; count < initial_mapPoints.length; count++){
-    if (Math.random() < PERCENT_POINTS_TO_DISPLAY) {
-      var marker = new google.maps.Marker({
-        position: initial_mapPoints[count],
-        map: map,
-      });
-    }
+    var marker = new google.maps.Marker({
+      position: initial_mapPoints[count],
+      map: map,
+    });
   }
-  */
-
   // listener for start point
   //   - adds marker on map
   //   - sets start point global variable
@@ -114,7 +105,6 @@ function initMap() {
     var marker = new google.maps.Marker({
       position: data.location.latLng,
       map: map,
-      title: data.location.description
     });
     start_latLng = data.location.latLng // global variable
   }
@@ -140,7 +130,6 @@ function initMap() {
       });
     //}
 
-
     $.ajax({
       type        : 'POST',
       url         : '/ImagePicker/bfs/',
@@ -153,10 +142,13 @@ function initMap() {
                      'address':address,
                      'csrfmiddlewaretoken':csrf_token}, // our data object
       success: function(data, textStatus, jqXHR) {
-        //alert("initial:"+panoID_val+", next:"+data['pano_id']+ ", queue="+data['queue'])
+        if (String(data).includes("error")) {
+          alert(data)
+        }
         panorama.setPano(data['pano_id']);
-      }, error: function (jqXHR, textStatus, errorThrown) {
-        alert("fail")
+      }, error: function (xhr, textStatus, errorThrown) {
+        alert("error: bfs failed")
+        alert(xhr.responseText)
       }
     });
 

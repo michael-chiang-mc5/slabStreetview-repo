@@ -455,7 +455,8 @@ def routePicker(request):
     return render(request, 'ImagePicker/route.html',context)
 
 def crawler(request):
-    #mapPoints = MapPoint.objects.all()
+    mapPoints = MapPoint.objects.all()
+    #context = {'api_key':settings.GOOGLE_MAPS_API_KEY,'mapPoints':MapPoint.objects.all()}
     context = {'api_key':settings.GOOGLE_MAPS_API_KEY}
     return render(request, 'ImagePicker/crawler.html',context)
 
@@ -469,20 +470,25 @@ def initialize_bfs(request):
 # saves mapPoint
 # downloads associated streetview images to point and saves streetviewImage (2 per mapPoint for right and left)
 def bfs(request):
-    time.sleep(0.2)
     # TODO: check whether distance from start point exceeds a given limit
 
-    # Verify node has never been visited before
-    #  - save point
-    #  - add node to queue if node not already in queue
     panoID = str(request.POST.get("panoID"))
     links = request.POST.getlist("links[]")
 
-    # If we start from a point that is already in dataset
+    # If we start from a point that is already in dataset (
+    # this can happen when if we have two separatedly initialized blobs merging)
+    # Suppose I initilize and run blob one.
+    # Then, I initilize blob two on the periphery of blob one
+    # Since I have not reset the queue for Blob one, a link in blob two could point to a point in blob one
+    # This logic is complicated and only applies when the two blobs are running at the same time.
+    # Therefore, I have disabled running two blobs at the same time (must delete queue before new blob)
+
     #    - we do not save point
     #    - should still delete point from queue
     #    - we should still save links to queue if links do not already exist in queue
-    if len(MapPoint.objects.filter(panoID__exact=panoID)) == 0:
+    #    - we should still construct edge to neighbors (although I don't think this is necessary)
+    match = MapPoint.objects.filter(panoID=panoID)
+    if len(match) == 0:
         # save point
         latitude = float(request.POST.get("latitude"))
         longitude = float(request.POST.get("longitude"))
@@ -498,17 +504,25 @@ def bfs(request):
                             address=str(address) \
                             )
         mapPoint.save()
+    elif len(match) == 1:
+        # collision. This can occur when you start blob 1, then delete queue and start blob 2
+        # This cannot occur in a single run since we check if link pre-exists as node before adding ot queue
+        mapPoint = match[0]
+        pass
+    else:
+        return HttpResponse("error: duplicate map points found. Please resolve this")
 
     # save links to queue
     for link in links:
-        match = MapPoint.objects.filter(panoID=link) # check if link is already saved as mapPoint
-        if len(match)==0:
+        match_link = MapPoint.objects.filter(panoID=link) # check if link is already saved as mapPoint
+        if len(match_link)==0:
             cqe = CrawlerQueueEntry(panoID=link)
             cqe.save()
-        elif len(match)==1:
-            match[0].neighbors.add(mapPoint)
+        elif len(match_link)==1:
+            match_link[0].neighbors.add(mapPoint)
         else:
-            return HttpResponse("error: duplicate entry")
+            return HttpResponse("error: duplicate map points found while linking. Please resolve this")
+
     # delete point from queue
     CrawlerQueueEntry.objects.filter(panoID=panoID).delete()
 
@@ -520,7 +534,7 @@ def bfs(request):
     else:
         data = {}
         data['pano_id'] = next_node.panoID
-        data['queue']   = list(CrawlerQueueEntry.objects.values_list('panoID').order_by('time'))
+        #data['queue']   = list(CrawlerQueueEntry.objects.values_list('panoID').order_by('time'))
         return HttpResponse(json.dumps(data), content_type = "application/json")
 
 def get_current_bfs_queue_item(request):

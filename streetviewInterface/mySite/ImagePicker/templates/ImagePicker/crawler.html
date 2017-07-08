@@ -26,7 +26,6 @@
 
   <script>
     csrf_token = "{{ csrf_token }}";
-
     var initial_mapPoints = []
     {% for mapPoint in mapPoints %}
       initial_mapPoints[{{ forloop.counter }} - 1] = {  lat:{{ mapPoint.latitude }},
@@ -58,7 +57,6 @@
 
 
           <button id="old_traversal" type="button">Start from old queue</button><br />
-          <button id="new_and_old_traversal" type="button">Start from old queue, incorporate new</button><br />
 
 
 
