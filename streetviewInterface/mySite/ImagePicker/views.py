@@ -472,6 +472,7 @@ def initialize_bfs(request):
 # downloads associated streetview images to point and saves streetviewImage (2 per mapPoint for right and left)
 def bfs(request):
     # TODO: check whether distance from start point exceeds a given limit
+    time.sleep(0.3)
 
     panoID = str(request.POST.get("panoID"))
     links = request.POST.getlist("links[]")
