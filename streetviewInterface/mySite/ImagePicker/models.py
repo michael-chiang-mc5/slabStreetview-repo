@@ -17,6 +17,8 @@ class MapPoint(models.Model):
     tag = models.TextField(blank=True)
     num_links = models.IntegerField(null=True,blank=True)
     address = models.TextField(blank=True)
+    neighbors = models.ManyToManyField("self")
+
     def __str__(self):
         return str('lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))
     def serialize_csv(self):

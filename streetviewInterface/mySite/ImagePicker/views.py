@@ -65,13 +65,6 @@ def listImage(request):
 # saves mapPoint
 # downloads associated streetview images to point and saves streetviewImage (2 per mapPoint for right and left)
 def savePoint(request):
-    #url = "http://maps.googleapis.com/maps/api/streetview?size=640x640&location=42.34554965704973,-71.09832376428187&fov=90&heading=270.0&pitch=0.0&key=AIzaSyBrwkUADkwqTvlC-HbKC_jZuqC3xBxUNLo"
-    #url = "http://maps.googleapis.com/maps/api/streetview?size=640x640&location=34.14583813149605,-118.13731629652199&fov=90&heading=179.3621063232422&pitch=0.0&key=AIzaSyBrwkUADkwqTvlC-HbKC_jZuqC3xBxUNLo"
-
-    #savLoc = "/Users/mcah5a/Desktop/projects/slabStreetview-repo/streetviewInterface/mySite/media/"
-    #fi = "1.jpg"
-    #data = urllib.request.urlretrieve(url, os.path.join(savLoc,fi))
-
     if request.method != 'POST':
         return HttpResponse("Must be POST")
 
@@ -91,7 +84,7 @@ def savePoint(request):
 
 def write_mapPoint(request):
     with open('output/MapPoints.csv', 'w') as csvfile:
-        fieldnames = ['pk', 'latitude', 'longitude', 'photographerHeading', 'panoID', 'tag','num_links','address']
+        fieldnames = ['pk', 'latitude', 'longitude', 'photographerHeading', 'panoID', 'tag','num_links','address','neighbors_panoID']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         #writer.writeheader()
         mapPoints = MapPoint.objects.all()
@@ -104,6 +97,7 @@ def write_mapPoint(request):
                              'tag':                 mapPoint.tag, \
                              'num_links':           mapPoint.num_links, \
                              'address':             mapPoint.address, \
+                             'neighbors_panoID':      list(mapPoint.neighbors.all().values_list('panoID')) , \
                             })
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
@@ -505,13 +499,19 @@ def bfs(request):
                             )
         mapPoint.save()
 
-    # delete point from queue
-    CrawlerQueueEntry.objects.filter(panoID=panoID).delete()
     # save links to queue
     for link in links:
-        if len(MapPoint.objects.filter(panoID=link))==0:
+        match = MapPoint.objects.filter(panoID=link) # check if link is already saved as mapPoint
+        if len(match)==0:
             cqe = CrawlerQueueEntry(panoID=link)
             cqe.save()
+        elif len(match)==1:
+            match[0].neighbors.add(mapPoint)
+        else:
+            return HttpResponse("error: duplicate entry")
+    # delete point from queue
+    CrawlerQueueEntry.objects.filter(panoID=panoID).delete()
+
 
     # return panoID of next node to visit
     next_node = CrawlerQueueEntry.objects.order_by('time').first()

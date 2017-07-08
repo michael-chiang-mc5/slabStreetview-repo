@@ -146,7 +146,7 @@ def get_column(I,firstOrLast):
     return column
 
 def saveImage2(xdim,ydim,latitude,longitude,fov,heading,pitch,filename):
-    url =   "http://maps.googleapis.com/maps/api/streetview?size=%dx%d&location=%f,%f&fov=%d&heading=%f&pitch=%f&key=AIzaSyBrwkUADkwqTvlC-HbKC_jZuqC3xBxUNLo" \
+    url =   "http://maps.googleapis.com/maps/api/streetview?size=%dx%d&location=%f,%f&fov=%d&heading=%f&pitch=%f&key="+settings.google_maps_api_key \
                  % (xdim,ydim,latitude,longitude,fov,heading,pitch)
     fi_path = os.path.join(settings.MEDIA_ROOT,filename)
     data = urllib.request.urlretrieve(url, fi_path)
