@@ -46,6 +46,7 @@ def saveImages_async():
         # if we have previously flagged streetviewImage objects as set, then we don't need to recreate
         elif mapPoints[0].image_is_set and mapPoints[1].image_is_set:
             recreate_image = False
+            print("skipping " str(mapPoints[0].pk) + " and " str(mapPoints[1].pk)
         # check if we need to recreate explicitly
         elif mapPoints[0].check_if_image_is_set() and mapPoints[1].check_if_image_is_set():
             mapPoints[0].image_is_set = True
@@ -53,6 +54,7 @@ def saveImages_async():
             mapPoints[1].image_is_set = True
             mapPoints[1].save()
             recreate_image = False
+            print("skipping " str(mapPoints[0].pk) + " and " str(mapPoints[1].pk)
         # we need to recreate image
         else:
             recreate_image = True
