@@ -25,7 +25,7 @@ def saveImages(request):
     p = subprocess.Popen(['python', 'manage.py', 'saveImages'],
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.STDOUT)
-    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    return HttpResponse("Save Images running. DO NOT RE-RUN!!")
 
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)

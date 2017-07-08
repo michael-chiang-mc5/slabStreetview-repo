@@ -24,25 +24,30 @@ import boto3
 
 # saves concatenated image from google streetview to local disk
 def saveImages_async():
-    # get mapPoints without corresponding images
-    mapPoints = MapPoint.objects.filter(streetviewimage=None)
+    # get mapPoints
+    mapPoints = MapPoint.objects.all()
     xdim = 640
     ydim = 640
     pitch=0
     for mapPoint in mapPoints:
+        # check if image associated here to prevent worker collisions
+        if mapPoint.streetviewimage_set.all().count() != 0:
+            continue
+
         # fov right is wider because we are nearer to the right side of the road.
         for rl in [{'heading':mapPoint.photographerHeading+90,'fov':35}, \
                         {'heading':mapPoint.photographerHeading-90,'fov':22.5}]:
-            # make image, save local
-            fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude,rl['fov'],rl['heading'],pitch)
-
             # save object
             streetviewImage = StreetviewImage(mapPoint=mapPoint, \
                                                    heading=rl['heading'], \
                                                    fov=rl['fov'], \
                                                    pitch=pitch)
-
             streetviewImage.save()
+
+            # make image, save local
+            fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude,rl['fov'],rl['heading'],pitch)
+
+
 
             # upload image to s3
             s3 = boto3.client('s3', \
@@ -146,7 +151,8 @@ def get_column(I,firstOrLast):
     return column
 
 def saveImage2(xdim,ydim,latitude,longitude,fov,heading,pitch,filename):
-    url =   "http://maps.googleapis.com/maps/api/streetview?size=%dx%d&location=%f,%f&fov=%d&heading=%f&pitch=%f&key="+settings.google_maps_api_key \
-                 % (xdim,ydim,latitude,longitude,fov,heading,pitch)
+    url =   "http://maps.googleapis.com/maps/api/streetview?size=%dx%d&location=%f,%f&fov=%d&heading=%f&pitch=%f&key="%(xdim,ydim,latitude,longitude,fov,heading,pitch) \
+             + settings.GOOGLE_MAPS_API_KEY
+
     fi_path = os.path.join(settings.MEDIA_ROOT,filename)
     data = urllib.request.urlretrieve(url, fi_path)
