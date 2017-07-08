@@ -22,8 +22,65 @@ import csv
 import boto3
 
 
-# saves concatenated image from google streetview to local disk
 def saveImages_async():
+    # parameters
+    xdim = 640
+    ydim = 640
+
+    # get mapPoints
+    mapPoints = MapPoint.objects.all()
+    for mapPoint in mapPoints:
+
+        # check if we should create the image
+        # if we don't have exactly two streetviewImage objects, then we need to (re)create the images
+        mapPoints = mapPoint.streetviewimage_set.all()
+        if mapPoints.count() != 2:
+            mapPoint.streetviewimage_set.all().delete()
+            mapPoint.createStreetviewImages()
+            recreate_image = True
+        # if we have previously flagged streetviewImage objects as set, then we don't need to recreate
+        elif mapPoints[0].image_is_set and mapPoints[1].image_is_set:
+            recreate_image = False
+        # check if we need to recreate explicitly
+        elif mapPoints[0].check_if_image_is_set() and mapPoints[1].check_if_image_is_set():
+            mapPoints[0].image_is_set = True
+            mapPoints[0].save()
+            mapPoints[1].image_is_set = True
+            mapPoints[1].save()
+            recreate_image = False
+        # we need to recreate image
+        else:
+            recreate_image = True
+
+        if recreate_image:
+            for streetviewImage in mapPoint.streetviewimage_set.all():
+                if settings.USE_S3:
+                    image_name = 'temp6.jpg'
+                    fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude, \
+                                         streetviewImage.fov,streetviewImage.heading,    \
+                                         streetviewImage.pitch, image_name)
+                    # upload image to s3
+                    s3 = boto3.client('s3', \
+                                        aws_access_key_id=settings.AWS_ACCESS_KEY,
+                                        aws_secret_access_key=settings.AWS_SECRET, \
+                                        )
+                    s3.upload_file(fi, settings.AWS_BUCKET_NAME, streetviewImage.image_name())
+                    streetviewImage.image_is_set = True
+                    streetviewImage.save()
+                    print(streetviewImage.image_name() + ' uploaded to s3')
+                else:
+                    image_name = streetviewImage.image_name()
+                    fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude, \
+                                         streetviewImage.fov,streetviewImage.heading,    \
+                                         streetviewImage.pitch, image_name)
+                    streetviewImage.image_is_set = True
+                    streetviewImage.save()
+                    print(streetviewImage.image_name() + ' saved')
+
+
+
+# saves concatenated image from google streetview to local disk
+def saveImages_async_deprecated():
     # get mapPoints
     mapPoints = MapPoint.objects.all()
     xdim = 640

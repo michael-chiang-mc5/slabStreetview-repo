@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from .dictionary_search import *
-
+import requests
 
 class CrawlerQueueEntry(models.Model):
     panoID = models.TextField()
@@ -28,6 +28,23 @@ class MapPoint(models.Model):
                str(self.photographerHeading)     + '\t' + \
                str(self.panoID)                  + '\t' + \
                str(self.tag)
+    def createStreetviewImages(self):
+        for rl in [{'heading':self.photographerHeading+90,'fov':35}, \
+                    {'heading':self.photographerHeading-90,'fov':22.5}]:
+            # save object
+            streetviewImage = StreetviewImage(mapPoint=self, \
+                                               heading=rl['heading'], \
+                                               fov=rl['fov'], \
+                                               pitch=0, \
+                                               image_is_set=False, )
+            streetviewImage.save()
+    def images_set(self):
+        all_images_set = True
+        for streetviewImage in self.streetviewimage_set.all():
+            if not streetviewImage.image_is_set:
+                all_images_set = False
+                break
+        return all_images_set
 
 class StreetviewImage(models.Model):
     mapPoint = models.ForeignKey(MapPoint) # each mapPoint has two images corresponding to left and right
@@ -35,6 +52,7 @@ class StreetviewImage(models.Model):
     fov = models.IntegerField()
     pitch = models.FloatField()
     notes = models.TextField(blank=True)
+    image_is_set = models.BooleanField(default=False)
 
     def __str__(self):
         return str("heading="+str(self.heading))
@@ -46,6 +64,17 @@ class StreetviewImage(models.Model):
         return str(self.pk) + '.jpg'
     def image_url(self):
         return settings.AWS_URL + self.image_name()
+    def check_if_image_is_set(self):
+        request = requests.get(self.image_url())
+        if request.status_code == 200:
+            self.image_is_set = True
+            self.save()
+            return True
+        else:
+            self.image_is_set = False
+            self.save()
+            return False
+
 
 class BoundingBox(models.Model):
     streetviewImage = models.ForeignKey(StreetviewImage) # each image can have multiple bounding boxes

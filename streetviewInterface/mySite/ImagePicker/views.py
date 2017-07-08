@@ -22,9 +22,10 @@ import csv
 from .views_saveImage import *
 
 def saveImages(request):
-    p = subprocess.Popen(['python', 'manage.py', 'saveImages'],
-                                        stdout=subprocess.PIPE,
-                                        stderr=subprocess.STDOUT)
+    #p = subprocess.Popen(['python', 'manage.py', 'saveImages'],
+    #                                    stdout=subprocess.PIPE,
+    #                                    stderr=subprocess.STDOUT)
+    saveImages_async()
     context = {'message':"Save Images running. DO NOT RE-RUN!!"}
     return render(request, 'ImagePicker/adminPanel.html',context)
 
@@ -427,11 +428,14 @@ def deleteOcrText(request,ocrtext_pk):
 # Given GPS coordinates, return the heading value perpendicular to the road
 def index(request):
     mapPoints = MapPoint.objects.all()
-    mapPoints_noImage = MapPoint.objects.filter(streetviewimage=None)
+
+    mapPoints_noImage = [mapPoint for mapPoint in mapPoints if mapPoint.images_set() is False]
+
     panoIdList = MapPoint.objects.values_list('panoID', flat=True)
     numDuplicate_mapPoints = len(panoIdList) - len(set(panoIdList))
 
-    streetviewImages = StreetviewImage.objects.all()
+    streetviewImages = [streetviewImage for streetviewImage in StreetviewImage.objects.all() if streetviewImage.image_is_set is True]
+
     streetviewImages_no_google_BB = StreetviewImage.objects.exclude( boundingbox__method__contains="google" )
     streetviewImages_no_CTPN_BB = StreetviewImage.objects.exclude( boundingbox__method__contains="CTPN" )
 
@@ -439,7 +443,8 @@ def index(request):
     boundingBoxes_no_google_text = BoundingBox.objects.exclude( ocrtext__method__contains="google" )
     boundingBoxes_no_crnn_text = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
 
-    context = {'mapPoints':len(mapPoints), 'mapPoints_noImage':len(mapPoints_noImage),'numDuplicate_mapPoints':numDuplicate_mapPoints, \
+    context = {'mapPoints':len(mapPoints), 'mapPoints_noImage':len(mapPoints_noImage), \
+               'numDuplicate_mapPoints':numDuplicate_mapPoints, \
                'streetviewImages':len(streetviewImages),'streetviewImages_no_google_BB':len(streetviewImages_no_google_BB), \
                'streetviewImages_no_CTPN_BB':len(streetviewImages_no_CTPN_BB), 'boundingBoxes':len(boundingBoxes), \
                'boundingBoxes_no_google_text':len(boundingBoxes_no_google_text),'boundingBoxes_no_crnn_text':len(boundingBoxes_no_crnn_text)}
@@ -506,6 +511,10 @@ def bfs(request):
                             address=str(address) \
                             )
         mapPoint.save()
+
+        # also save streetview images while we are at it
+        # this is so we can run image saving off-site
+        mapPoint.createStreetviewImages()
 
         # save links to queue
         for link in links:
