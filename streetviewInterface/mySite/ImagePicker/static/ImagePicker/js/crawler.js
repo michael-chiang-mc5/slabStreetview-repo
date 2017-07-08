@@ -130,6 +130,7 @@ function initMap() {
         map: map,
         title: panoID_val,
       });
+    }
 
     $.ajax({
       type        : 'POST',
