@@ -9,7 +9,7 @@
  *
  */
 
-var PERCENT_POINTS_TO_DISPLAY = 0.005
+var PERCENT_POINTS_TO_DISPLAY = 0.05
 var search_radius = 20
 
 var map;
@@ -124,13 +124,12 @@ function initMap() {
       links_pano.push(links[i].pano)
     }
     // mark on map: TODO too slow
-    //if (Math.random() < PERCENT_POINTS_TO_DISPLAY) {
+    if (Math.random() < PERCENT_POINTS_TO_DISPLAY) {
       var marker = new google.maps.Marker({
         position: panorama.location.latLng,
         map: map,
         title: panoID_val,
       });
-    //}
 
     $.ajax({
       type        : 'POST',

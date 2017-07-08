@@ -457,8 +457,8 @@ def routePicker(request):
 
 def crawler(request):
     mapPoints = MapPoint.objects.all()
-    context = {'api_key':settings.GOOGLE_MAPS_API_KEY,'mapPoints':MapPoint.objects.all()}
-    #context = {'api_key':settings.GOOGLE_MAPS_API_KEY}
+    #context = {'api_key':settings.GOOGLE_MAPS_API_KEY,'mapPoints':MapPoint.objects.all()}
+    context = {'api_key':settings.GOOGLE_MAPS_API_KEY}
     return render(request, 'ImagePicker/crawler.html',context)
 
 
