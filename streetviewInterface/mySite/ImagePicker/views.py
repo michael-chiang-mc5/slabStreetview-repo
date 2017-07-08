@@ -25,7 +25,8 @@ def saveImages(request):
     p = subprocess.Popen(['python', 'manage.py', 'saveImages'],
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.STDOUT)
-    return HttpResponse("Save Images running. DO NOT RE-RUN!!")
+    context = {'message':"Save Images running. DO NOT RE-RUN!!"}
+    return render(request, 'ImagePicker/adminPanel.html',context)
 
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
