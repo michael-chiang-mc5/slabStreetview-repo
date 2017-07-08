@@ -27,21 +27,20 @@
   <script>
     csrf_token = "{{ csrf_token }}";
     var initial_mapPoints = []
+    var initial_descriptions = []
     {% for mapPoint in mapPoints %}
-      initial_mapPoints[{{ forloop.counter }} - 1] = {  lat:{{ mapPoint.latitude }},
-                                                        lng:{{ mapPoint.longitude }}  }
+      initial_mapPoints[{{ forloop.counter }} - 1] = {  lat:{{ mapPoint.latitude }},lng:{{ mapPoint.longitude }}  };
+      initial_descriptions[{{ forloop.counter }} - 1] = "{{ mapPoint.panoID }}";
     {% endfor %}
   </script>
 
-  {% for mapPoint in mapPoints %}
-  {% endfor %}
 
   <script src="{% static 'ImagePicker/js/crawler.js' %}"></script>
 
 {% endblock %}
 
 {% block title %}
-  panorama
+  {{ mapPoints.first.panoID }}
 {% endblock %}
 
 {% block body_block %}

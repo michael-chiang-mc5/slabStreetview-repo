@@ -93,6 +93,7 @@ function initMap() {
     var marker = new google.maps.Marker({
       position: initial_mapPoints[count],
       map: map,
+      title: initial_descriptions[count]
     });
   }
   // listener for start point
@@ -127,6 +128,7 @@ function initMap() {
       var marker = new google.maps.Marker({
         position: panorama.location.latLng,
         map: map,
+        title: panoID_val,
       });
     //}
 
@@ -145,10 +147,14 @@ function initMap() {
         if (String(data).includes("error")) {
           alert(data)
         }
+        if (data['warning'].includes("warning")) {
+          console.log(String(data))
+        }
         panorama.setPano(data['pano_id']);
       }, error: function (xhr, textStatus, errorThrown) {
         alert("error: bfs failed")
         alert(xhr.responseText)
+        console.log(xhr.responseText)
       }
     });
 

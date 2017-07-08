@@ -456,8 +456,8 @@ def routePicker(request):
 
 def crawler(request):
     mapPoints = MapPoint.objects.all()
-    #context = {'api_key':settings.GOOGLE_MAPS_API_KEY,'mapPoints':MapPoint.objects.all()}
-    context = {'api_key':settings.GOOGLE_MAPS_API_KEY}
+    context = {'api_key':settings.GOOGLE_MAPS_API_KEY,'mapPoints':MapPoint.objects.all()}
+    #context = {'api_key':settings.GOOGLE_MAPS_API_KEY}
     return render(request, 'ImagePicker/crawler.html',context)
 
 
@@ -504,29 +504,30 @@ def bfs(request):
                             address=str(address) \
                             )
         mapPoint.save()
+
+        # save links to queue
+        for link in links:
+            match_link = MapPoint.objects.filter(panoID=link) # check if link is already saved as mapPoint
+            if len(match_link)==0:
+                cqe = CrawlerQueueEntry(panoID=link)
+                cqe.save()
+            elif len(match_link)==1:
+                match_link[0].neighbors.add(mapPoint)
+            else:
+                return HttpResponse("error: duplicate map points found while linking. Please resolve this")
+
+        # no warning
+        warning = ''
     elif len(match) == 1:
-        # collision. This can occur when you start blob 1, then delete queue and start blob 2
-        # This cannot occur in a single run since we check if link pre-exists as node before adding ot queue
-        mapPoint = match[0]
-        pass
+        # collision. This should not happen as long as you delete queue before starting new run
+        # i think javascript might be spawning multiple threads
+        warning = "warning: collision at " + panoID + " probably due to thread collision"
     else:
         return HttpResponse("error: duplicate map points found. Please resolve this")
 
-    # save links to queue
-    for link in links:
-        match_link = MapPoint.objects.filter(panoID=link) # check if link is already saved as mapPoint
-        if len(match_link)==0:
-            cqe = CrawlerQueueEntry(panoID=link)
-            cqe.save()
-        elif len(match_link)==1:
-            match_link[0].neighbors.add(mapPoint)
-        else:
-            return HttpResponse("error: duplicate map points found while linking. Please resolve this")
 
     # delete point from queue
     CrawlerQueueEntry.objects.filter(panoID=panoID).delete()
-
-
     # return panoID of next node to visit
     next_node = CrawlerQueueEntry.objects.order_by('time').first()
     if next_node is None:
@@ -535,6 +536,7 @@ def bfs(request):
         data = {}
         data['pano_id'] = next_node.panoID
         #data['queue']   = list(CrawlerQueueEntry.objects.values_list('panoID').order_by('time'))
+        data['warning'] = warning
         return HttpResponse(json.dumps(data), content_type = "application/json")
 
 def get_current_bfs_queue_item(request):
