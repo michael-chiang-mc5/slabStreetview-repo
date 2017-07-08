@@ -65,18 +65,14 @@ class StreetviewImage(models.Model):
     def image_url(self):
         return settings.AWS_URL + self.image_name()
     def check_if_image_is_set(self):
-        print(self.image_url())
         request = requests.get(self.image_url())
-        print(request.status_code)
         if request.status_code == 200:
             self.image_is_set = True
             self.save()
-            print("returning true")
             return True
         else:
             self.image_is_set = False
             self.save()
-            print("returning False")
             return False
 
 

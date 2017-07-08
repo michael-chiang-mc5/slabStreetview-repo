@@ -35,14 +35,9 @@ def saveImages_async():
         # if we don't have exactly two streetviewImage objects, then we need to (re)create the images
         streetviewImages = mapPoint.streetviewimage_set.all()
         if len(streetviewImages) != 2:
-            print("not 2, "+str( streetviewImages.count()    ))
-
-
             streetviewImages.delete()
             mapPoint.createStreetviewImages()
             recreate_image = True
-
-
         # if we have previously flagged streetviewImage objects as set, then we don't need to recreate
         elif streetviewImages[0].image_is_set and streetviewImages[1].image_is_set:
             recreate_image = False
