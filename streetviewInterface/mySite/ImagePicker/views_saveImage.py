@@ -214,9 +214,16 @@ def get_column(I,firstOrLast):
             column[i] = pix[dimx-1,i]
     return column
 
+class AppURLopener(urllib.request.FancyURLopener):
+    version = "Mozilla/5.0"
+
 def saveImage2(xdim,ydim,latitude,longitude,fov,heading,pitch,filename):
-    url =   "http://maps.googleapis.com/maps/api/streetview?size=%dx%d&location=%f,%f&fov=%d&heading=%f&pitch=%f&key="%(xdim,ydim,latitude,longitude,fov,heading,pitch) \
-             + settings.GOOGLE_MAPS_API_KEY
+    url =   "http://maps.googleapis.com/maps/api/streetview?size=%dx%d&location=%f,%f&fov=%d&heading=%f&pitch=%f"%(xdim,ydim,latitude,longitude,fov,heading,pitch) \
+             + '&key='+ settings.GOOGLE_MAPS_API_KEY
 
     fi_path = os.path.join(settings.MEDIA_ROOT,filename)
+
+    urllib._urlopener = AppURLopener()
+    print(url)
+    #urllib.URLopener.version = 'Mozilla/5.0' #  (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0
     data = urllib.request.urlretrieve(url, fi_path)
