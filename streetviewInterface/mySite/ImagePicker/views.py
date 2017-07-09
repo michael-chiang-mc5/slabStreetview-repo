@@ -21,13 +21,14 @@ import json
 import csv
 from .views_saveImage import *
 
+
 def saveImages(request):
     #p = subprocess.Popen(['python', 'manage.py', 'saveImages'],
     #                                    stdout=subprocess.PIPE,
     #                                    stderr=subprocess.STDOUT)
-    saveImages_async()
-    context = {'message':"Save Images running. DO NOT RE-RUN!!"}
-    return render(request, 'ImagePicker/adminPanel.html',context)
+    #context = {'message':"Save Images running. DO NOT RE-RUN!!"}
+    #return render(request, 'ImagePicker/adminPanel.html',context)
+    return HttpResponse("deprecated")
 
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
@@ -428,7 +429,7 @@ def deleteOcrText(request,ocrtext_pk):
 # Given GPS coordinates, return the heading value perpendicular to the road
 def index(request):
     mapPoints = MapPoint.objects.all()
-
+    streetviewImages = StreetviewImage.objects.filter(image_is_set=True)
     #mapPoints_noImage = [mapPoint for mapPoint in mapPoints if mapPoint.images_set() is False]
     #panoIdList = MapPoint.objects.values_list('panoID', flat=True)
     #numDuplicate_mapPoints = len(panoIdList) - len(set(panoIdList))
@@ -442,7 +443,7 @@ def index(request):
     #boundingBoxes_no_google_text = BoundingBox.objects.exclude( ocrtext__method__contains="google" )
     #boundingBoxes_no_crnn_text = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
 
-    context = {'mapPoints':len(mapPoints)}
+    context = {'mapPoints':len(mapPoints),'streetviewImages':len(streetviewImages)}
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):
