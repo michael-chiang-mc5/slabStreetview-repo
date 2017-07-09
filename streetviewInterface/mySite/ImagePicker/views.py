@@ -429,25 +429,20 @@ def deleteOcrText(request,ocrtext_pk):
 def index(request):
     mapPoints = MapPoint.objects.all()
 
-    mapPoints_noImage = [mapPoint for mapPoint in mapPoints if mapPoint.images_set() is False]
+    #mapPoints_noImage = [mapPoint for mapPoint in mapPoints if mapPoint.images_set() is False]
+    #panoIdList = MapPoint.objects.values_list('panoID', flat=True)
+    #numDuplicate_mapPoints = len(panoIdList) - len(set(panoIdList))
 
-    panoIdList = MapPoint.objects.values_list('panoID', flat=True)
-    numDuplicate_mapPoints = len(panoIdList) - len(set(panoIdList))
+    #streetviewImages = [streetviewImage for streetviewImage in StreetviewImage.objects.all() if streetviewImage.image_is_set is True]
 
-    streetviewImages = [streetviewImage for streetviewImage in StreetviewImage.objects.all() if streetviewImage.image_is_set is True]
+    #streetviewImages_no_google_BB = StreetviewImage.objects.exclude( boundingbox__method__contains="google" )
+    #streetviewImages_no_CTPN_BB = StreetviewImage.objects.exclude( boundingbox__method__contains="CTPN" )
 
-    streetviewImages_no_google_BB = StreetviewImage.objects.exclude( boundingbox__method__contains="google" )
-    streetviewImages_no_CTPN_BB = StreetviewImage.objects.exclude( boundingbox__method__contains="CTPN" )
+    #boundingBoxes = BoundingBox.objects.all()
+    #boundingBoxes_no_google_text = BoundingBox.objects.exclude( ocrtext__method__contains="google" )
+    #boundingBoxes_no_crnn_text = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
 
-    boundingBoxes = BoundingBox.objects.all()
-    boundingBoxes_no_google_text = BoundingBox.objects.exclude( ocrtext__method__contains="google" )
-    boundingBoxes_no_crnn_text = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
-
-    context = {'mapPoints':len(mapPoints), 'mapPoints_noImage':len(mapPoints_noImage), \
-               'numDuplicate_mapPoints':numDuplicate_mapPoints, \
-               'streetviewImages':len(streetviewImages),'streetviewImages_no_google_BB':len(streetviewImages_no_google_BB), \
-               'streetviewImages_no_CTPN_BB':len(streetviewImages_no_CTPN_BB), 'boundingBoxes':len(boundingBoxes), \
-               'boundingBoxes_no_google_text':len(boundingBoxes_no_google_text),'boundingBoxes_no_crnn_text':len(boundingBoxes_no_crnn_text)}
+    context = {'mapPoints':len(mapPoints)}
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):
