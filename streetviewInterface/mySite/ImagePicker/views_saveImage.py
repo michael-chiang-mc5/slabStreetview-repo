@@ -20,6 +20,8 @@ from random import randint
 import json
 import csv
 import boto3
+from random import randint
+from time import sleep
 
 def syncImages():
     streetviewImages = StreetviewImage.objects.all()
@@ -27,7 +29,7 @@ def syncImages():
         if streetviewImage.image_is_set is False:
             streetviewImage.check_if_image_is_set()
         else:
-            print(str(streetviewImage.pk) + " was previously set") 
+            print(str(streetviewImage.pk) + " was previously set")
 
 def saveImages_async():
     # parameters
@@ -63,6 +65,7 @@ def saveImages_async():
 
         if recreate_image:
             for streetviewImage in mapPoint.streetviewimage_set.all():
+                sleep(randint(0,6))
                 if settings.USE_S3:
                     image_name = 'temp6.jpg'
                     fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude, \
