@@ -22,10 +22,12 @@ import csv
 import boto3
 
 def syncImages():
-    streetviewImages = StreetviewImages.objects.all()
-    for streetviewImage in streetviewImage:
+    streetviewImages = StreetviewImage.objects.all()
+    for streetviewImage in streetviewImages:
         if streetviewImage.image_is_set is False:
             streetviewImage.check_if_image_is_set()
+        else:
+            print(str(streetviewImage.pk) + " was previously set") 
 
 def saveImages_async():
     # parameters

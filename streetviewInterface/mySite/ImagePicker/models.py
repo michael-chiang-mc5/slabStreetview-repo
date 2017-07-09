@@ -69,10 +69,12 @@ class StreetviewImage(models.Model):
         if request.status_code == 200:
             self.image_is_set = True
             self.save()
+            print(str(self.pk) + " is set True")
             return True
         else:
             self.image_is_set = False
             self.save()
+            print(str(self.pk) + " is set False")
             return False
 
 
