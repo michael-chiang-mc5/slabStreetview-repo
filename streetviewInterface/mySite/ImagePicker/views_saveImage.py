@@ -21,6 +21,11 @@ import json
 import csv
 import boto3
 
+def syncImages():
+    streetviewImages = StreetviewImages.objects.all()
+    for streetviewImage in streetviewImage:
+        if streetviewImage.image_is_set is False:
+            streetviewImage.check_if_image_is_set()
 
 def saveImages_async():
     # parameters
