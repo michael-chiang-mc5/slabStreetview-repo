@@ -15,6 +15,7 @@ from time import sleep
 #AWS_BUCKET_NAME = 'slab-streetview-debug'
 interface_url = "http://104.131.145.75/"
 AWS_BUCKET_NAME = 'slab-streetview'
+text_file = open("log.txt", "w")
 
 def main():
     count_continuous_error = 0
@@ -24,12 +25,13 @@ def main():
     r = requests.get('https://api.ipify.org/')
     if r.text == '172.249.49.159':
         GOOGLE_KEY = secret_keys.GOOGLE_KEY_BRIDGEPORT
+        text_file.write("Running on "+r.text)
     elif r.text == '104.131.145.75'
         GOOGLE_KEY = secret_keys.GOOGLE_KEY_VPS
-        print("running")
+        text_file.write("Running on "+r.text)
         #sleep(randint(3600,7200))
     else:
-        print("No key for " + r.text)
+        text_file.write("No key for " + r.text)
         return
 
     while(1):
@@ -42,9 +44,9 @@ def main():
             if count_timer > 50 + randint(0,40):
                 timer_max = randint(3,10)
                 count_timer = 0
-                print("changing to a new timer, timer_max = " + str(timer_max))
+                text_file.write("changing to a new timer, timer_max = " + str(timer_max))
             if randint(0,1000)>998:
-                print("taking a long rest")
+                text_file.write("taking a long rest")
                 sleep(randint(200,500))
 
 
@@ -53,18 +55,19 @@ def main():
                 create_and_upload_image(data,GOOGLE_KEY)
                 count_continuous_error = 0
             except BaseException as e:
-                print("ERROR : " + str(e))
+                text_file.write("ERROR : " + str(e))
                 if str(e) == 'HTTP Error 500: Internal Server Error': # google
                     pass
                 count_continuous_error += 1
-                print("continuous error = " + str(count_continuous_error))
+                text_file.write("continuous error = " + str(count_continuous_error))
                 if count_continuous_error > 4:
                     break
                 else:
                     continue
+    text_file.close()
 
 def create_and_upload_image(data,GOOGLE_KEY):
-    print('attempting to save '+data['name'] + ' to local')
+    text_file.write('attempting to save '+data['name'] + ' to local')
     # tell server to set pending so we don't assign twice
     payload = {'pk':data['pk'],'pending':True}
     post_url = interface_url + "ImagePicker/set_image_pending/"
@@ -79,7 +82,7 @@ def create_and_upload_image(data,GOOGLE_KEY):
     # upload image to s3
     s3 = boto3.client('s3',aws_access_key_id=secret_keys.AWS_ACCESS_KEY,aws_secret_access_key=secret_keys.AWS_SECRET)
     s3.upload_file(fi, AWS_BUCKET_NAME, data['name'])
-    print(data['name'] + ' uploaded to s3')
+    text_file.write(data['name'] + ' uploaded to s3')
     # tell server to set image is uploaded
     payload = {'pk':data['pk']}
     post_url = interface_url + "ImagePicker/set_image_uploaded/"
@@ -175,7 +178,7 @@ def saveImage2(xdim,ydim,latitude,longitude,fov,heading,pitch,filename,GOOGLE_KE
     url =   "http://maps.googleapis.com/maps/api/streetview?size=%dx%d&location=%f,%f&fov=%d&heading=%f&pitch=%f"%(xdim,ydim,latitude,longitude,fov,heading,pitch) \
              + '&key='+ GOOGLE_KEY
     urllib._urlopener = AppURLopener()
-    print('saving image from '+url)
+    text_file.write('saving image from '+url)
     data = urllib.request.urlretrieve(url, filename)
 
 if __name__ == "__main__":
