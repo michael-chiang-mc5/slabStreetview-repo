@@ -474,9 +474,9 @@ def deleteOcrText(request,ocrtext_pk):
 
 # Given GPS coordinates, return the heading value perpendicular to the road
 def index(request):
-    mapPoints = len(MapPoint.objects.all())
-    streetviewImages = len(StreetviewImage.objects.filter(image_is_set=True))
-    pending = len(Pending.objects.all())
+    mapPoints = MapPoint.objects.all().count()
+    streetviewImages = StreetviewImage.objects.filter(image_is_set=True).count()
+    pending = Pending.objects.all().count()
     #mapPoints_noImage = [mapPoint for mapPoint in mapPoints if mapPoint.images_set() is False]
     #panoIdList = MapPoint.objects.values_list('panoID', flat=True)
     #numDuplicate_mapPoints = len(panoIdList) - len(set(panoIdList))

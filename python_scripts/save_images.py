@@ -24,6 +24,10 @@ def main():
     r = requests.get('https://api.ipify.org/')
     if r.text == '172.249.49.159':
         GOOGLE_KEY = secret_keys.GOOGLE_KEY_BRIDGEPORT
+    elif r.text == '104.131.145.75'
+        GOOGLE_KEY = secret_keys.GOOGLE_KEY_VPS
+        print("running")
+        #sleep(randint(3600,7200))
     else:
         print("No key for " + r.text)
         return
@@ -47,6 +51,7 @@ def main():
 
             try:
                 create_and_upload_image(data,GOOGLE_KEY)
+                count_continuous_error = 0
             except BaseException as e:
                 print("ERROR : " + str(e))
                 if str(e) == 'HTTP Error 500: Internal Server Error': # google
