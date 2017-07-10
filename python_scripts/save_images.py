@@ -18,6 +18,7 @@ AWS_BUCKET_NAME = 'slab-streetview'
 text_file = open("log.txt", "w")
 
 def main():
+    print('starting, see log.txt')
     count_continuous_error = 0
     count_timer = 0
     timer_max = 6
@@ -36,6 +37,7 @@ def main():
 
     while(1):
         # get metadata
+        text_file.flush()
         with urllib.request.urlopen(interface_url+"ImagePicker/image_saver_metadata/") as url: # TODO: update to 104....
             data = json.loads(url.read().decode())
 
