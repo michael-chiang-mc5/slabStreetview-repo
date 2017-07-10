@@ -26,7 +26,7 @@ def main():
     if r.text == '172.249.49.159':
         GOOGLE_KEY = secret_keys.GOOGLE_KEY_BRIDGEPORT
         text_file.write("Running on "+r.text+"\n")
-    elif r.text == '104.131.145.75'
+    elif r.text == '104.131.145.75':
         GOOGLE_KEY = secret_keys.GOOGLE_KEY_VPS
         text_file.write("Running on "+r.text+"\n")
         #sleep(randint(3600,7200))
