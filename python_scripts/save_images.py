@@ -4,6 +4,8 @@ import urllib.request, json, requests
 from PIL import Image
 import os
 from math import sqrt
+from random import randint
+from time import sleep
 
 # Example url:
 # https://s3-us-west-1.amazonaws.com/slab-streetview/1.jpg
@@ -16,19 +18,30 @@ AWS_BUCKET_NAME = 'slab-streetview'
 
 def main():
     count_continuous_error = 0
+    count_timer = 0
+    timer_max = 6
+
     r = requests.get('https://api.ipify.org/')
-    if r.text = '172.249.49.159':
-        GOOGLE_KEY = GOOGLE_KEY_BRIDGEPORT
+    if r.text == '172.249.49.159':
+        GOOGLE_KEY = secret_keys.GOOGLE_KEY_BRIDGEPORT
     else:
-        print("No key")
+        print("No key for " + r.text)
         return
 
     while(1):
         # get metadata
         with urllib.request.urlopen(interface_url+"ImagePicker/image_saver_metadata/") as url: # TODO: update to 104....
             data = json.loads(url.read().decode())
+
+            # human-like timer
+            if count_timer > 50 + randint(0,40):
+                timer_max = randint(3,10)
+                count_timer = 0
+            sleep(randint(0,timer_max))
+            if randint(0,1000)>995:
+                sleep(randint(300,600))
             try:
-                create_and_upload_image(data)
+                create_and_upload_image(data,GOOGLE_KEY)
             except BaseException as e:
                 print("ERROR : " + str(e))
                 if str(e) == 'HTTP Error 500: Internal Server Error': # google
@@ -40,7 +53,7 @@ def main():
                 else:
                     continue
 
-def create_and_upload_image(data):
+def create_and_upload_image(data,GOOGLE_KEY):
     print('attempting to save '+data['name'] + ' to local')
     # tell server to set pending so we don't assign twice
     payload = {'pk':data['pk'],'pending':True}
@@ -52,7 +65,7 @@ def create_and_upload_image(data):
     # create and save image locally
     fi = saveConcatImage(data['xdim'],data['ydim'],data['lat'],data['lon'], \
                          data['fov'],data['heading'],    \
-                         data['pitch'], data['name'])
+                         data['pitch'], data['name'],GOOGLE_KEY)
     # upload image to s3
     s3 = boto3.client('s3',aws_access_key_id=secret_keys.AWS_ACCESS_KEY,aws_secret_access_key=secret_keys.AWS_SECRET)
     s3.upload_file(fi, AWS_BUCKET_NAME, data['name'])
@@ -66,11 +79,11 @@ def create_and_upload_image(data):
     post_url = interface_url + "ImagePicker/set_image_pending/"
     r = requests.post(post_url, data={'json-str':json.dumps(payload)})
 
-def saveConcatImage(xdim,ydim,latitude,longitude,fov,heading,pitch,image_name):
+def saveConcatImage(xdim,ydim,latitude,longitude,fov,heading,pitch,image_name,GOOGLE_KEY):
     # save to local
-    saveImage2(xdim,ydim,latitude,longitude,fov,heading-(fov-0.5),pitch,'temp2.jpg')
-    saveImage2(xdim,ydim,latitude,longitude,fov,heading    ,pitch,'temp3.jpg')
-    saveImage2(xdim,ydim,latitude,longitude,fov,heading+(fov-0.5),pitch,'temp4.jpg')
+    saveImage2(xdim,ydim,latitude,longitude,fov,heading-(fov-0.5),pitch,'temp2.jpg',GOOGLE_KEY)
+    saveImage2(xdim,ydim,latitude,longitude,fov,heading    ,pitch,'temp3.jpg',GOOGLE_KEY)
+    saveImage2(xdim,ydim,latitude,longitude,fov,heading+(fov-0.5),pitch,'temp4.jpg',GOOGLE_KEY)
     # open
     I2 = Image.open('temp2.jpg')
     I3 = Image.open('temp3.jpg')
@@ -148,9 +161,9 @@ def get_column(I,firstOrLast):
 class AppURLopener(urllib.request.FancyURLopener):
     version = "Mozilla/5.0" # 'Mozilla/5.0' (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36 SE 2.X MetaSr 1.0
 
-def saveImage2(xdim,ydim,latitude,longitude,fov,heading,pitch,filename):
+def saveImage2(xdim,ydim,latitude,longitude,fov,heading,pitch,filename,GOOGLE_KEY):
     url =   "http://maps.googleapis.com/maps/api/streetview?size=%dx%d&location=%f,%f&fov=%d&heading=%f&pitch=%f"%(xdim,ydim,latitude,longitude,fov,heading,pitch) \
-             + '&key='+ secret_keys.GOOGLE_KEY
+             + '&key='+ GOOGLE_KEY
     urllib._urlopener = AppURLopener()
     print('saving image from '+url)
     data = urllib.request.urlretrieve(url, filename)
