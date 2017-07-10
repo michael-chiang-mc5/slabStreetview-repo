@@ -23,6 +23,7 @@ from django.http import JsonResponse
 
 def image_saver_metadata(request):
     streetviewImage = StreetviewImage.valid_set().filter(image_is_set=False).first()
+    streetviewImage.set_pending(True)
     mapPoint = streetviewImage.mapPoint
     return JsonResponse({'xdim':640, 'ydim':640,'lat':mapPoint.latitude,'lon':mapPoint.longitude,\
                          'fov':streetviewImage.fov,'heading':streetviewImage.heading, 'pitch':streetviewImage.pitch,\
@@ -36,11 +37,9 @@ def set_image_pending(request):
     pk = d['pk'] # this is the pk of the streetviewImage object
     pending = d['pending']
     if pending is True:
-        Pending.objects.filter(streetviewImage=StreetviewImage.objects.get(pk=pk)).delete()
-        pending = Pending(streetviewImage=StreetviewImage.objects.get(pk=pk))
-        pending.save()
+        StreetviewImage.objects.get(pk=pk).set_pending(True)
     if pending is False:
-        Pending.objects.filter(streetviewImage=StreetviewImage.objects.get(pk=pk)).delete()
+        StreetviewImage.objects.get(pk=pk).set_pending(False)
     return HttpResponse('set streetviewImage.pk='+str(pk)+' to pending='+str(pending))
 
 def deletePending(request):

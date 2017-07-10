@@ -54,6 +54,13 @@ class StreetviewImage(models.Model):
     notes = models.TextField(blank=True)
     image_is_set = models.BooleanField(default=False)
 
+    def set_pending(self,trueOrFalse):
+        if trueOrFalse is True:
+            Pending.objects.filter(streetviewImage=self).delete()
+            pending = Pending(streetviewImage=self)
+            pending.save()
+        else:
+            Pending.objects.filter(streetviewImage=self).delete()
     def __str__(self):
         return str("heading="+str(self.heading))
     def valid_set():
