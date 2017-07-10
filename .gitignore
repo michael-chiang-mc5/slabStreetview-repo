@@ -11,3 +11,5 @@ visualize/output/
 data.txt
 main.m~
 streetviewInterface/mySite/output/
+python_scripts/*.jpg
+python_scripts/secret_keys.py

@@ -9,7 +9,6 @@ import ast
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from PIL import Image
 from math import sqrt
 from collections import Counter, defaultdict
 from .google_ocr import *
@@ -20,6 +19,39 @@ from random import randint
 import json
 import csv
 from .views_saveImage import *
+from django.http import JsonResponse
+
+def image_saver_metadata(request):
+    streetviewImage = StreetviewImage.valid_set().filter(image_is_set=False).first()
+    mapPoint = streetviewImage.mapPoint
+    return JsonResponse({'xdim':640, 'ydim':640,'lat':mapPoint.latitude,'lon':mapPoint.longitude,\
+                         'fov':streetviewImage.fov,'heading':streetviewImage.heading, 'pitch':streetviewImage.pitch,\
+                         'name':streetviewImage.image_name(),'pk':streetviewImage.pk})
+
+@csrf_exempt
+def set_image_pending(request):
+    json_str = request.POST.get("json-str")
+    d = json.loads(json_str)
+    #d = ast.literal_eval(json_str) # "true" is not the same as "True"
+    pk = d['pk'] # this is the pk of the streetviewImage object
+    pending = d['pending']
+    if pending is True:
+        Pending.objects.filter(streetviewImage=StreetviewImage.objects.get(pk=pk)).delete()
+        pending = Pending(streetviewImage=StreetviewImage.objects.get(pk=pk))
+        pending.save()
+    if pending is False:
+        Pending.objects.filter(streetviewImage=StreetviewImage.objects.get(pk=pk)).delete()
+    return HttpResponse('set streetviewImage.pk='+str(pk)+' to pending='+str(pending))
+
+@csrf_exempt
+def set_image_uploaded(request):
+    json_str = request.POST.get("json-str")
+    d = ast.literal_eval(json_str)
+    pk = d['pk'] # this is the pk of the streetviewImage object
+    streetviewImage=StreetviewImage.objects.get(pk=pk)
+    streetviewImage.image_is_set = True
+    streetviewImage.save()
+    return HttpResponse('set streetviewImage.pk='+str(pk)+' to image_is_set=True')
 
 
 def saveImages(request):

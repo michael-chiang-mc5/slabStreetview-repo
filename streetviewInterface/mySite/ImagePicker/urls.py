@@ -20,6 +20,11 @@ urlpatterns = [
     url(r'^postBoundingBox/$',  views.postBoundingBox, name='postBoundingBox'),
     url(r'^postOCR/$',  views.postOCR, name='postOCR'), #
 
+    url(r'^image_saver_metadata/$',  views.image_saver_metadata, name='image_saver_metadata'), #
+    url(r'^set_image_pending/$',  views.set_image_pending, name='set_image_pending'), #
+    url(r'^set_image_uploaded/$',  views.set_image_uploaded, name='set_image_uploaded'), #
+
+
     url(r'^saveImages/$',  views.saveImages, name='saveImages'), #
     url(r'^picker/$', views.picker, name='picker'),
 

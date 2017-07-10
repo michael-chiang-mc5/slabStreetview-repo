@@ -56,6 +56,8 @@ class StreetviewImage(models.Model):
 
     def __str__(self):
         return str("heading="+str(self.heading))
+    def valid_set():
+        return StreetviewImage.objects.filter(pending__isnull=True)
     def dimY(self):
         return self.image.height
     def dimX(self):
@@ -77,6 +79,15 @@ class StreetviewImage(models.Model):
             print(str(self.pk) + " is set False")
             return False
 
+class Pending(models.Model):
+    streetviewImage = models.ForeignKey(StreetviewImage, null=True, blank=True,
+                                        on_delete=models.CASCADE)
+    is_corrupted = models.BooleanField(default=False)
+    time = models.DateTimeField(auto_now_add=True)
+    def remove_if_dead_task(self):
+        time_elapse = datetime.datetime.utcnow().replace(tzinfo=utc) - self.time
+        if time_elapse.total_seconds() > 86400 and is_corrupted is not False: # one day
+            self.delete()
 
 class BoundingBox(models.Model):
     streetviewImage = models.ForeignKey(StreetviewImage) # each image can have multiple bounding boxes
