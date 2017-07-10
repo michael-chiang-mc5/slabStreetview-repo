@@ -34,12 +34,17 @@ def main():
             data = json.loads(url.read().decode())
 
             # human-like timer
+            sleep(randint(0,timer_max))
             if count_timer > 50 + randint(0,40):
                 timer_max = randint(3,10)
                 count_timer = 0
-            sleep(randint(0,timer_max))
-            if randint(0,1000)>995:
+                print("changing to a new timer, timer_max = " + str(timer_max))
+            if randint(0,1000)>997:
+                print("taking a long rest")
                 sleep(randint(300,600))
+
+
+
             try:
                 create_and_upload_image(data,GOOGLE_KEY)
             except BaseException as e:
