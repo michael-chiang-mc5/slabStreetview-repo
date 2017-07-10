@@ -365,6 +365,8 @@ def annotateRandomBoundingBox(request):
     return render(request, 'ImagePicker/annotateRandomBoundingBox.html',context)
 
 def postManualOCR(request):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
     pk = request.POST.get("pk")
     method = "manual"
     text = request.POST.get("text")
@@ -376,6 +378,8 @@ def postManualOCR(request):
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def deleteDuplicateMapPoints(request):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
     # get values of duplicate panoID
     #mapPoints = MapPoint.objects.all()
     #list_str = mapPoints.values_list('panoID')
@@ -396,6 +400,8 @@ def runLanguageIdentifiction(request):
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def runLanguageIdentifiction_async():
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
     ocrTexts = OcrText.objects.filter(method='google', ocrlanguage__isnull=True)
     for ocrText in ocrTexts:
         ocrLanguage = OcrLanguage.init(ocrText) # saving done in method
@@ -427,6 +433,8 @@ def runGoogleOCR_image(request,pk):
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def runGoogleOCR_randomImage(request):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
     streetviewImages = StreetviewImage.objects.exclude( boundingbox__method__contains="google" )
     streetviewImage = streetviewImages[randint(0, streetviewImages.count() - 1)]
     return runGoogleOCR_image(request,streetviewImage.pk)
@@ -486,16 +494,22 @@ def index(request):
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
     mapPoints = MapPoint.objects.all()
     context = {'mapPoints':mapPoints,'api_key':settings.GOOGLE_MAPS_API_KEY}
     return render(request, 'ImagePicker/panorama.html',context)
 
 def routePicker(request):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
     mapPoints = MapPoint.objects.all()
     context = {'mapPoints':mapPoints,'api_key':settings.GOOGLE_MAPS_API_KEY}
     return render(request, 'ImagePicker/route.html',context)
 
 def crawler(request):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
     mapPoints = MapPoint.objects.all()
     #context = {'api_key':settings.GOOGLE_MAPS_API_KEY,'mapPoints':MapPoint.objects.all()}
     context = {'api_key':settings.GOOGLE_MAPS_API_KEY}
@@ -503,6 +517,8 @@ def crawler(request):
 
 
 def initialize_bfs(request):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
     CrawlerQueueEntry.objects.all().delete()
     # TODO: set MapPoint.panoID = None for all pre-existing
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
@@ -511,6 +527,8 @@ def initialize_bfs(request):
 # saves mapPoint
 # downloads associated streetview images to point and saves streetviewImage (2 per mapPoint for right and left)
 def bfs(request):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
     # TODO: check whether distance from start point exceeds a given limit
     time.sleep(0.3)
 
@@ -586,6 +604,8 @@ def bfs(request):
         return HttpResponse(json.dumps(data), content_type = "application/json")
 
 def get_current_bfs_queue_item(request):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
     next_node = CrawlerQueueEntry.objects.order_by('time').first()
     if next_node is None:
         return HttpResponse('terminate')

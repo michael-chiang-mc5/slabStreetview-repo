@@ -39,9 +39,9 @@ def main():
                 timer_max = randint(3,10)
                 count_timer = 0
                 print("changing to a new timer, timer_max = " + str(timer_max))
-            if randint(0,1000)>997:
+            if randint(0,1000)>998:
                 print("taking a long rest")
-                sleep(randint(300,600))
+                sleep(randint(200,500))
 
 
 
