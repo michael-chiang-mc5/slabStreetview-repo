@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^image_saver_metadata/$',  views.image_saver_metadata, name='image_saver_metadata'), #
     url(r'^set_image_pending/$',  views.set_image_pending, name='set_image_pending'), #
     url(r'^set_image_uploaded/$',  views.set_image_uploaded, name='set_image_uploaded'), #
+    url(r'^deletePending/$',  views.deletePending, name='deletePending'), #
 
 
     url(r'^saveImages/$',  views.saveImages, name='saveImages'), #

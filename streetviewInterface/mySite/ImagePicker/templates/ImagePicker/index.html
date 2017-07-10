@@ -37,6 +37,14 @@
 {% block body_block %}
 
   <h1>Statistics</h1>
+  {{ mapPoints }} total MapPoints <br />
+  {{ streetviewImages }} images saved <br />
+  {{ pending }} pending <br />
+
+
+
+
+
   <p>~~~~~~~~~~~~~</p>
   {{ mapPoints }} total MapPoints
   <li>{{ mapPoints_noImage }} have no associated image. <a href="{% url 'ImagePicker:saveImages' %}">Download</a></li>

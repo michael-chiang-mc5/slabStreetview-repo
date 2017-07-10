@@ -43,6 +43,12 @@ def set_image_pending(request):
         Pending.objects.filter(streetviewImage=StreetviewImage.objects.get(pk=pk)).delete()
     return HttpResponse('set streetviewImage.pk='+str(pk)+' to pending='+str(pending))
 
+def deletePending(request):
+    if not request.user.is_superuser:
+        return HttpResponse("you are not an admin")
+    Pending.objects.all().delete()
+    return HttpResponseRedirect(request.META['HTTP_REFERER'])
+
 @csrf_exempt
 def set_image_uploaded(request):
     json_str = request.POST.get("json-str")
@@ -460,8 +466,9 @@ def deleteOcrText(request,ocrtext_pk):
 
 # Given GPS coordinates, return the heading value perpendicular to the road
 def index(request):
-    mapPoints = MapPoint.objects.all()
-    streetviewImages = StreetviewImage.objects.filter(image_is_set=True)
+    mapPoints = len(MapPoint.objects.all())
+    streetviewImages = len(StreetviewImage.objects.filter(image_is_set=True))
+    pending = len(Pending.objects.all())
     #mapPoints_noImage = [mapPoint for mapPoint in mapPoints if mapPoint.images_set() is False]
     #panoIdList = MapPoint.objects.values_list('panoID', flat=True)
     #numDuplicate_mapPoints = len(panoIdList) - len(set(panoIdList))
@@ -475,7 +482,7 @@ def index(request):
     #boundingBoxes_no_google_text = BoundingBox.objects.exclude( ocrtext__method__contains="google" )
     #boundingBoxes_no_crnn_text = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
 
-    context = {'mapPoints':len(mapPoints),'streetviewImages':len(streetviewImages)}
+    context = {'mapPoints':mapPoints,'streetviewImages':streetviewImages,'pending':pending}
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):
