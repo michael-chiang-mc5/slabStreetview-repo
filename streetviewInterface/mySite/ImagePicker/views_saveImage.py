@@ -35,6 +35,7 @@ def saveImages_async():
     # parameters
     xdim = 640
     ydim = 640
+    count_continuous_error = 0
 
     # get mapPoints
     mapPoints = MapPoint.objects.all()
@@ -50,7 +51,7 @@ def saveImages_async():
         # if we have previously flagged streetviewImage objects as set, then we don't need to recreate
         elif streetviewImages[0].image_is_set and streetviewImages[1].image_is_set:
             recreate_image = False
-            print("skipping " + str(streetviewImages[0].pk) + " and " + str(streetviewImages[1].pk))
+            #print("skipping " + str(streetviewImages[0].pk) + " and " + str(streetviewImages[1].pk))
         # check if we need to recreate explicitly
         elif streetviewImages[0].check_if_image_is_set() and streetviewImages[1].check_if_image_is_set():
             streetviewImages[0].image_is_set = True
@@ -63,31 +64,42 @@ def saveImages_async():
         else:
             recreate_image = True
 
-        if recreate_image:
-            for streetviewImage in mapPoint.streetviewimage_set.all():
-                sleep(randint(0,6))
-                if settings.USE_S3:
-                    image_name = 'temp6.jpg'
-                    fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude, \
-                                         streetviewImage.fov,streetviewImage.heading,    \
-                                         streetviewImage.pitch, image_name)
-                    # upload image to s3
-                    s3 = boto3.client('s3', \
-                                        aws_access_key_id=settings.AWS_ACCESS_KEY,
-                                        aws_secret_access_key=settings.AWS_SECRET, \
-                                        )
-                    s3.upload_file(fi, settings.AWS_BUCKET_NAME, streetviewImage.image_name())
-                    streetviewImage.image_is_set = True
-                    streetviewImage.save()
-                    print(streetviewImage.image_name() + ' uploaded to s3')
-                else:
-                    image_name = streetviewImage.image_name()
-                    fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude, \
-                                         streetviewImage.fov,streetviewImage.heading,    \
-                                         streetviewImage.pitch, image_name)
-                    streetviewImage.image_is_set = True
-                    streetviewImage.save()
-                    print(streetviewImage.image_name() + ' saved')
+        try:
+            if recreate_image:
+                for streetviewImage in mapPoint.streetviewimage_set.all():
+                    sleep(randint(0,6))
+                    if settings.USE_S3:
+                        image_name = 'temp6.jpg'
+                        fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude, \
+                                             streetviewImage.fov,streetviewImage.heading,    \
+                                             streetviewImage.pitch, image_name)
+                        # upload image to s3
+                        s3 = boto3.client('s3', \
+                                            aws_access_key_id=settings.AWS_ACCESS_KEY,
+                                            aws_secret_access_key=settings.AWS_SECRET, \
+                                            )
+                        s3.upload_file(fi, settings.AWS_BUCKET_NAME, streetviewImage.image_name())
+                        streetviewImage.image_is_set = True
+                        streetviewImage.save()
+                        print(streetviewImage.image_name() + ' uploaded to s3')
+                    else:
+                        image_name = streetviewImage.image_name()
+                        fi = saveConcatImage(xdim,ydim,mapPoint.latitude,mapPoint.longitude, \
+                                             streetviewImage.fov,streetviewImage.heading,    \
+                                             streetviewImage.pitch, image_name)
+                        streetviewImage.image_is_set = True
+                        streetviewImage.save()
+                        print(streetviewImage.image_name() + ' saved')
+                count_continuous_error = 0
+        except BaseException as e:
+            print(str(e))
+            count_continuous_error += 1
+            print("continuous error = " + str(count_continuous_error))
+            if count_continuous_error > 3:
+                break
+            else:
+                continue
+
 
 
 
