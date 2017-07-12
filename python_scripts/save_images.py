@@ -30,7 +30,7 @@ def main():
     elif r.text == '104.131.145.75':
         GOOGLE_KEY = secret_keys.GOOGLE_KEY_VPS
         text_file.write("Running on "+r.text+"\n")
-        #sleep(randint(3600,7200))
+        sleep(randint(0,1800))
     else:
         text_file.write("No key for " + r.text+"\n")
         return
