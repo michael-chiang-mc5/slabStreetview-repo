@@ -122,7 +122,7 @@ def savePoint(request):
     time.sleep(0.5)
     return HttpResponse("done")
 
-def write_mapPoint(request):
+def write_mapPoint():
     with open('output/MapPoints.csv', 'w') as csvfile:
         fieldnames = ['pk', 'latitude', 'longitude', 'photographerHeading', 'panoID', 'tag','num_links','address','neighbors_panoID']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -132,14 +132,13 @@ def write_mapPoint(request):
             writer.writerow({'pk':                  mapPoint.pk, \
                              'latitude':            mapPoint.latitude, \
                              'longitude':           mapPoint.longitude, \
-                             'photographerHeading': mapPoint.photographerHeading, \
-                             'panoID':              mapPoint.panoID, \
-                             'tag':                 mapPoint.tag, \
-                             'num_links':           mapPoint.num_links, \
-                             'address':             mapPoint.address, \
-                             'neighbors_panoID':      list(mapPoint.neighbors.all().values_list('panoID')) , \
+                             #'photographerHeading': mapPoint.photographerHeading, \
+                             #'panoID':              mapPoint.panoID, \
+                             #'tag':                 mapPoint.tag, \
+                             #'num_links':           mapPoint.num_links, \
+                             #'address':             mapPoint.address, \
+                             #'neighbors_panoID':      list(mapPoint.neighbors.all().values_list('panoID')) , \
                             })
-    return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def read_mapPoint(request):
     with open('output/MapPoints.csv', 'r') as f:

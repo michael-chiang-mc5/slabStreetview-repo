@@ -10,7 +10,6 @@ urlpatterns = [
     url(r'^initialize_bfs/$', views.initialize_bfs, name='initialize_bfs'),
     url(r'^savePoint/$', views.savePoint, name='savePoint'),
     url(r'^listImage/$',  views.listImage, name='listImage'), #
-    url(r'^write_mapPoint/$',  views.write_mapPoint, name='write_mapPoint'), #
     url(r'^read_mapPoint/$',  views.read_mapPoint, name='read_mapPoint'), #
 
     url(r'^list_CTPN_metadata/$',  views.list_CTPN_metadata, name='list_CTPN_metadata'), #
