@@ -20,6 +20,7 @@ import json
 import csv
 from .views_saveImage import *
 from django.http import JsonResponse
+from io import BytesIO
 
 def image_saver_metadata(request):
     streetviewImage = StreetviewImage.valid_set().filter(image_is_set=False).first()
@@ -77,8 +78,12 @@ def saveImages(request):
 
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
-    image_url = os.path.join(settings.MEDIA_ROOT,boundingBox.streetviewImage.image.name)
-    img = Image.open(os.path.join(image_url))
+    image_url = boundingBox.streetviewImage.image_url()
+    #data = urllib.request.urlretrieve(image_url, 'temp_boundingBox.jpg')
+
+    response = requests.get(image_url)
+    img = Image.open(BytesIO(response.content))
+    #img = Image.open('temp_boundingBox.jpg')
     img = img.crop((boundingBox.x1, boundingBox.y1, boundingBox.x2, boundingBox.y2 ))
     response = HttpResponse(content_type="image/jpeg")
     img.save(response, "JPEG")
@@ -486,6 +491,7 @@ def index(request):
     mapPoints = MapPoint.objects.all().count()
     streetviewImages = StreetviewImage.objects.filter(image_is_set=True).count()
     pending = Pending.objects.all().count()
+    boundingBoxes = BoundingBox.objects.count()
     #mapPoints_noImage = [mapPoint for mapPoint in mapPoints if mapPoint.images_set() is False]
     #panoIdList = MapPoint.objects.values_list('panoID', flat=True)
     #numDuplicate_mapPoints = len(panoIdList) - len(set(panoIdList))
@@ -499,7 +505,7 @@ def index(request):
     #boundingBoxes_no_google_text = BoundingBox.objects.exclude( ocrtext__method__contains="google" )
     #boundingBoxes_no_crnn_text = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
 
-    context = {'mapPoints':mapPoints,'streetviewImages':streetviewImages,'pending':pending}
+    context = {'mapPoints':mapPoints,'streetviewImages':streetviewImages,'pending':pending,'boundingBoxes':boundingBoxes}
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):
