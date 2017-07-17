@@ -31,8 +31,11 @@ def image_saver_metadata(request):
 
 def list_CTPN_metadata(request):
     streetviewImage = StreetviewImage.valid_set().filter(image_is_set=True).exclude( boundingbox__method__contains="CTPN" ).first()
-    streetviewImage.set_pending(True)
-    return JsonResponse({'pk':streetviewImage.pk, 'url':streetviewImage.image_url()})
+    if streetviewImage is None:
+        return HttpResponse("done")
+    else:
+        streetviewImage.set_pending(True)
+        return JsonResponse({'pk':streetviewImage.pk, 'url':streetviewImage.image_url()})
 
 @csrf_exempt
 def set_image_pending(request):
