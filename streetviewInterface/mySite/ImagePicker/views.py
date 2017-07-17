@@ -20,6 +20,7 @@ import json
 import csv
 from .views_saveImage import *
 from django.http import JsonResponse
+from io import BytesIO
 
 def image_saver_metadata(request):
     streetviewImage = StreetviewImage.valid_set().filter(image_is_set=False).first()
@@ -75,7 +76,6 @@ def saveImages(request):
     #return render(request, 'ImagePicker/adminPanel.html',context)
     return HttpResponse("deprecated")
 
-from io import BytesIO
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
     image_url = boundingBox.streetviewImage.image_url()
