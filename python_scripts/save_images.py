@@ -31,6 +31,9 @@ def main():
         GOOGLE_KEY = secret_keys.GOOGLE_KEY_VPS
         text_file.write("Running on "+r.text+"\n")
         sleep(randint(0,1800))
+    elif r.text == '68.190.247.186':
+        GOOGLE_KEY = secret_keys.GOOGLE_KEY_CORDOVA
+        text_file.write("Running on "+r.text+"\n")
     else:
         text_file.write("No key for " + r.text+"\n")
         return
