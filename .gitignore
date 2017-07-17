@@ -1,4 +1,7 @@
 streetviewInterface/venv/
+gis/venv/
+aws_manager/venv/
+gis/supporting_files/ZONING_PLY.csv
 streetviewInterface/mySite/mySite/secret_keys_and_passwords.py
 .DS_Store
 *.pyc

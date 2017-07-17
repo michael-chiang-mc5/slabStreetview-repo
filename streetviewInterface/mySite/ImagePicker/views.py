@@ -29,6 +29,11 @@ def image_saver_metadata(request):
                          'fov':streetviewImage.fov,'heading':streetviewImage.heading, 'pitch':streetviewImage.pitch,\
                          'name':streetviewImage.image_name(),'pk':streetviewImage.pk})
 
+def list_CTPN_metadata(request):
+    streetviewImage = StreetviewImage.valid_set().filter(image_is_set=True).exclude( boundingbox__method__contains="CTPN" ).first()
+    streetviewImage.set_pending(True)
+    return JsonResponse({'pk':streetviewImage.pk, 'url':streetviewImage.image_url()})
+
 @csrf_exempt
 def set_image_pending(request):
     json_str = request.POST.get("json-str")
@@ -160,17 +165,17 @@ def read_mapPoint(request):
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 # produces a text file for CTPN
-def list_CTPN_metadata(request):
-    # only run detector on images without CTPN derived bounding boxes
-    streetviewImages = StreetviewImage.objects.exclude( boundingbox__method__contains="CTPN" )
-    response = HttpResponse(content_type='text/plain; charset=utf8')
-    for streetviewImage in streetviewImages:
-        response.write(str(streetviewImage.pk) + "\t")
-        response.write("http://")
-        response.write(request.META['HTTP_HOST']+"/")
-        response.write(streetviewImage.image.url)
-        response.write("\n")
-    return response
+#def list_CTPN_metadata(request):
+#    # only run detector on images without CTPN derived bounding boxes
+#    streetviewImages = StreetviewImage.objects.exclude( boundingbox__method__contains="CTPN" )
+#    response = HttpResponse(content_type='text/plain; charset=utf8')
+#    for streetviewImage in streetviewImages:
+#        response.write(str(streetviewImage.pk) + "\t")
+#        response.write("http://")
+#        response.write(request.META['HTTP_HOST']+"/")
+#        response.write(streetviewImage.image.url)
+#        response.write("\n")
+#    return response
 
 def listBoundingBox(request): # TODO: make urls to cropped image
     if request.method == 'POST':
