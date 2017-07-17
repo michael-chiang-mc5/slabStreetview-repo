@@ -9,7 +9,7 @@
  *
  */
 
-var PERCENT_POINTS_TO_DISPLAY = 0.05
+var PERCENT_POINTS_TO_DISPLAY = 1
 var search_radius = 20
 
 var map;
