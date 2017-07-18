@@ -78,12 +78,11 @@ def saveImages(request):
 
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
+    if boundingBox.is_nil == True:
+        return HttpResponse("nil bounding box")
     image_url = boundingBox.streetviewImage.image_url()
-    #data = urllib.request.urlretrieve(image_url, 'temp_boundingBox.jpg')
-
     response = requests.get(image_url)
     img = Image.open(BytesIO(response.content))
-    #img = Image.open('temp_boundingBox.jpg')
     img = img.crop((boundingBox.x1, boundingBox.y1, boundingBox.x2, boundingBox.y2 ))
     response = HttpResponse(content_type="image/jpeg")
     img.save(response, "JPEG")
@@ -195,7 +194,7 @@ def listBoundingBox(request): # TODO: make urls to cropped image
         boundingBoxes = BoundingBox.objects.all()
 
     page = request.GET.get('page', 1)
-    paginator = Paginator(boundingBoxes, 100)
+    paginator = Paginator(boundingBoxes, 10)
     try:
         boundingBoxes_page = paginator.page(page)
     except PageNotAnInteger:
