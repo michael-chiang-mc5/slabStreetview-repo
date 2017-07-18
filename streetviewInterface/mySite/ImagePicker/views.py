@@ -492,6 +492,8 @@ def index(request):
     streetviewImages = StreetviewImage.objects.filter(image_is_set=True).count()
     pending = Pending.objects.all().count()
     boundingBoxes = BoundingBox.objects.count()
+    streetviewImages_withBB = StreetviewImage.objects.filter(image_is_set=True, boundingbox__isnull=False).distinct().count()
+
     #mapPoints_noImage = [mapPoint for mapPoint in mapPoints if mapPoint.images_set() is False]
     #panoIdList = MapPoint.objects.values_list('panoID', flat=True)
     #numDuplicate_mapPoints = len(panoIdList) - len(set(panoIdList))
@@ -505,7 +507,7 @@ def index(request):
     #boundingBoxes_no_google_text = BoundingBox.objects.exclude( ocrtext__method__contains="google" )
     #boundingBoxes_no_crnn_text = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
 
-    context = {'mapPoints':mapPoints,'streetviewImages':streetviewImages,'pending':pending,'boundingBoxes':boundingBoxes}
+    context = {'mapPoints':mapPoints,'streetviewImages':streetviewImages,'pending':pending,'boundingBoxes':boundingBoxes,'streetviewImages_withBB':streetviewImages_withBB}
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):
