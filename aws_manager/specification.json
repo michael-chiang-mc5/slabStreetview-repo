@@ -1,0 +1,8 @@
+{
+  "ImageId": "ami-289fb148",
+  "InstanceType": "g2.2xlarge",
+  "KeyName": "devenv-key",
+  "SecurityGroupIds": [ "sg-77a15511" ],
+  "EbsOptimized": true,
+  "UserData": "IyEvYmluL2Jhc2gKY2QgL2hvbWUvdWJ1bnR1L0NUUE5fR1BVLwpweXRob24gbWMvdGV4dERldGVjdG9yLnB5"
+}
