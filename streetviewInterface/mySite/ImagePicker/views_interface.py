@@ -35,8 +35,8 @@ def post_zoning(request):
     json_str = request.POST.get("json-str")
     d = json.loads(json_str)
     pk = int(d['pk']) # this is the pk of the mapPoint object
-    zone = d['zone']
-    mapTag = MapTag(mapPoint=MapPoint.objects.get(pk=pk),tag_type="zoning",tag_text=zone)
+    tag_text = d['tag_text']
+    mapTag = MapTag(mapPoint=MapPoint.objects.get(pk=pk),tag_type="zoning",tag_text=tag_text)
     mapTag.save()
     return HttpResponse('created tag for mapPoint.pk='+str(pk))
 
