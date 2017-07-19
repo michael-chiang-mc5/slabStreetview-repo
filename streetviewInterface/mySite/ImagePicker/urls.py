@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     url(r'^index/$', views.index, name='index'),
     url(r'^index_figures/$', views.index_figures, name='index_figures'),
-    
+
     url(r'^routePicker/$', views.routePicker, name='routePicker'),
     url(r'^crawler/$', views.crawler, name='crawler'),
     url(r'^bfs/$', views.bfs, name='bfs'),
@@ -17,6 +17,9 @@ urlpatterns = [
     url(r'^list_CTPN_metadata/$',  views.list_CTPN_metadata, name='list_CTPN_metadata'), #
     url(r'^list_crnn_metadata/$',  views.list_crnn_metadata, name='list_crnn_metadata'), #
     url(r'^list_ECN_metadata/$',  views.list_ECN_metadata, name='list_ECN_metadata'), #
+    url(r'^metadata_zoning/$', views.metadata_zoning, name='metadata_zoning'),
+
+
     url(r'^listBoundingBox/$',  views.listBoundingBox, name='listBoundingBox'), #
     url(r'^postBoundingBox/$',  views.postBoundingBox, name='postBoundingBox'),
     url(r'^postOCR/$',  views.postOCR, name='postOCR'), #

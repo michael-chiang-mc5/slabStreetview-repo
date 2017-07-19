@@ -7,8 +7,6 @@ class CrawlerQueueEntry(models.Model):
     panoID = models.TextField()
     time = models.DateTimeField(auto_now_add=True)
 
-
-
 class MapPoint(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
@@ -45,6 +43,14 @@ class MapPoint(models.Model):
                 all_images_set = False
                 break
         return all_images_set
+
+class MapTag(models.Model):
+    mapPoint = models.ForeignKey(MapPoint)
+    tag_type = models.TextField(blank=True)
+    tag_text = models.TextField(blank=True)
+    def __str__(self):
+        return self.tag_text
+
 
 class StreetviewImage(models.Model):
     mapPoint = models.ForeignKey(MapPoint) # each mapPoint has two images corresponding to left and right
