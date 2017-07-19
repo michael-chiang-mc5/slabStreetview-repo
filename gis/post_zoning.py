@@ -70,10 +70,10 @@ def parse_line(line):
 def main():
     lonlat_pkl_path = 'supporting_files/lonlat_store.pkl'
     zoning_pkl_path = 'supporting_files/zoning_store.pkl'
-    #file_name = 'supporting_files/ZONING_PLY.csv'
-    file_name = 'supporting_files/test.csv'
-    interface_url = "http://104.131.145.75/"
-
+    file_name = 'supporting_files/ZONING_PLY.csv'
+    #file_name = 'supporting_files/test.csv'
+    #interface_url = "http://104.131.145.75/"
+    interface_url = "http://127.0.0.1:8000/"
 
 
 
@@ -113,23 +113,22 @@ def main():
     t1 = time.time()
     print(str(t1-t0) + " seconds to construct lon/lat")
 
-    print(zoning_store)
-    #unique = set(zoning_store)
-    #print(unique)
+    #print(zoning_store)
+    unique = set(zoning_store)
+    print(unique)
 
     tree = scipy.spatial.cKDTree(lonlat_store, leafsize=100)
     t2 = time.time()
     print(str(t2-t1) + " seconds to construct tree")
 
     while(1):
-        print(interface_url+"ImagePicker/metadata_zoning/")
         with urllib.request.urlopen(interface_url+"ImagePicker/metadata_zoning/") as url: # TODO: update to 104....
             try:
                 data = json.loads(url.read().decode())
             except:
                 print("no more")
                 break
-        print(data)
+        #print(data)
         pk = int(data['pk'])
         lon = float(data['lon'])
         lat = float(data['lat'])
@@ -139,10 +138,11 @@ def main():
         if result[0] == float('inf'):
             payload = {'pk':pk,'tag_text':'unknown'}
         else:
-            payload = {'pk':pk,'tag_text':'zoning_store[result[1]]'}
+            payload = {'pk':pk,'tag_text':zoning_store[result[1]]}
         print(payload)
         post_url = interface_url + "ImagePicker/post_zoning/"
         r = requests.post(post_url, data={'json-str':json.dumps(payload)})
+        #print(r.text)
     t3 = time.time()
     print(str(t3-t2) + " seconds to run search")
 
