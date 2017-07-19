@@ -77,15 +77,7 @@ def main():
 
 
 
-    zone_mapping = {'A1':'A', 'A2':'A', 'RA':'A', \
-                    'RE40':'R', 'RE20':'R', 'RE15':'R', 'RE11':'R', 'RE9':'R', 'RS':'R', 'R1':'R', 'RU':'R', 'RZ2.5':'R', \
-                    'RZ3':'R', 'RZ4':'R', 'RW1':'R', 'R2':'R', 'RD1.5':'R', 'RD2':'R', 'RD3':'R', 'RD4':'R', 'RD5':'R', \
-                    'RD6':'R', 'RMP':'R', 'RW2':'R', 'R3':'R', 'RAS3':'R', 'R4':'R', 'RAS4':'R', 'R5':'R', \
-                    'CR':'C', 'C1':'C', 'C1.5':'C', 'C2':'C', 'C4':'C', 'C5':'C', 'CM':'C', \
-                    'MR1':'I', 'M1':'I', 'MR2':'I', 'M2':'I', 'M3':'I', \
-                    'P':'P','PB':'P', \
-                    'OS':'O', 'PF':'O', 'SL':'O', \
-                    }
+
 
     t0 = time.time()
     if os.path.isfile(lonlat_pkl_path) and os.path.isfile(zoning_pkl_path):

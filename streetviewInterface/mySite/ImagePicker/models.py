@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from .dictionary_search import *
 import requests
+import statistics
 
 class CrawlerQueueEntry(models.Model):
     panoID = models.TextField()
@@ -43,11 +44,66 @@ class MapPoint(models.Model):
                 all_images_set = False
                 break
         return all_images_set
+    def count_zoning():
+        total = MapPoint.objects.filter(maptag__tag_type="zoning").count()
+
+        # initialize output
+        possible_codes = list(MapTag.zone_mapping.keys())
+        rn = {}
+        for code in possible_codes:
+            rn[code] = []
+
+        # get mapPoints with: zoning tag, bounding box
+        mapPoints = MapPoint.objects.filter(maptag__tag_type="zoning", streetviewimage__boundingbox__isnull=False).distinct()
+
+
+
+        #return list(mapPoints.values_list('pk'))
+
+        for mapPoint in mapPoints:
+            zone_code =  mapPoint.get_zone_code()
+            num_signs = mapPoint.get_num_signs()
+            try:
+                rn[zone_code].append(num_signs)
+            except:
+                rn['unknown'].append(num_signs)
+
+        rn2 = {}
+        for key in list(rn.keys()):
+            if len(rn[key]) == 0:
+                rn2[key] = {'mean':-1, 'std':-1, 'n':0}
+            else:
+                rn2[key] = {'mean':sum(rn[key]) / len(rn[key]), 'std':statistics.stdev(rn[key]), 'n':len(rn[key])}
+        return rn2
+
+
+
+
+    def get_zone_code(self):
+        try:
+            return self.maptag_set.filter(tag_type="zoning")[0].tag_text
+        except:
+            return None
+    def get_num_signs(self):
+        streetviewImages = self.streetviewimage_set.all()
+        count = 0
+        for streetviewImage in streetviewImages:
+            count += streetviewImage.count_boundingBoxes()
+        return count
 
 class MapTag(models.Model):
     mapPoint = models.ForeignKey(MapPoint)
     tag_type = models.TextField(blank=True)
     tag_text = models.TextField(blank=True)
+    zone_mapping = {'A1':'A', 'A2':'A', 'RA':'A', \
+                    'RE40':'R', 'RE20':'R', 'RE15':'R', 'RE11':'R', 'RE9':'R', 'RS':'R', 'R1':'R', 'RU':'R', 'RZ2.5':'R', \
+                    'RZ3':'R', 'RZ4':'R', 'RW1':'R', 'R2':'R', 'RD1.5':'R', 'RD2':'R', 'RD3':'R', 'RD4':'R', 'RD5':'R', \
+                    'RD6':'R', 'RMP':'R', 'RW2':'R', 'R3':'R', 'RAS3':'R', 'R4':'R', 'RAS4':'R', 'R5':'R', \
+                    'CR':'C', 'C1':'C', 'C1.5':'C', 'C2':'C', 'C4':'C', 'C5':'C', 'CM':'C', \
+                    'MR1':'I', 'M1':'I', 'MR2':'I', 'M2':'I', 'M3':'I', \
+                    'P':'P','PB':'P', \
+                    'OS':'O', 'PF':'O', 'SL':'O', \
+                    'unknown':'U'}
     def __str__(self):
         return self.tag_text
 
@@ -59,6 +115,16 @@ class StreetviewImage(models.Model):
     pitch = models.FloatField()
     notes = models.TextField(blank=True)
     image_is_set = models.BooleanField(default=False)
+
+    def count_boundingBoxes(self):
+        boundingBoxes = self.boundingbox_set.all()
+        count = 0
+        for boundingBox in boundingBoxes:
+            if boundingBox.is_nil:
+                continue
+            else:
+                count += 1
+        return count
 
     def set_pending(self,trueOrFalse):
         if trueOrFalse is True:

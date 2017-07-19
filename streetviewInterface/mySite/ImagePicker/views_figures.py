@@ -24,5 +24,8 @@ from random import randint
 from time import sleep
 
 def index_figures(request):
-    context = {}
+    sign_counts = MapPoint.count_zoning()
+    sign_counts = sorted(sign_counts.items() , key=lambda x: x[1]['mean'], reverse=True)
+
+    context = {'sign_counts':  sign_counts }
     return render(request, 'ImagePicker/index_figures.html',context)

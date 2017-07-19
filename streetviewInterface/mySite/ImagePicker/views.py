@@ -386,6 +386,7 @@ def deleteOcrText(request,ocrtext_pk):
 # Given GPS coordinates, return the heading value perpendicular to the road
 def index(request):
     mapPoints = MapPoint.objects.all().count()
+    mapPoints_withTags = MapPoint.objects.filter(maptag__isnull=False).distinct().count()
     streetviewImages = StreetviewImage.objects.filter(image_is_set=True).count()
     pending = Pending.objects.all().count()
     boundingBoxes = BoundingBox.objects.count()
@@ -404,7 +405,8 @@ def index(request):
     #boundingBoxes_no_google_text = BoundingBox.objects.exclude( ocrtext__method__contains="google" )
     #boundingBoxes_no_crnn_text = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
 
-    context = {'mapPoints':mapPoints,'streetviewImages':streetviewImages,'pending':pending,'boundingBoxes':boundingBoxes,'streetviewImages_withBB':streetviewImages_withBB}
+    context = {'mapPoints':mapPoints,'streetviewImages':streetviewImages,'pending':pending,'boundingBoxes':boundingBoxes, \
+               'streetviewImages_withBB':streetviewImages_withBB,'mapPoints_withTags':mapPoints_withTags}
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):
