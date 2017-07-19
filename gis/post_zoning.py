@@ -143,7 +143,6 @@ def main():
         print(payload)
         post_url = interface_url + "ImagePicker/post_zoning/"
         r = requests.post(post_url, data={'json-str':json.dumps(payload)})
-
     t3 = time.time()
     print(str(t3-t2) + " seconds to run search")
 
