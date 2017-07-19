@@ -3,6 +3,8 @@ from . import views
 
 urlpatterns = [
     url(r'^index/$', views.index, name='index'),
+    url(r'^index_figures/$', views.index_figures, name='index_figures'),
+    
     url(r'^routePicker/$', views.routePicker, name='routePicker'),
     url(r'^crawler/$', views.crawler, name='crawler'),
     url(r'^bfs/$', views.bfs, name='bfs'),

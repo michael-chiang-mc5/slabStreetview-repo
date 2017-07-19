@@ -1,0 +1,46 @@
+{% extends "MCBase/base.html" %}
+{% load staticfiles %}
+{% block javascript %}
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    #pano, #pano1, #pano2 {
+      width: 100%;
+      height: 100%;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+    hr {
+      color: black;
+      background-color: black;
+      height: 5px;
+    }
+
+  </style>
+{% endblock %}
+
+{% block title %}
+  figures
+{% endblock %}
+
+{% block body_block %}
+
+  <h1>Figure 1</h1>
+  <p>Question: What are we assessing when we count signs? Are we looking at commercial properties,
+     residential properties, or industrial properties? What sorts of businesses display signs? Do large
+     properties display less signs?</p>
+  <h2>1a: Average number of signs for commercial/residential/industrial zones</h2>
+  <h2>1b: Average number of signs in commercial subzones
+  <hr />
+
+  <h1>Figure 2</h1>
+  <p>Question: Can we map ethnicity with signage?</p>
+
+
+  <hr />
+{% endblock %}

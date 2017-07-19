@@ -19,6 +19,7 @@ from random import randint
 import json
 import csv
 from .views_saveImage import *
+from .views_figures import *
 from django.http import JsonResponse
 from io import BytesIO
 
