@@ -72,8 +72,8 @@ def main():
     zoning_pkl_path = 'supporting_files/zoning_store.pkl'
     file_name = 'supporting_files/ZONING_PLY.csv'
     #file_name = 'supporting_files/test.csv'
-    #interface_url = "http://104.131.145.75/"
-    interface_url = "http://127.0.0.1:8000/"
+    interface_url = "http://104.131.145.75/"
+    #interface_url = "http://127.0.0.1:8000/"
 
 
 

@@ -94,7 +94,7 @@ class MapPoint(models.Model):
 class MapTag(models.Model):
     mapPoint = models.ForeignKey(MapPoint)
     tag_type = models.TextField(blank=True)
-    tag_text = models.TextField(blank=True)
+    tag_text = models.TextField(blank=True) # "unknown" if MapPoint lon/lat not with 0.001 of any LARIAC data
     zone_mapping = {'A1':'A', 'A2':'A', 'RA':'A', \
                     'RE40':'R', 'RE20':'R', 'RE15':'R', 'RE11':'R', 'RE9':'R', 'RS':'R', 'R1':'R', 'RU':'R', 'RZ2.5':'R', \
                     'RZ3':'R', 'RZ4':'R', 'RW1':'R', 'R2':'R', 'RD1.5':'R', 'RD2':'R', 'RD3':'R', 'RD4':'R', 'RD5':'R', \
