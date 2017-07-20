@@ -68,6 +68,7 @@ class MapPoint(models.Model):
             except:
                 rn['unknown'].append(num_signs)
 
+        # rn2 example: {'C2' : {'mean':10.2,'std':0.3}, ...}
         rn2 = {}
         for key in list(rn.keys()):
             if len(rn[key]) == 0:

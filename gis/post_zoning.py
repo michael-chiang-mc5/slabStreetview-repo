@@ -114,12 +114,11 @@ def main():
     print(str(t2-t1) + " seconds to construct tree")
 
     while(1):
-        with urllib.request.urlopen(interface_url+"ImagePicker/metadata_zoning/") as url: # TODO: update to 104....
-            try:
+        try:
+            with urllib.request.urlopen(interface_url+"ImagePicker/metadata_zoning/") as url: 
                 data = json.loads(url.read().decode())
-            except:
-                print("no more")
-                break
+        except:
+            continue
         #print(data)
         pk = int(data['pk'])
         lon = float(data['lon'])
