@@ -81,16 +81,19 @@ class MapPoint(models.Model):
 
 
     def get_zone_code(self):
-        try:
-            return self.maptag_set.filter(tag_type="zoning")[0].tag_text
-        except:
-            return None
-    def get_num_signs(self):
-        streetviewImages = self.streetviewimage_set.all()
-        count = 0
-        for streetviewImage in streetviewImages:
-            count += streetviewImage.count_boundingBoxes()
-        return count
+        tags = MapTag.objects.filter(mapPoint=self,tag_type="zoning")
+        if tags.count() == 1:
+            return tags[0]
+        else:
+            raise ValueError('MapPoint does not have exactly one zoning tag')
+
+    def get_num_CTPN_boundingBoxes(self):
+        num_boundingBoxes = BoundingBox.objects.filter(streetviewImage__mapPoint=self, is_nil=False, method="CTPN").distinct().count()
+        #streetviewImages = self.streetviewimage_set.all()
+        #count = 0
+        #for streetviewImage in streetviewImages:
+        #    count += streetviewImage.count_boundingBoxes()
+        return num_boundingBoxes
 
 class MapTag(models.Model):
     mapPoint = models.ForeignKey(MapPoint)

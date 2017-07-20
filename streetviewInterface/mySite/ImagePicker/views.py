@@ -23,6 +23,7 @@ from .views_figures import *
 from .views_interface import *
 from django.http import JsonResponse
 from io import BytesIO
+from django.db.models import Count
 
 
 
@@ -102,14 +103,24 @@ def savePoint(request):
 
 def write_mapPoint():
     with open('output/MapPoints.csv', 'w') as csvfile:
-        fieldnames = ['pk', 'latitude', 'longitude', 'photographerHeading', 'panoID', 'tag','num_links','address','neighbors_panoID']
+        fieldnames = ['pk', 'latitude', 'longitude', 'num_boundingboxes','zone_code']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        #writer.writeheader()
-        mapPoints = MapPoint.objects.all()
+        writer.writeheader()
+        #mapPoints = MapPoint.objects.filter(streetviewimage__image_is_set=True).distinct()
+
+        # get mapPoints where:
+        #    mapPoint is associated with two streetview images whose images are set
+        #    mapPoint is associated with at least 1 CTPN boundingBoxes object (nil is ok)
+        mapPoints = MapPoint.objects.extra(  select={'image_count':       'SELECT COUNT(*) FROM imagepicker_streetviewimage WHERE imagepicker_streetviewimage.mappoint_id = imagepicker_mappoint.id AND imagepicker_streetviewimage.image_is_set = 1',},
+                                             where=['image_count = 2']
+                                    ).filter(streetviewimage__boundingbox__method="CTPN").distinct()
+
         for mapPoint in mapPoints:
             writer.writerow({'pk':                  mapPoint.pk, \
                              'latitude':            mapPoint.latitude, \
                              'longitude':           mapPoint.longitude, \
+                             'num_boundingboxes':   mapPoint.get_num_CTPN_boundingBoxes(), \
+                             'zone_code':           mapPoint.get_zone_code(), \
                              #'photographerHeading': mapPoint.photographerHeading, \
                              #'panoID':              mapPoint.panoID, \
                              #'tag':                 mapPoint.tag, \
