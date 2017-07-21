@@ -1,3 +1,5 @@
+Might need to configure awscli to run on new machine
+
 See http://docs.aws.amazon.com/cli/latest/userguide/installing.html
     http://docs.aws.amazon.com/cli/latest/userguide/tutorial-ec2-ubuntu.html
 
