@@ -4,17 +4,17 @@ client = boto3.client('ec2')
 
 response = client.describe_spot_instance_requests()
 
-open_requests = 0
+open_or_active_request = 0
 for request in response['SpotInstanceRequests']:
     state = request['State']
-    if state == 'open':
-        open_requests += 1
+    print(state)
+    if state == 'open' or state == "active":
+        open_or_active_request += 1
 
-if open_requests == 0:
+if open_or_active_request == 0:
 
-    #if asdfadsfs: # check to see if there is already a g2 instancce running
 
-    print("no open requests, opening new request")
+    print("no open/active requests, opening new request")
     response = client.request_spot_instances(
         InstanceCount=1,
         SpotPrice='0.21',
@@ -38,4 +38,4 @@ if open_requests == 0:
         }
     )
 else:
-    print("open request exists, doing nothing")
+    print("open/active requests exist, doing nothing")
