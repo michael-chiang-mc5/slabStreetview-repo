@@ -11,6 +11,9 @@ for request in response['SpotInstanceRequests']:
         open_requests += 1
 
 if open_requests == 0:
+
+    #if asdfadsfs: # check to see if there is already a g2 instancce running
+
     print("no open requests, opening new request")
     response = client.request_spot_instances(
         InstanceCount=1,

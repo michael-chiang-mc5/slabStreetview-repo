@@ -95,6 +95,14 @@ class MapPoint(models.Model):
         #    count += streetviewImage.count_boundingBoxes()
         return num_boundingBoxes
 
+    def get_size_CTPN_boundingBoxes(self):
+        boundingBoxes = BoundingBox.objects.filter(streetviewImage__mapPoint=self, is_nil=False, method="CTPN").distinct()
+        total_area = 0
+        for boundingBox in boundingBoxes:
+            total_area += boundingBox.area()
+        return total_area
+
+
 class MapTag(models.Model):
     mapPoint = models.ForeignKey(MapPoint)
     tag_type = models.TextField(blank=True)
@@ -182,6 +190,8 @@ class BoundingBox(models.Model):
     score = models.FloatField(null=True, blank=True)
     is_nil = models.BooleanField(default=False)
 
+    def area(self):
+        return self.width()*self.height()
     def __str__(self):
         return str([self.x1, self.y1, self.x2, self.y2])
     def width(self):
