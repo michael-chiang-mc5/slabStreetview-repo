@@ -18,6 +18,14 @@ class MapPoint(models.Model):
     address = models.TextField(blank=True)
     neighbors = models.ManyToManyField("self")
 
+    def get_census_tracts(self):
+        censusBlocks = self.censusblock_set.all()
+        tracts = []
+        for block in censusBlocks:
+            tracts.append(block.tract_code())
+        unique = list(set(tracts)) # get unique
+        s = ",".join(unique)
+        return s
     def __str__(self):
         return str('lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))
     def serialize_csv(self):
@@ -119,6 +127,17 @@ class MapTag(models.Model):
     def __str__(self):
         return self.tag_text
 
+class CensusBlock(models.Model):
+    mapPoint = models.ForeignKey(MapPoint)
+    fips = models.TextField()
+    def __str__(self):
+        return str(self.fips)
+    def tract_code(self):
+        state  = self.fips[0:2]
+        county = self.fips[2:5]
+        tract  = self.fips[5:11]
+        block  = self.fips[11:]
+        return tract
 
 class StreetviewImage(models.Model):
     mapPoint = models.ForeignKey(MapPoint) # each mapPoint has two images corresponding to left and right

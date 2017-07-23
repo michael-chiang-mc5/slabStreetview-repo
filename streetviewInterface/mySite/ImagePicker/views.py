@@ -101,10 +101,31 @@ def savePoint(request):
     time.sleep(0.5)
     return HttpResponse("done")
 
+# See: https://www.fcc.gov/general/census-block-conversions-api
+def get_census_tracts():
+    mapPoints = MapPoint.objects.filter(censusblock__isnull=True)
+    url_template = 'http://data.fcc.gov/api/block/%d/find?format=json&latitude=%f&longitude=%f&showall=true'
+    for mapPoint in mapPoints:
+        url = url_template % (2010,mapPoint.latitude,mapPoint.longitude)
+        with urllib.request.urlopen(url) as url:
+            data = json.loads(url.read().decode())
+        # figure out whether intersection or single tract
+        if 'intersection' in data['Block'].keys(): # if true, then we have intersection
+            for el in data['Block']['intersection']:
+                fips = el['FIPS']
+                censusBlock = CensusBlock(mapPoint = mapPoint, fips = fips)
+                censusBlock.save()
+                print(censusBlock)
+        else:
+            fips = data['Block']['FIPS']
+            censusBlock = CensusBlock(mapPoint = mapPoint, fips = fips)
+            censusBlock.save()
+            print(censusBlock)
+
 def write_mapPoint():
     with open('output/MapPoints.csv', 'w') as csvfile:
-        fieldnames = ['pk', 'latitude', 'longitude', 'num_boundingboxes','size_boundingboxes','zone_code']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        fieldnames = ['pk', 'latitude', 'longitude', 'num_boundingboxes','size_boundingboxes','zone_code','census_tracts']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         #mapPoints = MapPoint.objects.filter(streetviewimage__image_is_set=True).distinct()
 
@@ -113,7 +134,8 @@ def write_mapPoint():
         #    mapPoint is associated with at least 1 CTPN boundingBoxes object (nil is ok)
         mapPoints = MapPoint.objects.extra(  select={'image_count':       'SELECT COUNT(*) FROM imagepicker_streetviewimage WHERE imagepicker_streetviewimage.mappoint_id = imagepicker_mappoint.id AND imagepicker_streetviewimage.image_is_set = 1',},
                                              where=['image_count = 2']
-                                    ).filter(streetviewimage__boundingbox__method="CTPN").distinct()
+                                    ).filter(streetviewimage__boundingbox__method="CTPN").filter(censusblock__isnull=False).distinct()
+
 
         for mapPoint in mapPoints:
             writer.writerow({'pk':                  mapPoint.pk, \
@@ -122,6 +144,7 @@ def write_mapPoint():
                              'num_boundingboxes':   mapPoint.get_num_CTPN_boundingBoxes(), \
                              'size_boundingboxes':  mapPoint.get_size_CTPN_boundingBoxes(), \
                              'zone_code':           mapPoint.get_zone_code(), \
+                             'census_tracts':       mapPoint.get_census_tracts(), \
                              #'photographerHeading': mapPoint.photographerHeading, \
                              #'panoID':              mapPoint.panoID, \
                              #'tag':                 mapPoint.tag, \
@@ -403,6 +426,7 @@ def index(request):
     pending = Pending.objects.all().count()
     boundingBoxes = BoundingBox.objects.count()
     streetviewImages_withBB = StreetviewImage.objects.filter(image_is_set=True, boundingbox__isnull=False).distinct().count()
+    mapPoints_withTract = MapPoint.objects.filter(censusblock__isnull=False).distinct().count()
 
     #mapPoints_noImage = [mapPoint for mapPoint in mapPoints if mapPoint.images_set() is False]
     #panoIdList = MapPoint.objects.values_list('panoID', flat=True)
@@ -418,7 +442,7 @@ def index(request):
     #boundingBoxes_no_crnn_text = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
 
     context = {'mapPoints':mapPoints,'streetviewImages':streetviewImages,'pending':pending,'boundingBoxes':boundingBoxes, \
-               'streetviewImages_withBB':streetviewImages_withBB,'mapPoints_withTags':mapPoints_withTags}
+               'streetviewImages_withBB':streetviewImages_withBB,'mapPoints_withTags':mapPoints_withTags, 'mapPoints_withTract':mapPoints_withTract}
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):
