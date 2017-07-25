@@ -137,7 +137,7 @@ class CensusBlock(models.Model):
         county = self.fips[2:5]
         tract  = self.fips[5:11]
         block  = self.fips[11:]
-        return tract
+        return state+county+tract
 
 class StreetviewImage(models.Model):
     mapPoint = models.ForeignKey(MapPoint) # each mapPoint has two images corresponding to left and right

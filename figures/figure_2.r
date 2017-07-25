@@ -1,4 +1,3 @@
-# See https://github.com/dkahle/ggmap
 library(ggmap)
 
 # read csv file
