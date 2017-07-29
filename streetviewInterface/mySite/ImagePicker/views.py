@@ -360,7 +360,7 @@ def deleteAllOcrLanguage(request):
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 def run_google_ocr():
-    max_count = 1
+    max_count = 3
 
     # get list of all census FIPS
     FIPS = [el.tract_code() for el in CensusBlock.objects.all()]
@@ -477,7 +477,8 @@ def index(request):
     boundingBoxes = BoundingBox.objects.count()
     streetviewImages_withBB = StreetviewImage.objects.filter(image_is_set=True, boundingbox__isnull=False).distinct().count()
     mapPoints_withTract = MapPoint.objects.filter(censusblock__isnull=False).distinct().count()
-    googleOCR = GoogleOCR.objects.all()
+    googleOCR = GoogleOCR.objects.count()
+    FIPS = len(list(set([el.tract_code() for el in CensusBlock.objects.all()])))
 
     #mapPoints_noImage = [mapPoint for mapPoint in mapPoints if mapPoint.images_set() is False]
     #panoIdList = MapPoint.objects.values_list('panoID', flat=True)
@@ -494,7 +495,7 @@ def index(request):
 
     context = {'mapPoints':mapPoints,'streetviewImages':streetviewImages,'pending':pending,'boundingBoxes':boundingBoxes, \
                'streetviewImages_withBB':streetviewImages_withBB,'mapPoints_withTags':mapPoints_withTags, 'mapPoints_withTract':mapPoints_withTract, \
-               'googleOCR':MapPoint.objects.get(pk=40620).count_language()}
+               'googleOCR':googleOCR, 'FIPS':FIPS}
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):
