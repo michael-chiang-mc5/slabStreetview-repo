@@ -370,8 +370,10 @@ def run_google_ocr():
     for FIP in FIPS:
         print("iterating through census tract " + FIP)
         censusBlocks = CensusBlock.objects.filter(fips__startswith=FIP)
-        mapPoints = MapPoint.objects.filter(id__in=censusBlocks.values('mapPoint_id')).distinct()
-
+        mapPoints = MapPoint.objects.filter(id__in=censusBlocks.values('mapPoint_id'))
+        mapPoints = mapPoints.exclude(streetviewimage__image_is_set=False)
+        mapPoints = mapPoints.filter(streetviewimage__boundingbox__isnull=False)
+        mapPoints = mapPoints.distinct()
         mapPoints = sorted(mapPoints, key=lambda x: x.get_num_CTPN_boundingBoxes(), reverse=True)
         print(str(len(mapPoints)) + " mapPoints")
         count = 0
