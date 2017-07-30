@@ -376,8 +376,9 @@ def deleteAllOcrLanguage(request):
     OcrLanguage.objects.all().delete()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
-def run_google_ocr():
-    max_count = 3
+def run_google_ocr(max_api_calls):
+    max_count = 10
+    api_count = 0
 
     # get list of all census FIPS
     FIPS = [el.tract_code() for el in CensusBlock.objects.all()]
@@ -398,6 +399,10 @@ def run_google_ocr():
             if count >= len(mapPoints):
                 print("no more map points")
                 break
+            if api_count > max_api_calls:
+                print("Ran " + str(api_count) + " api calls, stopping")
+                return
+
             mapPoint = mapPoints[count]
             streetviewImages = StreetviewImage.objects.filter(mapPoint=mapPoint)
 
@@ -418,6 +423,7 @@ def run_google_ocr():
                 if len(googleOCR) == 0:
                     print("running google ocr on streetviewImage " + str(streetviewImage.pk))
                     google_ocr_api(settings.GOOGLE_OCR_API_KEY, streetviewImage)
+                    api_count += 1
                 else:
                     print("previous google ocr found for streetviewImage " + str(streetviewImage.pk) + ", doing nothing")
             count += 1
