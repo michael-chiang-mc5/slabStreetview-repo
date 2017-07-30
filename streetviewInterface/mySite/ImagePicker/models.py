@@ -20,6 +20,20 @@ class MapPoint(models.Model):
     address = models.TextField(blank=True)
     neighbors = models.ManyToManyField("self")
 
+    def count_language_total():
+        # initailize output
+        rn = {}
+        for language in settings.OCR_LANGUAGES:
+            rn[language] = 0
+
+        #
+        mapPoints = MapPoint.objects.filter(streetviewimage__googleocr__isnull=False)
+        for mapPoint in mapPoints:
+            count_language = mapPoint.count_language()
+            for language in settings.OCR_LANGUAGES:
+                rn[language] += count_language[language]
+        return rn
+
     def count_language(self):
         streetviewImages = self.streetviewimage_set.all()
 
@@ -234,6 +248,10 @@ class GoogleOCR(models.Model):
         return json_data[0]
     def naive_words(self):
         data = self.json()
+        if len(data)==0:
+            return []
+
+
         blocks = data['fullTextAnnotation']['pages'][0]['blocks']
         rn = []
         for block in blocks:

@@ -124,7 +124,7 @@ def get_census_tracts():
 
 def write_mapPoint():
     with open('output/MapPoints.csv', 'w') as csvfile:
-        fieldnames = ['pk', 'latitude', 'longitude', 'num_boundingboxes','size_boundingboxes','zone_code','census_tracts']
+        fieldnames = ['pk', 'latitude', 'longitude', 'num_boundingboxes','size_boundingboxes','zone_code','census_tracts','en_count','es_count','ko_count','zh_count']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         #mapPoints = MapPoint.objects.filter(streetviewimage__image_is_set=True).distinct()
@@ -138,6 +138,17 @@ def write_mapPoint():
 
 
         for mapPoint in mapPoints:
+            try:
+                en_count = mapPoint.count_language()['en']
+                es_count = mapPoint.count_language()['es']
+                ko_count = mapPoint.count_language()['ko']
+                zh_count = mapPoint.count_language()['zh']
+            except:
+                en_count = ""
+                es_count = ""
+                ko_count = ""
+                zh_count = ""
+
             writer.writerow({'pk':                  mapPoint.pk, \
                              'latitude':            mapPoint.latitude, \
                              'longitude':           mapPoint.longitude, \
@@ -145,6 +156,12 @@ def write_mapPoint():
                              'size_boundingboxes':  mapPoint.get_size_CTPN_boundingBoxes(), \
                              'zone_code':           mapPoint.get_zone_code(), \
                              'census_tracts':       mapPoint.get_census_tracts(), \
+                             'en_count':            en_count, \
+                             'es_count':            es_count, \
+                             'ko_count':            ko_count, \
+                             'zh_count':            zh_count, \
+
+
                              #'photographerHeading': mapPoint.photographerHeading, \
                              #'panoID':              mapPoint.panoID, \
                              #'tag':                 mapPoint.tag, \
@@ -479,6 +496,7 @@ def index(request):
     mapPoints_withTract = MapPoint.objects.filter(censusblock__isnull=False).distinct().count()
     googleOCR = GoogleOCR.objects.count()
     FIPS = len(list(set([el.tract_code() for el in CensusBlock.objects.all()])))
+    language_count = 0#MapPoint.count_language_total()
 
     #mapPoints_noImage = [mapPoint for mapPoint in mapPoints if mapPoint.images_set() is False]
     #panoIdList = MapPoint.objects.values_list('panoID', flat=True)
@@ -495,7 +513,7 @@ def index(request):
 
     context = {'mapPoints':mapPoints,'streetviewImages':streetviewImages,'pending':pending,'boundingBoxes':boundingBoxes, \
                'streetviewImages_withBB':streetviewImages_withBB,'mapPoints_withTags':mapPoints_withTags, 'mapPoints_withTract':mapPoints_withTract, \
-               'googleOCR':googleOCR, 'FIPS':FIPS}
+               'googleOCR':googleOCR, 'FIPS':FIPS, 'language_count':language_count}
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):

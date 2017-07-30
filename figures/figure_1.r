@@ -35,7 +35,7 @@ categorize_zone_code <- function(zone_code){
 zone_code_categorized <- categorize_zone_code(zone_code)
 
 # Choose between stamen map and google map
-map <- get_map(location=c(lon=-118.27687109859778, lat=34.04464406169281), zoom = 14, color = "bw", scale = 2, maptype = "roadmap")
+map <- get_map(location=c(lon=-118.27687109859778, lat=34.04464406169281), zoom = 13, color = "bw", scale = 2, maptype = "roadmap")
 #map <- get_stamenmap(bbox = c(left = -118.324385, bottom = 33.991552, right = -118.223963, top = 34.065814), zoom = 13, maptype = "watercolor")
 
 
