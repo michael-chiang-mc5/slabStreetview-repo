@@ -10,23 +10,27 @@ head(df_FIP)
 library(glmnet)
 
 set.seed(1)
-x1 <- 100*rnorm(3000)
-x2 <- rnorm(3000)
-x3 <- rnorm(3000)
-X <- matrix( c(x1, x2, x3), byrow = F, ncol = 3)
+x1 <- df_FIP$pop_white / df_FIP$pop_total
+x2 <- df_FIP$pop_black / df_FIP$pop_total
+x3 <- df_FIP$pop_asian / df_FIP$pop_total
+x4 <- df_FIP$pop_hispanic / df_FIP$pop_total
+x5 <- df_FIP$pop_other / df_FIP$pop_total
+x6 <- df_FIP$sign_es / df_FIP$pop_total
 
-y <- 3 + 4*x1 + 3*x2 + 1*x3 + rnorm(3000)
 
-fit <-glmnet(x = X, y = y, alpha = 1) 
+X <- matrix( c(x4, x6), byrow = F, ncol = 2)
+Y <- df_FIP$health_physical
+
+fit <-glmnet(x = X, y = Y, alpha = 1) 
 plot(fit, xvar = "lambda")
 coef(fit, s = 0.01)
 
 
-crossval <-  cv.glmnet(x = X, y = y, alpha = 1)
+crossval <-  cv.glmnet(x = X, y = Y, alpha = 1)
 plot(crossval)
 penalty <- crossval$lambda.min #optimal lambda
 penalty #minimal shrinkage
-fit1 <-glmnet(x = X, y = y, alpha = 1, lambda = penalty ) #estimate the model with that
+fit1 <-glmnet(x = X, y = Y, alpha = 1, lambda = penalty ) #estimate the model with that
 coef(fit1)
 
 
