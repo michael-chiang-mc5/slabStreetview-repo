@@ -1,3 +1,9 @@
+source('df_mappoint.r')
+source('df_FIP.r')
+
+head(df_FIP)
+
+
 # https://stats.stackexchange.com/questions/188753/lasso-regression-for-predicting-continuous-variable-variable-selection
 
 # install.packages("glmnet")
