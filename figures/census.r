@@ -16,7 +16,6 @@ library(tigris)
 library(acs)
 library(stringr)
 library(dplyr)
-library(leaflet)
 
 # 06037 = Los Angeles County in California
 # 06 = California
@@ -32,8 +31,8 @@ geo<-geo.make(state=c("CA"),
 
 # Tables for census:
 # https://www.socialexplorer.com/data/C2010/metadata/?ds=SF1
-income<-acs.fetch(endyear = 2010, dataset='sf1', geography = geo,
-                  table.number = "P5", col.names = "pretty")
+census_data<-acs.fetch(endyear = 2010, dataset='sf1', geography = geo,
+                       table.number = "P5", col.names = "pretty")
 
 # possible methods
 #  acs.colnames
@@ -48,7 +47,7 @@ income<-acs.fetch(endyear = 2010, dataset='sf1', geography = geo,
 #  sum
 #  summary
 #  confit
-attr(income,'acs.colnames')
+attr(census_data,'acs.colnames')
 #  [1] "P5. HISPANIC OR LATINO ORIGIN BY RACE: Total population"                                                          
 #  [2] "P5. HISPANIC OR LATINO ORIGIN BY RACE: Not Hispanic or Latino:"                                                   
 #  [3] "P5. HISPANIC OR LATINO ORIGIN BY RACE: Not Hispanic or Latino:   White alone"                                     
@@ -68,18 +67,11 @@ attr(income,'acs.colnames')
 #  [17] "P5. HISPANIC OR LATINO ORIGIN BY RACE: Hispanic or Latino:   Two or More Races"     
 
 
-attr(income,'acs.colnames')
-head(attr(income,'estimate'))
-income@estimate[,c("P5. HISPANIC OR LATINO ORIGIN BY RACE: Total population")]
-income@estimate[,c("P5. HISPANIC OR LATINO ORIGIN BY RACE: Total population")]['Census Tract 818']
-
-
-
 # convert to a data.frame for merging
-income_df <- data.frame(paste0(str_pad(income@geography$state, 2, "left", pad="0"), 
-                               str_pad(income@geography$county, 3, "left", pad="0"), 
-                               str_pad(income@geography$tract, 6, "left", pad="0")), 
-                               income@estimate[,c("P5. HISPANIC OR LATINO ORIGIN BY RACE: Total population",
+df <- data.frame(paste0(str_pad(census_data@geography$state, 2, "left", pad="0"), 
+                               str_pad(census_data@geography$county, 3, "left", pad="0"), 
+                               str_pad(census_data@geography$tract, 6, "left", pad="0")), 
+                                census_data@estimate[,c("P5. HISPANIC OR LATINO ORIGIN BY RACE: Total population",
                                                   "P5. HISPANIC OR LATINO ORIGIN BY RACE: Not Hispanic or Latino:   White alone",
                                                   "P5. HISPANIC OR LATINO ORIGIN BY RACE: Not Hispanic or Latino:   Black or African American alone",
                                                   "P5. HISPANIC OR LATINO ORIGIN BY RACE: Not Hispanic or Latino:   American Indian and Alaska Native alone",
@@ -92,31 +84,7 @@ income_df <- data.frame(paste0(str_pad(income@geography$state, 2, "left", pad="0
 
 
 
-
-
-income_df <- select(income_df, 1:9)
-rownames(income_df)<-1:nrow(income_df)
-names(income_df)<-c("GEOID", "total", "white","black","native","asian","pacific_islander","other","two_or_more")
-
-# Do merge with tigris
-income_merged<- geo_join(tracts, income_df, "GEOID", "GEOID")
-income_merged <- income_merged[income_merged$ALAND>0,]
-
-#income_merged[income_merged$TRACTCE==930101,]
-#income_merged[income_merged$TRACTCE==930101,]@polygons[[1]]@Polygons[[1]]@coords
-
-
-
-df <- data.frame(tract           =as.integer(income_merged$TRACTCE),
-                 total           =income_merged$total,
-                 white           =income_merged$white,
-                 black           =income_merged$black,
-                 native          =income_merged$native,
-                 asian           =income_merged$asian,
-                 pacific_islander=income_merged$pacific_islander,
-                 other           =income_merged$other,
-                 two_or_more     =income_merged$two_or_more,
-                 hispanic        =income_merged$total - income_merged$white - income_merged$black - income_merged$native - income_merged$asian - income_merged$pacific_islander - income_merged$other - income_merged$two_or_more
-                )
-
+rownames(df)<-1:nrow(df)
+names(df)<-c("FIPS", "total", "white","black","native","asian","pacific_islander","other","two_or_more")
+df$hispanic = df$total - df$white - df$black - df$native - df$asian - df$pacific_islander - df$other - df$two_or_more
 write.csv(df, file = "supporting_files/census.csv",row.names=F)

@@ -3,6 +3,8 @@ from django.conf import settings
 from .dictionary_search import *
 import requests
 import statistics
+import json
+import ast
 
 class CrawlerQueueEntry(models.Model):
     panoID = models.TextField()
@@ -18,14 +20,46 @@ class MapPoint(models.Model):
     address = models.TextField(blank=True)
     neighbors = models.ManyToManyField("self")
 
+    def count_language_total():
+        # initailize output
+        rn = {}
+        for language in settings.OCR_LANGUAGES:
+            rn[language] = 0
+
+        #
+        mapPoints = MapPoint.objects.filter(streetviewimage__googleocr__isnull=False)
+        for mapPoint in mapPoints:
+            count_language = mapPoint.count_language()
+            for language in settings.OCR_LANGUAGES:
+                rn[language] += count_language[language]
+        return rn
+
+    def count_language(self):
+        streetviewImages = self.streetviewimage_set.all()
+
+        # initailize output
+        rn = {}
+        for language in settings.OCR_LANGUAGES:
+            rn[language] = 0
+
+        # add up
+        for streetviewImage in streetviewImages:
+            count_language = streetviewImage.count_language()
+            print("final result: " + str(count_language))
+            for language in settings.OCR_LANGUAGES:
+                rn[language] += count_language[language]
+
+        # returnr
+        return rn
+
     def get_census_tracts(self):
         censusBlocks = self.censusblock_set.all()
         tracts = []
         for block in censusBlocks:
             tracts.append(block.tract_code())
         unique = list(set(tracts)) # get unique
-        s = ",".join(unique)
-        return s
+        #s = ",".join(unique)
+        return unique[0]
     def __str__(self):
         return str('lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))
     def serialize_csv(self):
@@ -147,6 +181,10 @@ class StreetviewImage(models.Model):
     notes = models.TextField(blank=True)
     image_is_set = models.BooleanField(default=False)
 
+    def count_language(self):
+        googleOCR = GoogleOCR.objects.get(streetviewImage=self)
+        return googleOCR.count_language()
+
     def count_boundingBoxes(self):
         boundingBoxes = self.boundingbox_set.all()
         count = 0
@@ -198,6 +236,89 @@ class Pending(models.Model):
         time_elapse = datetime.datetime.utcnow().replace(tzinfo=utc) - self.time
         if time_elapse.total_seconds() > 86400 and is_corrupted is not False: # one day
             self.delete()
+
+class GoogleOCR(models.Model):
+    streetviewImage = models.ForeignKey(StreetviewImage)
+    json_text = models.TextField()
+    def __str__(self):
+        return self.json_text
+    def json(self):
+        s = self.json_text
+        json_data = ast.literal_eval(s)
+        return json_data[0]
+    def naive_words(self):
+        data = self.json()
+        if len(data)==0:
+            return []
+
+
+        blocks = data['fullTextAnnotation']['pages'][0]['blocks']
+        rn = []
+        for block in blocks:
+            words = block['paragraphs'][0]['words']
+            for word in words:
+                boundingBox = GoogleOCR.sanitize_vertices(word['boundingBox']['vertices'])
+                locale = word['property']['detectedLanguages'][0]['languageCode']
+                if 'zh' in locale:
+                    locale='zh'
+                text = ""
+                for symbol in word['symbols']:
+                    text += symbol['text']
+                rn.append({'text':text,'locale':locale,'boundingBox':boundingBox})
+                print(locale)
+                print(text)
+                print(boundingBox)
+                print("****")
+        return rn
+
+    def words(self):
+        words = self.naive_words()
+        rn = []
+        for word in words:
+
+            if word['locale'] not in settings.OCR_LANGUAGES:
+               print("skipping due to locale: " + str(word))
+               continue
+
+            # exclude numbers
+            skip = False
+            for letter in word['text']:
+                if letter in '1234567890':
+                    skip = True
+                    break
+            if skip:
+                print("skipping due to numbers: " + str(word))
+                continue
+
+            # append
+            rn.append(word)
+        return rn
+
+    def count_language(self):
+        words = self.words()
+        rn = {}
+        for language in settings.OCR_LANGUAGES:
+            asdf = [e for e in words if e['locale'] == language]
+            print(asdf)
+            rn[language] = len(asdf)
+        return rn
+
+    def sanitize_vertices(vertices):
+        tmp = {}
+        for idx in range(0,4):
+            tmp.update({idx: {}})
+            for dim in ['x','y']:
+                try:
+                    val = vertices[idx][dim]
+                except:
+                    val = 0
+                tmp[idx].update({dim:val})
+        x1 = min(tmp[0]['x'], tmp[1]['x'], tmp[2]['x'], tmp[3]['x'])
+        x2 = max(tmp[0]['x'], tmp[1]['x'], tmp[2]['x'], tmp[3]['x'])
+        y1 = min(tmp[0]['y'], tmp[1]['y'], tmp[2]['y'], tmp[3]['y'])
+        y2 = max(tmp[0]['y'], tmp[1]['y'], tmp[2]['y'], tmp[3]['y'])
+        return [x1,x2,y1,y2]
+
 
 class BoundingBox(models.Model):
     streetviewImage = models.ForeignKey(StreetviewImage) # each image can have multiple bounding boxes

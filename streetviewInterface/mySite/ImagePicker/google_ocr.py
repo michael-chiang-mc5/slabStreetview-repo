@@ -10,6 +10,7 @@ import json
 import requests
 from .models import *
 from PIL import Image
+import urllib.request, json, requests
 
 
 ENDPOINT_URL = 'https://vision.googleapis.com/v1/images:annotate'
@@ -74,6 +75,23 @@ def google_ocr_boundingBox(api_key, boundingBox):
             text = annotation['description']  # possible keys: description, boundingPoly, locale for FIRST element only
             ocrText = OcrText(boundingBox=boundingBox,method='google',text=text,locale='locale='+locale, notes=json.dumps(resp, indent=2))
             ocrText.save()
+
+def google_ocr_api(api_key, streetviewImage):
+    image_url = streetviewImage.image_url()
+    print("running google ocr on " + image_url)
+    urllib.request.urlretrieve(image_url, 'deleteMe_google_ocr_api.jpg')
+    image_filenames = ['deleteMe_google_ocr_api.jpg']
+    response = request_ocr(api_key, image_filenames)
+
+    if response.status_code != 200 or response.json().get('error'):
+        print(response.text)
+        raise ValueError('google ocr api failed')
+    else:
+
+
+        responses = response.json()['responses']
+        googleocr = GoogleOCR(streetviewImage=streetviewImage,json_text=responses)
+        googleocr.save()
 
 def google_ocr_streetviewImage(api_key, streetviewImage):
     image_url = join(settings.MEDIA_ROOT,streetviewImage.image.name)

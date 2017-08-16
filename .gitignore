@@ -1,7 +1,7 @@
 streetviewInterface/venv/
 figures/venv/
 aws_manager/venv/
-figures/supporting_files/ZONING_PLY.csv
+gis/venv/
 streetviewInterface/mySite/mySite/secret_keys_and_passwords.py
 .DS_Store
 *.pyc
@@ -24,6 +24,9 @@ aws_manager/devenv-key.pem
 google/*
 ocr/*
 log.txt
-figures/supporting_files/census.csv
 .placeholder
 figures/*.zip
+*.png
+.RData
+.Rhistory
+*.csv

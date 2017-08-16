@@ -124,7 +124,7 @@ def get_census_tracts():
 
 def write_mapPoint():
     with open('output/MapPoints.csv', 'w') as csvfile:
-        fieldnames = ['pk', 'latitude', 'longitude', 'num_boundingboxes','size_boundingboxes','zone_code','census_tracts']
+        fieldnames = ['pk', 'latitude', 'longitude', 'num_boundingboxes','size_boundingboxes','zone_code','census_tracts','en_count','es_count','ko_count','zh_count']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         #mapPoints = MapPoint.objects.filter(streetviewimage__image_is_set=True).distinct()
@@ -138,6 +138,17 @@ def write_mapPoint():
 
 
         for mapPoint in mapPoints:
+            try:
+                en_count = mapPoint.count_language()['en']
+                es_count = mapPoint.count_language()['es']
+                ko_count = mapPoint.count_language()['ko']
+                zh_count = mapPoint.count_language()['zh']
+            except:
+                en_count = ""
+                es_count = ""
+                ko_count = ""
+                zh_count = ""
+
             writer.writerow({'pk':                  mapPoint.pk, \
                              'latitude':            mapPoint.latitude, \
                              'longitude':           mapPoint.longitude, \
@@ -145,6 +156,12 @@ def write_mapPoint():
                              'size_boundingboxes':  mapPoint.get_size_CTPN_boundingBoxes(), \
                              'zone_code':           mapPoint.get_zone_code(), \
                              'census_tracts':       mapPoint.get_census_tracts(), \
+                             'en_count':            en_count, \
+                             'es_count':            es_count, \
+                             'ko_count':            ko_count, \
+                             'zh_count':            zh_count, \
+
+
                              #'photographerHeading': mapPoint.photographerHeading, \
                              #'panoID':              mapPoint.panoID, \
                              #'tag':                 mapPoint.tag, \
@@ -359,6 +376,62 @@ def deleteAllOcrLanguage(request):
     OcrLanguage.objects.all().delete()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
+def run_google_ocr(max_api_calls):
+    max_count = 10
+    api_count = 0
+
+    # get list of all census FIPS
+    FIPS = [el.tract_code() for el in CensusBlock.objects.all()]
+    FIPS = list(set(FIPS))
+
+
+    for FIP in FIPS:
+        print("iterating through census tract " + FIP)
+        censusBlocks = CensusBlock.objects.filter(fips__startswith=FIP)
+        mapPoints = MapPoint.objects.filter(id__in=censusBlocks.values('mapPoint_id'))
+        mapPoints = mapPoints.exclude(streetviewimage__image_is_set=False)
+        mapPoints = mapPoints.filter(streetviewimage__boundingbox__isnull=False)
+        mapPoints = mapPoints.distinct()
+        mapPoints = sorted(mapPoints, key=lambda x: x.get_num_CTPN_boundingBoxes(), reverse=True)
+        print(str(len(mapPoints)) + " mapPoints")
+        count = 0
+        while(1):
+            if count >= len(mapPoints):
+                print("no more map points")
+                break
+            if api_count > max_api_calls:
+                print("Ran " + str(api_count) + " api calls, stopping")
+                return
+
+            mapPoint = mapPoints[count]
+            streetviewImages = StreetviewImage.objects.filter(mapPoint=mapPoint)
+
+            # check to see if both streetview images have image set
+            skip = False
+            for streetviewImage in streetviewImages:
+                if streetviewImage.image_is_set == False:
+                    print("image is not set, skipping")
+                    skip = True
+                    break
+            if skip == True:
+                continue
+
+            for streetviewImage in streetviewImages:
+                print("working on streetviewImage " + str(streetviewImage.pk))
+                print(str(streetviewImage.count_boundingBoxes()) + " bounding boxes found")
+                googleOCR = GoogleOCR.objects.filter(streetviewImage=streetviewImage)
+                if len(googleOCR) == 0:
+                    print("running google ocr on streetviewImage " + str(streetviewImage.pk))
+                    google_ocr_api(settings.GOOGLE_OCR_API_KEY, streetviewImage)
+                    api_count += 1
+                else:
+                    print("previous google ocr found for streetviewImage " + str(streetviewImage.pk) + ", doing nothing")
+            count += 1
+            if count >= max_count:
+                break
+        print("************")
+
+
 def runGoogleOCR_images(request):
     if not request.user.is_superuser:
         return HttpResponse("you are not an admin")
@@ -427,6 +500,9 @@ def index(request):
     boundingBoxes = BoundingBox.objects.count()
     streetviewImages_withBB = StreetviewImage.objects.filter(image_is_set=True, boundingbox__isnull=False).distinct().count()
     mapPoints_withTract = MapPoint.objects.filter(censusblock__isnull=False).distinct().count()
+    googleOCR = GoogleOCR.objects.count()
+    FIPS = len(list(set([el.tract_code() for el in CensusBlock.objects.all()])))
+    language_count = 0#MapPoint.count_language_total()
 
     #mapPoints_noImage = [mapPoint for mapPoint in mapPoints if mapPoint.images_set() is False]
     #panoIdList = MapPoint.objects.values_list('panoID', flat=True)
@@ -442,7 +518,8 @@ def index(request):
     #boundingBoxes_no_crnn_text = BoundingBox.objects.exclude( ocrtext__method__contains="crnn" )
 
     context = {'mapPoints':mapPoints,'streetviewImages':streetviewImages,'pending':pending,'boundingBoxes':boundingBoxes, \
-               'streetviewImages_withBB':streetviewImages_withBB,'mapPoints_withTags':mapPoints_withTags, 'mapPoints_withTract':mapPoints_withTract}
+               'streetviewImages_withBB':streetviewImages_withBB,'mapPoints_withTags':mapPoints_withTags, 'mapPoints_withTract':mapPoints_withTract, \
+               'googleOCR':googleOCR, 'FIPS':FIPS, 'language_count':language_count}
     return render(request, 'ImagePicker/index.html',context)
 
 def picker(request):

@@ -26,6 +26,7 @@ DEBUG = debug_setting # SECURITY WARNING: don't run with debug turned on in prod
 
 ALLOWED_HOSTS = ['.michael-chiang.com','127.0.0.1','104.131.145.75']
 
+OCR_LANGUAGES = ['en','es','zh','ko']
 
 # Application definition
 
