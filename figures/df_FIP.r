@@ -1,3 +1,5 @@
+source('df_mappoint.r')
+
 # creates a data frame "df_FIP" containing census tract level data:
 #   sign_*  :  language count for signage (en, es, ko,zh, total)
 #   pop_*   :  population count for tract (white, black, asian, hispanic, other)
@@ -24,6 +26,13 @@ for (FIP in df_FIP$FIP) {
 }
 
 
+# calculate race percentages
+df_FIP$percent_white = df_FIP$pop_white / df_FIP$pop_total
+df_FIP$percent_black = df_FIP$pop_black / df_FIP$pop_total
+df_FIP$percent_asian = df_FIP$pop_asian / df_FIP$pop_total
+df_FIP$percent_hispanic = df_FIP$pop_hispanic / df_FIP$pop_total
+df_FIP$percent_other = df_FIP$pop_other / df_FIP$pop_total
+
 
 # get map point level data (sign count, lon/lat, census tract)
 source('df_mappoint.r')
@@ -37,6 +46,13 @@ for (FIP in df_FIP$FIP){
     df_FIP[[field]][df_FIP$FIP == FIP] = tmp_sum[[field]]    
   }
 }
+
+# calculate sign percentages
+df_FIP$percent_lang_en = df_FIP$sign_en / df_FIP$sign_total
+df_FIP$percent_lang_es = df_FIP$sign_es / df_FIP$sign_total
+df_FIP$percent_lang_ko = df_FIP$sign_ko / df_FIP$sign_total
+df_FIP$percent_lang_zh = df_FIP$sign_zh / df_FIP$sign_total
+
 
 # load 500 cities data
 # CHECKUP_CrudePrev: doctor checup

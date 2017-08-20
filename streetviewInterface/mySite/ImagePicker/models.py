@@ -127,7 +127,7 @@ class MapPoint(models.Model):
         if tags.count() == 1:
             return tags[0]
         else:
-            raise ValueError('MapPoint does not have exactly one zoning tag')
+            raise ValueError('MapPoint ' +  str(self.pk)  +' does not have exactly one zoning tag (' +  str(tags.count()) + ' !=1)')
 
     def get_num_CTPN_boundingBoxes(self):
         num_boundingBoxes = BoundingBox.objects.filter(streetviewImage__mapPoint=self, is_nil=False, method="CTPN").distinct().count()
