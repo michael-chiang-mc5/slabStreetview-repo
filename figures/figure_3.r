@@ -21,22 +21,39 @@ data <- read.csv("supporting_files/500_Cities__Census_Tract-level_Data__GIS_Frie
 #[49] "MHLTH_CrudePrev"        "MHLTH_Crude95CI"        "OBESITY_CrudePrev"      "OBESITY_Crude95CI"      "PAPTEST_CrudePrev"      "PAPTEST_Crude95CI"     
 #[55] "PHLTH_CrudePrev"        "PHLTH_Crude95CI"        "SLEEP_CrudePrev"        "SLEEP_Crude95CI"        "STROKE_CrudePrev"       "STROKE_Crude95CI"      
 
-# CHECKUP_CrudePrev: doctor checup
-# DENTAL_CrudePrev: dental
-# MHLTH_CrudePrev: mental helath
-# PHLTH_CrudePrev: physical health
+# CHECKUP_CrudePrev: doctor checkup - Model-based estimate for crude prevalence of visits to doctor for routine checkup within the past year among adults aged >=18 years
+# DENTAL_CrudePrev: dental checkup - Model-based estimate for crude prevalence of visits to dentist for routine checkup within the past year among adults aged >=18 years
+# MHLTH_CrudePrev: mental helath   - Model-based estimate for crude prevalence of mental health not good for >=14 days among adults aged >=18 years
+# PHLTH_CrudePrev: physical health - Model-based estimate for crude prevalence of physical health not good for >=14 days among adults aged >=18 years
 
 
-df$checkup <- c(0)
+outputs <- c('CHECKUP_CrudePrev','DENTAL_CrudePrev','MHLTH_CrudePrev','PHLTH_CrudePrev')
+
+for (output in outputs) {
+  df[[output]] <- c(0)
+}
+
 for (census_tract in unique(df$census_tracts)) {
-  df$checkup[df$census_tracts == census_tract] =  data$CHECKUP_CrudePrev[data$TractFIPS == census_tract]
+  
+  for (output in outputs) {
+    vals = data[[output]][data$TractFIPS == census_tract]
+    if (length(vals)==0) {
+      df[[output]][df$census_tracts == census_tract] = NA   
+    } else {
+      df[[output]][df$census_tracts == census_tract] = vals      
+    }
+  }
 }
 
 
-map <- get_map(location=c(lon=-118.27687109859778, lat=34.04464406169281), zoom = 14, color = "bw", scale = 2, maptype = "roadmap")
+map <- get_map(location=c(lon=-118.27687109859778, lat=34.04464406169281), zoom = 13, color = "bw", scale = 2, maptype = "roadmap")
 
 
-# plot number of signs on map
-png(filename="output/checkups.png", width=1280, height=1280)
-ggmap(map) + geom_point(aes(x=df$lon,y=df$lat,color=df$checkup),data=df) + geom_point(size=3,alpha=0.3) + scale_color_gradientn(colors=rainbow(3))
-dev.off()
+for (output in outputs) {
+  print(output)
+  png(filename=paste("output/",output,".png",sep=""), width=1280, height=1280)
+  print(ggmap(map) + geom_point(aes(x=df$lon,y=df$lat,color=df[[output]]),data=df,na.rm = TRUE) + geom_point(size=3,alpha=0.3) + scale_color_gradientn(colors=rainbow(3)))
+  dev.off()
+}
+
+

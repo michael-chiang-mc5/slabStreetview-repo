@@ -17,7 +17,7 @@ df$total = df$es + df$ko + df$zh + df$en
 
 
 
-map <- get_map(location=c(lon=-118.27687109859778, lat=34.04464406169281), zoom = 14, color = "bw", scale = 2, maptype = "roadmap")
+map <- get_map(location=c(lon=-118.27687109859778, lat=34.04464406169281), zoom = 13, color = "bw", scale = 2, maptype = "roadmap")
 
 
 png(filename="output/linguistic_landscape.png", width=1280, height=1280)

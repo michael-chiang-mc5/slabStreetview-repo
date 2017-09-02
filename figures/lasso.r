@@ -1,26 +1,25 @@
 source('df_FIP.r')
 
 # keep majority hispanic tracts
-PERCENT_HISPANIC_THRESHOLD = 0.75
+PERCENT_HISPANIC_THRESHOLD = 0
+idx_pop_spanish = df_FIP$percent_hispanic >= PERCENT_HISPANIC_THRESHOLD
 
-df <- df_FIP[df_FIP$percent_hispanic >= PERCENT_HISPANIC_THRESHOLD,]
+
+df <- df_FIP[idx_pop_spanish,]
 nrow(df)
 
 plot(df$percent_hispanic , df$percent_lang_es)
 hist(df$percent_lang_es)
 
+plot(df$percent_hispanic,df$health_mental)
 
 
 
 
-X <- matrix( c(pop_hispanic, sign_spanish), byrow = F, ncol = 2)
-Y <- df_FIP$health_physical
-
-X <- matrix( c(sign_spanish[idx_pop_spanish]), byrow = F, ncol = 2)
-Y <- df_FIP$health_physical[idx_pop_spanish]
+X <- matrix( c(df$percent_hispanic, df$percent_lang_es), byrow = F, ncol = 2)
+Y <- df$health_physical
 
 
-plot(sign_spanish[idx_pop_spanish],Y)
 
 # Do lasso
 # https://stats.stackexchange.com/questions/188753/lasso-regression-for-predicting-continuous-variable-variable-selection

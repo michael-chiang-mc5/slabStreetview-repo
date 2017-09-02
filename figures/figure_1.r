@@ -13,8 +13,6 @@ size_signs <- MyData[['size_boundingboxes']]
 
 num_signs_scaled <- num_signs
 num_signs_scaled[num_signs_scaled> sign_count_threshold] <- sign_count_threshold
-size_signs_scaled <- num_signs
-size_signs_scaled[size_signs_scaled> 30000] <- 30000
 
 
 # categorizes zone codes
@@ -74,27 +72,6 @@ dev.off()
 #df <- data.frame(zone_code=zone_code_categorized,num_signs=num_signs)
 #ggplot(df, aes(factor(zone_code), num_signs)) + geom_boxplot() + coord_cartesian(ylim = c(0,20))
 #dev.off()
-
-
-# Plot number of signs across zones
-png('output/barplot-sem.png')
-
-zone_code_categorized_withLevel = factor(zone_code_categorized)
-df <- data.frame(
-  zone_code=levels(zone_code_categorized_withLevel),
-  mean=tapply(num_signs, zone_code_categorized_withLevel, mean),
-  n=tapply(num_signs, zone_code_categorized_withLevel, length),
-  sd=tapply(num_signs, zone_code_categorized_withLevel, sd)
-)
-df$sem <- df$sd/sqrt(df$n)
-
-ggplot(df, aes(x = zone_code, y = mean)) +  
-  geom_bar(position = position_dodge(), stat="identity", fill="blue") + 
-  geom_errorbar(aes(ymin=mean-sem, ymax=mean+sem)) +
-  ggtitle("Number of signs vs zone") + 
-  theme_bw() +
-  theme(panel.grid.major = element_blank())
-dev.off()
 
 
 # Plot number of signs across zones
