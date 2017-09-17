@@ -130,7 +130,7 @@ def dumpDB():
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         mapPoints = MapPoint.objects.all()
-        for mapPoint in mapPoints[0:10]:
+        for mapPoint in mapPoints:
             writer.writerow({'mappoint_pk':                  mapPoint.pk, \
                              'latitude':            mapPoint.latitude, \
                              'longitude':           mapPoint.longitude, \
@@ -143,7 +143,7 @@ def dumpDB():
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         streetviewImages = StreetviewImage.objects.all()
-        for streetviewImage in streetviewImages[0:10]:
+        for streetviewImage in streetviewImages:
             writer.writerow({'image_pk':          streetviewImage.pk, \
                              'mappoint_pk':       streetviewImage.mapPoint.pk, \
                              'left_or_right':     streetviewImage.get_left_or_right(), \
@@ -158,7 +158,7 @@ def dumpDB():
         writer.writeheader()
 
         googleOCRs = GoogleOCR.objects.all()
-        for googleOCR in googleOCRs[0:10]:
+        for googleOCR in googleOCRs:
             words = googleOCR.words()
             for word in words:
                 writer.writerow({'googleOCR_pk':   googleOCR.pk, \
