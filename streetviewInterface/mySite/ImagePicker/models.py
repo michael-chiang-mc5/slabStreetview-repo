@@ -181,6 +181,12 @@ class StreetviewImage(models.Model):
     notes = models.TextField(blank=True)
     image_is_set = models.BooleanField(default=False)
 
+    def get_left_or_right(self):
+        if self.heading - self.mapPoint.photographerHeading < 0:
+            return "left"
+        else:
+            return "right"
+
     def count_language(self):
         googleOCR = GoogleOCR.objects.get(streetviewImage=self)
         return googleOCR.count_language()
@@ -214,6 +220,11 @@ class StreetviewImage(models.Model):
         return str(self.pk) + '.jpg'
     def image_url(self):
         return settings.AWS_URL + self.image_name()
+    def image_url_if_exists(self):
+        if self.image_is_set:
+            return settings.AWS_URL + self.image_name()
+        else:
+            return "na"
     def check_if_image_is_set(self):
         request = requests.get(self.image_url())
         if request.status_code == 200:
@@ -246,6 +257,8 @@ class GoogleOCR(models.Model):
         s = self.json_text
         json_data = ast.literal_eval(s)
         return json_data[0]
+
+    # helper function for words()
     def naive_words(self):
         data = self.json()
         if len(data)==0:

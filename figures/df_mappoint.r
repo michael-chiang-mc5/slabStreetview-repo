@@ -9,7 +9,7 @@
 MapPointData <- read.csv(file="../streetviewInterface/mySite/output/MapPoints.csv", header=TRUE, sep="\t",stringsAsFactors = FALSE)
 df_mappoint <- data.frame(
   lon=MapPointData$longitude,
-  lat=MapPointData$latitud,
+  lat=MapPointData$latitude,
   sign_en=MapPointData$en_count,
   sign_es=MapPointData$es_count,
   sign_ko=MapPointData$ko_count,

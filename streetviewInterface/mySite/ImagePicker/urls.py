@@ -1,5 +1,7 @@
 from django.conf.urls import url
 from . import views
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     url(r'^index/$', views.index, name='index'),
@@ -61,4 +63,4 @@ urlpatterns = [
 
     url(r'^runLanguageIdentifiction/$',  views.runLanguageIdentifiction, name='runLanguageIdentifiction'), #
     url(r'^deleteAllOcrLanguage/$',  views.deleteAllOcrLanguage, name='deleteAllOcrLanguage'), #
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # TODO: disable this in production

@@ -122,6 +122,53 @@ def get_census_tracts():
             censusBlock.save()
             print(censusBlock)
 
+# write database to text file to transfer to Julia
+def dumpDB():
+    # mapPoint
+    with open('media/mapPoint.csv', 'w') as csvfile:
+        fieldnames = ['mappoint_pk', 'latitude', 'longitude', 'address']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+        mapPoints = MapPoint.objects.all()
+        for mapPoint in mapPoints[0:10]:
+            writer.writerow({'mappoint_pk':                  mapPoint.pk, \
+                             'latitude':            mapPoint.latitude, \
+                             'longitude':           mapPoint.longitude, \
+                             'address':             mapPoint.address, \
+                            })
+
+    # streetviewImage
+    with open('media/images.csv', 'w') as csvfile:
+        fieldnames = ['image_pk', 'mappoint_pk', 'left_or_right', 'image_url']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+        streetviewImages = StreetviewImage.objects.all()
+        for streetviewImage in streetviewImages[0:10]:
+            writer.writerow({'image_pk':          streetviewImage.pk, \
+                             'mappoint_pk':       streetviewImage.mapPoint.pk, \
+                             'left_or_right':     streetviewImage.get_left_or_right(), \
+                             'image_url':         streetviewImage.image_url_if_exists(), \
+                            })
+
+    #
+    with open('media/googleOCR.csv', 'w') as csvfile:
+
+        fieldnames = ['googleOCR_pk', 'image_pk', 'boundingBox', 'locale', 'text']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+
+        googleOCRs = GoogleOCR.objects.all()
+        for googleOCR in googleOCRs[0:10]:
+            words = googleOCR.words()
+            for word in words:
+                writer.writerow({'googleOCR_pk':   googleOCR.pk, \
+                                 'image_pk':       googleOCR.streetviewImage.pk, \
+                                 'boundingBox':    word['boundingBox'], \
+                                 'locale':         word['locale'], \
+                                 'text':         word['text'], \
+                                })
+
+
 def write_mapPoint():
     with open('output/MapPoints.csv', 'w') as csvfile:
         fieldnames = ['pk', 'latitude', 'longitude', 'num_boundingboxes','size_boundingboxes','zone_code','census_tracts','en_count','es_count','ko_count','zh_count']
