@@ -123,7 +123,7 @@ def get_census_tracts():
             print(censusBlock)
 
 # write database to text file to transfer to Julia
-def dumpDB():
+def dumpDB_deprecated():
     # mapPoint
     with open('media/mapPoint.csv', 'w') as csvfile:
         fieldnames = ['mappoint_pk', 'latitude', 'longitude', 'address']
@@ -168,6 +168,31 @@ def dumpDB():
                                  'text':         word['text'], \
                                 })
 
+
+def dumpDB():
+    with open('media/googleOCR.csv', 'w') as csvfile:
+
+        fieldnames = ['pk', 'googleOCR_pk', 'image_url', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+
+        count=0
+        googleOCRs = GoogleOCR.objects.all()
+        for googleOCR in googleOCRs[0:10]:
+            words = googleOCR.words()
+            for word in words:
+                count = count + 1
+                writer.writerow({'pk': count, \
+                                 'googleOCR_pk':   googleOCR.pk, \
+                                 'image_url':       googleOCR.streetviewImage.image_url(), \
+                                 'boundingBox':    word['boundingBox'], \
+                                 'locale':         word['locale'], \
+                                 'text':         word['text'], \
+                                 'heading':      googleOCR.streetviewImage.heading, \
+                                 'longitude':    googleOCR.streetviewImage.mapPoint.longitude, \
+                                 'latitude':    googleOCR.streetviewImage.mapPoint.latitude, \
+                                 'address':     googleOCR.streetviewImage.mapPoint.address, \
+                                })
 
 def write_mapPoint():
     with open('output/MapPoints.csv', 'w') as csvfile:
