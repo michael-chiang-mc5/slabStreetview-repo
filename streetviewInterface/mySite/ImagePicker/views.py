@@ -178,7 +178,7 @@ def dumpDB():
 
         count=0
         googleOCRs = GoogleOCR.objects.all()
-        for googleOCR in googleOCRs[0:10]:
+        for googleOCR in googleOCRs:
             words = googleOCR.words()
             for word in words:
                 count = count + 1
