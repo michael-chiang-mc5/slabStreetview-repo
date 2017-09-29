@@ -172,7 +172,7 @@ def dumpDB_deprecated():
 def dumpDB():
     with open('media/googleOCR.csv', 'w') as csvfile:
 
-        fieldnames = ['pk', 'googleOCR_pk', 'image_url', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address']
+        fieldnames = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
 
@@ -185,6 +185,7 @@ def dumpDB():
                 writer.writerow({'pk': count, \
                                  'googleOCR_pk':   googleOCR.pk, \
                                  'image_url':       googleOCR.streetviewImage.image_url(), \
+                                 'image_fov':       googleOCR.streetviewImage.fov * 3, \
                                  'boundingBox':    word['boundingBox'], \
                                  'locale':         word['locale'], \
                                  'text':         word['text'], \
