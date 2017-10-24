@@ -50,6 +50,32 @@ def julia_harten_csv():
             break
 
 
+    with open('media/googleOCR_koreatown.csv', 'w') as csvfile:
+
+        fieldnames = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+
+        count=0
+        googleOCRs = GoogleOCR.objects.filter(streetviewImage__in=streetviewImages)
+        for googleOCR in googleOCRs:
+            words = googleOCR.words()
+            for word in words:
+                count = count + 1
+                writer.writerow({'pk': count, \
+                                 'googleOCR_pk':   googleOCR.pk, \
+                                 'image_url':       googleOCR.streetviewImage.image_url(), \
+                                 'image_fov':       googleOCR.streetviewImage.fov * 3, \
+                                 'boundingBox':    word['boundingBox'], \
+                                 'locale':         word['locale'], \
+                                 'text':         word['text'], \
+                                 'heading':      googleOCR.streetviewImage.heading, \
+                                 'longitude':    googleOCR.streetviewImage.mapPoint.longitude, \
+                                 'latitude':    googleOCR.streetviewImage.mapPoint.latitude, \
+                                 'address':     googleOCR.streetviewImage.mapPoint.address, \
+                                })
+
+
 
 
 
