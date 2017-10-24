@@ -25,6 +25,36 @@ from django.http import JsonResponse
 from io import BytesIO
 from django.db.models import Count
 
+def julia_harten_csv():
+    lon1 = -118.3100831509
+    lat1 = 34.0634478683
+    lon2 = -118.2936894894
+    lat2 = 34.0637256166
+
+    max_api_calls = 500
+
+    streetviewImages = StreetviewImage.objects.filter(mapPoint__longitude__gt=min(lon1,lon2)).filter(mapPoint__longitude__lt=max(lon1,lon2)).filter(mapPoint__latitude__gt=min(lat1,lat2)).filter(mapPoint__latitude__lt=max(lat1,lat2))
+
+    api_count = 0
+    for streetviewImage in streetviewImages:
+        print("working on streetviewImage " + str(streetviewImage.pk))
+        print(str(streetviewImage.count_boundingBoxes()) + " bounding boxes found")
+        googleOCR = GoogleOCR.objects.filter(streetviewImage=streetviewImage)
+        if len(googleOCR) == 0:
+            print("running google ocr on streetviewImage " + str(streetviewImage.pk))
+            #google_ocr_api(settings.GOOGLE_OCR_API_KEY, streetviewImage)
+            api_count += 1
+        else:
+            print("previous google ocr found for streetviewImage " + str(streetviewImage.pk) + ", doing nothing")
+        if api_count >= max_api_calls:
+            break
+
+
+
+
+
+
+
 
 
 def deletePending(request):

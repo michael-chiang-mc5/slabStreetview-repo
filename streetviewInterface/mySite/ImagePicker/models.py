@@ -209,7 +209,7 @@ class StreetviewImage(models.Model):
         else:
             Pending.objects.filter(streetviewImage=self).delete()
     def __str__(self):
-        return str("heading="+str(self.heading))
+        return str("lon="+str(self.longitude)+", lat="+str(self.latitude))
     def valid_set():
         return StreetviewImage.objects.filter(pending__isnull=True)
     def dimY(self):
