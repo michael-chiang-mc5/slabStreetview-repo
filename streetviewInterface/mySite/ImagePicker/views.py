@@ -42,7 +42,7 @@ def julia_harten_csv():
         googleOCR = GoogleOCR.objects.filter(streetviewImage=streetviewImage)
         if len(googleOCR) == 0:
             print("running google ocr on streetviewImage " + str(streetviewImage.pk))
-            #google_ocr_api(settings.GOOGLE_OCR_API_KEY, streetviewImage)
+            google_ocr_api(settings.GOOGLE_OCR_API_KEY, streetviewImage)
             api_count += 1
         else:
             print("previous google ocr found for streetviewImage " + str(streetviewImage.pk) + ", doing nothing")
