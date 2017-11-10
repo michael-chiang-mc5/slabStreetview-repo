@@ -1,0 +1,60 @@
+{% extends "MCBase/base-extended.html" %}
+{% load staticfiles %}
+
+{% block javascript %}
+<style>
+  .image_container {
+      position:relative;
+      margin-bottom: 20px;
+  }
+  .tag_green {
+      float: left;
+      position: absolute;
+      background-color: green;
+      opacity: 0.5;
+      z-index: 1000;
+  }
+
+  .tag_yellow {
+      float: left;
+      position: absolute;
+      background-color: yellow;
+      opacity: 0.5;
+      z-index: 1000;
+  }
+  .grayscale {
+  	filter: grayscale(100%);
+    position:relative;
+  }
+
+  .grayscale:hover {
+    filter: none;
+  }
+
+  .image_container:hover .tag {
+    opacity: 0.1;
+  }
+
+
+</style>
+
+{% endblock %}
+
+{% block title %}
+  List
+{% endblock %}
+
+{% block body_block %}
+  <div class="content">
+
+
+
+
+  <!-- image -->
+  <div class="image_container">
+    <!-- bounding box overlay -->
+    <div style="left:{{ x1 }}px;top:{{ y1 }};width:{{ width }}px;height:{{ height }}px" class="tag_green"></div>
+    <img class="grayscale" src="{{ streetviewImage.image_url }}"  >
+  </div>
+
+{% endblock %}
