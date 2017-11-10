@@ -49,7 +49,14 @@ urlpatterns = [
     url(r'^deleteStreetviewImage/(?P<streetviewImage_pk>[0-9]+)/$',  views.deleteStreetviewImage, name='deleteStreetviewImage'), #
     url(r'^boundingBox/(?P<boundingBox_pk>[0-9]+)/$',  views.boundingBox, name='boundingBox'), #
     url(r'^boundingBox_expanded/(?P<boundingBox_pk>[0-9]+)/$',  views.boundingBox_expanded, name='boundingBox_expanded'), #
+
+
+    url(r'^overlayBox/(?P<image_pk>[0-9]+)/(?P<x1>[0-9]+)/(?P<x2>[0-9]+)/(?P<y1>[0-9]+)/(?P<y2>[0-9]+)/$',  views.overlayBox, name='overlayBox'), #
+
+
     url(r'^runGoogleOCR_image/(?P<pk>[0-9]+)/$',  views.runGoogleOCR_image, name='runGoogleOCR_image'), #
+
+
     url(r'^runGoogleOCR_randomImage/$',  views.runGoogleOCR_randomImage, name='runGoogleOCR_randomImage'), #
 
     url(r'^runGoogleOCR_boundingBox/(?P<boundingBox_pk>[0-9]+)/$',  views.runGoogleOCR_boundingBox, name='runGoogleOCR_boundingBox'), #

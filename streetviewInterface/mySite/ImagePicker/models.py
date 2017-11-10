@@ -278,10 +278,10 @@ class GoogleOCR(models.Model):
                 for symbol in word['symbols']:
                     text += symbol['text']
                 rn.append({'text':text,'locale':locale,'boundingBox':boundingBox})
-                print(locale)
-                print(text)
-                print(boundingBox)
-                print("****")
+                #print(locale)
+                #print(text)
+                #print(boundingBox)
+                #print("****")
         return rn
 
     def words(self):

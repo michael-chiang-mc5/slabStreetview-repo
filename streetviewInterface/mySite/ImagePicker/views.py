@@ -25,6 +25,29 @@ from django.http import JsonResponse
 from io import BytesIO
 from django.db.models import Count
 
+# bb = [x1,x2,y1,y2]
+def overlappingBoundingBox(bb1,bb2):
+    x1 = bb1[0]
+    x2 = bb1[1]
+    y1 = bb1[2]
+    y2 = bb1[3]
+    xx1 = bb2[0]
+    xx2 = bb2[1]
+    yy1 = bb2[2]
+    yy2 = bb2[3]
+
+    if x1 > xx2:
+        return False
+    elif x2 < xx1:
+        return False
+    elif y1 > yy2:
+        return False
+    elif y2 < yy1:
+        return False
+    else:
+        return True
+
+
 def julia_harten_csv():
     lon1 = -118.3100831509
     lat1 = 34.0634478683
@@ -35,6 +58,7 @@ def julia_harten_csv():
 
     streetviewImages = StreetviewImage.objects.filter(mapPoint__longitude__gt=min(lon1,lon2)).filter(mapPoint__longitude__lt=max(lon1,lon2)).filter(mapPoint__latitude__gt=min(lat1,lat2)).filter(mapPoint__latitude__lt=max(lat1,lat2))
 
+    # run google ocr if necessary
     api_count = 0
     for streetviewImage in streetviewImages:
         print("working on streetviewImage " + str(streetviewImage.pk))
@@ -50,18 +74,43 @@ def julia_harten_csv():
             break
 
 
+    with open('media/ctpn_koreatown.csv', 'w') as csvfile:
+        fieldnames = ['ctpn_pk','boundingBox','image_url','overlay_url']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+
+        boundingBoxes = BoundingBox.objects.filter(streetviewImage__in=streetviewImages)
+        for boundingBox in boundingBoxes:
+            if boundingBox.is_nil:
+                continue
+            #print(boundingBox)
+            writer.writerow({'ctpn_pk': boundingBox.pk, \
+                             'boundingBox': [boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2], \
+                             'image_url': boundingBox.streetviewImage.image_url(), \
+                             'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (boundingBox.streetviewImage.pk,boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2) , \
+                             })
+
     with open('media/googleOCR_koreatown.csv', 'w') as csvfile:
 
-        fieldnames = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address']
+        fieldnames = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
 
         count=0
         googleOCRs = GoogleOCR.objects.filter(streetviewImage__in=streetviewImages)
         for googleOCR in googleOCRs:
-            words = googleOCR.words()
+            words = googleOCR.naive_words()
             for word in words:
                 count = count + 1
+
+                boundingBoxes = BoundingBox.objects.filter(streetviewImage=googleOCR.streetviewImage)
+                ctpn_pk = 'na'
+                for boundingBox in boundingBoxes:
+                    overlap = overlappingBoundingBox(word['boundingBox'],[boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2])
+                    if overlap:
+                        ctpn_pk = boundingBox.pk
+                        break
+
                 writer.writerow({'pk': count, \
                                  'googleOCR_pk':   googleOCR.pk, \
                                  'image_url':       googleOCR.streetviewImage.image_url(), \
@@ -73,9 +122,18 @@ def julia_harten_csv():
                                  'longitude':    googleOCR.streetviewImage.mapPoint.longitude, \
                                  'latitude':    googleOCR.streetviewImage.mapPoint.latitude, \
                                  'address':     googleOCR.streetviewImage.mapPoint.address, \
+                                 'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (googleOCR.streetviewImage.pk,word['boundingBox'][0], word['boundingBox'][1], word['boundingBox'][2], word['boundingBox'][3]) , \
+                                 'ctpn_pk':     ctpn_pk, \
                                 })
 
 
+
+def overlayBox(request,image_pk,x1,x2,y1,y2):
+    width = int(x2)-int(x1)
+    height = int(y2)-int(y1)
+    streetviewImage = StreetviewImage.objects.get(pk=image_pk)
+    context = {'streetviewImage':streetviewImage,'x1':x1,'y1':y1,'width':width,'height':height}
+    return render(request, 'ImagePicker/overlayBoundingBox.html',context)
 
 
 
