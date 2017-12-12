@@ -117,9 +117,10 @@ def image_saver_metadata(request):
 
     # check for high priority first
     mapPoints = MapPoint.objects.filter(high_priority=True)
+    print(len(mapPoints), " high priority mapPoints")
     for mapPoint in mapPoints:
         streetviewImages = mapPoint.streetviewimage_set.all()
-        if len(streetviewImage)!=2:
+        if len(streetviewImages)!=2:
             mapPoint.createStreetviewImages()
             streetviewImages = mapPoint.streetviewimage_set.all()
         for streetviewImage in streetviewImages:

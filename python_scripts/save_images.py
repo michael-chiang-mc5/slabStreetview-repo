@@ -30,7 +30,7 @@ def main():
     elif r.text == '104.131.145.75':
         GOOGLE_KEY = secret_keys.GOOGLE_KEY_VPS
         text_file.write("Running on "+r.text+"\n")
-        sleep(randint(0,1800))
+        sleep(randint(0,0))
     elif r.text == '68.190.247.186':
         GOOGLE_KEY = secret_keys.GOOGLE_KEY_CORDOVA
         text_file.write("Running on "+r.text+"\n")
@@ -41,6 +41,7 @@ def main():
     while(1):
         # get metadata
         text_file.flush()
+        print(interface_url+"ImagePicker/image_saver_metadata/")
         with urllib.request.urlopen(interface_url+"ImagePicker/image_saver_metadata/") as url:
             data = json.loads(url.read().decode())
 
