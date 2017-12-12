@@ -53,7 +53,8 @@ def temp():
             address_str = row['Address'] + ', ' + row['City'] + ', ' + row['State']
             if row['City']!='Los Angeles':
                 continue
-            print(address_str)
+            #print(address_str)
+            print(len(BoundingBox.objects.all()))
             address_str = address_str.replace(' ','+')
 
             lnglat = geocode(address_str)
@@ -76,11 +77,11 @@ def process_mapPoints(mapPoints):
     is not complete
     """
     for mapPoint in mapPoints:
-        print("working on mapPoint.pk = " + str(mapPoint.pk))
+        #print("working on mapPoint.pk = " + str(mapPoint.pk))
         mapPoint_complete = mapPoint.complete()
         mapPoint.high_priority = not mapPoint_complete
         mapPoint.save()
-        print("high_priority=", mapPoint.high_priority)
+        #print("high_priority=", mapPoint.high_priority)
         break
 
 
@@ -89,7 +90,7 @@ def process_mapPoints(mapPoints):
 # returns a dictionary with {'lng', 'lat'} of input address
 def geocode(address):
     url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s' % (address,settings.GOOGLE_GEOCODE_API_KEY)
-    print(url)
+    #print(url)
     response = requests.get(url)
     try:
         rn = response.json()['results'][0]['geometry']['location'] # {'lng', 'lat'}
