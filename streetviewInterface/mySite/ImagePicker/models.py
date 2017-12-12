@@ -126,6 +126,7 @@ class MapPoint(models.Model):
                str(self.panoID)                  + '\t' + \
                str(self.tag)
     def createStreetviewImages(self):
+        self.streetviewimage_set.all().delete()
         for rl in [{'heading':self.photographerHeading+90,'fov':35}, \
                     {'heading':self.photographerHeading-90,'fov':22.5}]:
             # save object

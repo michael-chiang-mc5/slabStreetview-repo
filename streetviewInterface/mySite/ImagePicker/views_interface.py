@@ -111,6 +111,28 @@ def set_image_uploaded(request):
 
 
 def image_saver_metadata(request):
+    """
+
+    """
+
+    # check for high priority first
+    mapPoints = MapPoint.objects.filter(high_priority=True)
+    for mapPoint in mapPoints:
+        streetviewImages = mapPoint.streetviewimage_set.all()
+        if len(streetviewImage)!=2:
+            mapPoint.createStreetviewImages()
+            streetviewImages = mapPoint.streetviewimage_set.all()
+        for streetviewImage in streetviewImages:
+            if streetviewImage.check_if_image_is_set_lazy():
+                continue
+            else:
+                print("High priority image for MapPoint ", mapPoint.pk)
+                streetviewImage.set_pending(True)
+                return JsonResponse({'xdim':640, 'ydim':640,'lat':mapPoint.latitude,'lon':mapPoint.longitude,\
+                                     'fov':streetviewImage.fov,'heading':streetviewImage.heading, 'pitch':streetviewImage.pitch,\
+                                     'name':streetviewImage.image_name(),'pk':streetviewImage.pk})
+
+    # if no high priority images to download, just get a random one
     streetviewImage = StreetviewImage.valid_set().filter(image_is_set=False).first()
     streetviewImage.set_pending(True)
     mapPoint = streetviewImage.mapPoint
