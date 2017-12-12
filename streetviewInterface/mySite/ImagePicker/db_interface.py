@@ -53,8 +53,8 @@ def temp():
             address_str = row['Address'] + ', ' + row['City'] + ', ' + row['State']
             if row['City']!='Los Angeles':
                 continue
-            #print(address_str)
-            print(len(BoundingBox.objects.all()))
+            print(address_str)
+            #print(len(BoundingBox.objects.all()))
             address_str = address_str.replace(' ','+')
 
             lnglat = geocode(address_str)
