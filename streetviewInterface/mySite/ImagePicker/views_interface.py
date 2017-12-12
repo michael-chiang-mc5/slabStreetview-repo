@@ -63,6 +63,22 @@ def postBoundingBox(request):
     return HttpResponse("done")
 
 def list_CTPN_metadata(request):
+    # check for high priority first
+    mapPoints = MapPoint.objects.filter(high_priority=True)
+    for mapPoint in mapPoints:
+        streetviewImages = mapPoint.streetviewimage_set.all()
+        if len(streetviewImages)!=2:
+            mapPoint.createStreetviewImages()
+            streetviewImages = mapPoint.streetviewimage_set.all()
+        for streetviewImage in streetviewImages:
+            if streetviewImage.check_if_image_is_set_lazy():
+                if len(BoundingBox.objects.filter(streetviewImage=streetviewImage))==0:
+                    streetviewImage.set_pending(True)
+                    return JsonResponse({'pk':streetviewImage.pk, 'url':streetviewImage.image_url()})
+            else:
+                continue
+
+    # low priority
     streetviewImage = StreetviewImage.valid_set().filter(image_is_set=True).exclude( boundingbox__method__contains="CTPN" ).first()
     if streetviewImage is None:
         return HttpResponse("done")
