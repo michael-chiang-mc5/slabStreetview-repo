@@ -46,7 +46,7 @@ def boundingBox(latitudeInDegrees, longitudeInDegrees, halfSideInKm):
 
 
 def temp():
-    csv_file = '/Users/michaelchiang/Desktop/projects/slabStreetview-repo/streetviewInterface/mySite/media/matt_black-owned-business.csv'
+    csv_file = '/home/michaelc/dev/slabStreetview-repo/streetviewInterface/mySite/media/matt_black-owned-business.csv'
     with open(csv_file) as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
@@ -88,7 +88,8 @@ def process_mapPoints(mapPoints):
 
 # returns a dictionary with {'lng', 'lat'} of input address
 def geocode(address):
-    url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s' % (address,settings.GOOGLE_OCR_API_KEY)
+    url = 'https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s' % (address,settings.GOOGLE_GEOCODE_API_KEY)
+    print(url)
     response = requests.get(url)
     try:
         rn = response.json()['results'][0]['geometry']['location'] # {'lng', 'lat'}
