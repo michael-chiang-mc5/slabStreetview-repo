@@ -41,7 +41,7 @@ def main():
     while(1):
         # get metadata
         text_file.flush()
-        with urllib.request.urlopen(interface_url+"ImagePicker/image_saver_metadata/") as url: # TODO: update to 104....
+        with urllib.request.urlopen(interface_url+"ImagePicker/image_saver_metadata/") as url:
             data = json.loads(url.read().decode())
 
             # human-like timer

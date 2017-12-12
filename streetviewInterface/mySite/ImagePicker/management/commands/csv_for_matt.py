@@ -1,9 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
-from ImagePicker.views import saveImages_async
+from ImagePicker.db_interface import *
 import sys
 class Command(BaseCommand):
-    help = 'saves images'
-
+    help = 'creates csv file for matt bob project'
     def handle(self, *args, **options):
-        saveImages_async()
+        temp()
         sys.exit(0)

@@ -31,7 +31,7 @@ def syncImages():
         else:
             print(str(streetviewImage.pk) + " was previously set")
 
-def saveImages_async():
+def saveImages_async_deprecated():
     # parameters
     xdim = 640
     ydim = 640

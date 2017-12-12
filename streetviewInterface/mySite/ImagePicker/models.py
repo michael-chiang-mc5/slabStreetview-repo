@@ -19,6 +19,62 @@ class MapPoint(models.Model):
     num_links = models.IntegerField(null=True,blank=True)
     address = models.TextField(blank=True)
     neighbors = models.ManyToManyField("self")
+    high_priority = models.BooleanField(default=False)
+
+
+    def complete(self,lazy=None):
+        """
+        Set high_priority = True if any of the following is False:
+            (1) Two associated streetview images
+            (2) Streetview images set (i.e., downloaded)
+            (3) CTPN run
+            (4) Google OCR run
+
+        lazy=True means we explicitly check whether images are saved in aws (this costs money)
+        lazy=False is default. We do not check whether images are saved in aws (free)
+        """
+
+        if lazy is None:
+            lazy=True
+        else:
+            lazy=False
+
+        # make sure that there are two associated streetviewImage objects associated
+        # with each mapPoint. If not, delete and recreate
+        streetviewImages = self.streetviewimage_set.all()
+        if len(streetviewImages)!=2:
+            self.streetviewimage_set.all().delete()
+            self.createStreetviewImages()
+            print("MapPoint ",self.pk, " streetviewImage objects not set")
+            return False
+
+        # check whether streetview images are set
+        for streetviewImage in streetviewImages:
+            if lazy:
+                image_is_set = streetviewImage.check_if_image_is_set_lazy()
+            else:
+                image_is_set = treetviewImage.check_if_image_is_set()
+            if image_is_set is False:
+                print("MapPoint ",self.pk, " images not downloaded")
+                return False
+
+        # check whether CTPN is run
+        for streetviewImage in streetviewImages:
+            boundingBoxes = BoundingBox.objects.filter(streetviewImage=streetviewImage)
+            if len(boundingBoxes)==0:
+                print("MapPoint ",self.pk, " CTPN bounding box not generated")
+                return False
+
+        # check whether google OCR is run
+        for streetviewImage in streetviewImages:
+            googleOCRs = GoogleOCR.objects.filter(streetviewImage=streetviewImage)
+            if len(googleOCRs)==0:
+                print("MapPoint ",self.pk, " googleOCR bounding box not generated")
+                return False
+
+        # set high_prioritity to false if two streetviewImage objects, images downloaded, CTPN run, and googleOCR run
+        print("MapPoint ",self.pk, " data complete")
+        return True
 
     def count_language_total():
         # initailize output
@@ -61,7 +117,7 @@ class MapPoint(models.Model):
         #s = ",".join(unique)
         return unique[0]
     def __str__(self):
-        return str('lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))
+        return str('pk='+str(self.pk)+', lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))
     def serialize_csv(self):
         return str(self.pk)                      + '\t' + \
                str(self.latitude)                + '\t' + \
@@ -80,12 +136,15 @@ class MapPoint(models.Model):
                                                image_is_set=False, )
             streetviewImage.save()
     def images_set(self):
-        all_images_set = True
+        # make sure there are two streetviewImage objects
+        if len(self.streetviewimage_set.all()) != 2:
+            return False
+        # make sure images downloaded
         for streetviewImage in self.streetviewimage_set.all():
-            if not streetviewImage.image_is_set:
-                all_images_set = False
-                break
-        return all_images_set
+            if not streetviewImage.check_if_image_is_set_lazy():
+                return False
+        # 2 streetviewImage objects and images downloaded
+        return True
     def count_zoning():
         total = MapPoint.objects.filter(maptag__tag_type="zoning").count()
 
@@ -131,10 +190,6 @@ class MapPoint(models.Model):
 
     def get_num_CTPN_boundingBoxes(self):
         num_boundingBoxes = BoundingBox.objects.filter(streetviewImage__mapPoint=self, is_nil=False, method="CTPN").distinct().count()
-        #streetviewImages = self.streetviewimage_set.all()
-        #count = 0
-        #for streetviewImage in streetviewImages:
-        #    count += streetviewImage.count_boundingBoxes()
         return num_boundingBoxes
 
     def get_size_CTPN_boundingBoxes(self):
@@ -225,6 +280,13 @@ class StreetviewImage(models.Model):
             return settings.AWS_URL + self.image_name()
         else:
             return "na"
+
+    def check_if_image_is_set_lazy(self):
+        if self.image_is_set == True:
+            return True
+        else:
+            return False
+
     def check_if_image_is_set(self):
         request = requests.get(self.image_url())
         if request.status_code == 200:
@@ -334,6 +396,9 @@ class GoogleOCR(models.Model):
 
 
 class BoundingBox(models.Model):
+    """
+    CTPN bounding box
+    """
     streetviewImage = models.ForeignKey(StreetviewImage) # each image can have multiple bounding boxes
     method = models.TextField()
     x1 = models.IntegerField()

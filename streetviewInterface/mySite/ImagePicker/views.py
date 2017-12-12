@@ -563,8 +563,50 @@ def deleteAllOcrLanguage(request):
     OcrLanguage.objects.all().delete()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
-def run_google_ocr(max_api_calls):
-    max_count = 10
+
+def run_google_ocr(max_api_calls=None):
+    """
+    runs google ocr on streetview images
+    prioritize high_priority images
+    set priority low if appropriate
+    """
+    if max_api_calls is None:
+        max_api_calls=1000
+    api_count = 0
+
+    mapPoints=MapPoint.objects.filter(high_priority=True)
+    for mapPoint in mapPoints:
+        # break if we exceed maximum number of google OCR api calls
+        if api_count>=max_api_calls:
+            break
+        # skip if all images are not set
+        if not mapPoint.images_set():
+            print("MapPoint ", mapPoint.pk, " images not set so skipping google OCR")
+            continue
+        # run google OCR if not already run
+        streetviewImages = mapPoint.streetviewimage_set.all()
+        for streetviewImage in streetviewImages:
+            googleOCR = GoogleOCR.objects.filter(streetviewImage=streetviewImage)
+            if len(googleOCR) == 0:
+                print("running google ocr on streetviewImage ", streetviewImage.pk)
+                google_ocr_api(settings.GOOGLE_OCR_API_KEY, streetviewImage)
+                api_count += 1
+            else:
+                print("previous google ocr found for streetviewImage " , streetviewImage.pk)
+        # set priority back to low if appropriate
+        mapPoint.high_priority = not mapPoint.complete()
+        mapPoint.save()
+
+
+
+
+
+
+def run_google_ocr_deprecated(max_api_calls):
+    """
+    Runs google ocr on 10 images with most CTPN boxes in each census tract
+    """
+    max_count = 10 # max number of results per census tract
     api_count = 0
 
     # get list of all census FIPS
@@ -681,8 +723,8 @@ def deleteOcrText(request,ocrtext_pk):
 # Given GPS coordinates, return the heading value perpendicular to the road
 def index(request):
     mapPoints = MapPoint.objects.all().count()
-    mapPoints_withTags = MapPoint.objects.filter(maptag__isnull=False).distinct().count()
-    streetviewImages = StreetviewImage.objects.filter(image_is_set=True).count()
+    #mapPoints_withTags = MapPoint.objects.filter(maptag__isnull=False).distinct().count()
+    #streetviewImages = StreetviewImage.objects.filter(image_is_set=True).count()
     pending = Pending.objects.all().count()
     boundingBoxes = BoundingBox.objects.count()
     streetviewImages_withBB = StreetviewImage.objects.filter(image_is_set=True, boundingbox__isnull=False).distinct().count()
