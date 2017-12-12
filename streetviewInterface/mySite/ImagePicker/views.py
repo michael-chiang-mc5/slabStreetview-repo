@@ -575,6 +575,9 @@ def run_google_ocr(max_api_calls=None):
     api_count = 0
 
     mapPoints=MapPoint.objects.filter(high_priority=True)
+    print(len(mapPoints), " high priority mapPoints")
+    print(max_api_calls, " max api calls")
+
     for mapPoint in mapPoints:
         # break if we exceed maximum number of google OCR api calls
         if api_count>=max_api_calls:
