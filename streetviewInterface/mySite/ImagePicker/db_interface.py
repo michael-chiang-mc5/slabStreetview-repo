@@ -82,7 +82,6 @@ def process_mapPoints(mapPoints):
         mapPoint.high_priority = not mapPoint_complete
         mapPoint.save()
         #print("high_priority=", mapPoint.high_priority)
-        break
 
 
 
