@@ -144,7 +144,7 @@ def set_priority_bob():
     Marks mapPoints high-priority based on Matt's dataset on black-owned business
     """
     print(settings.BASE_DIR)
-    csv_file = '/Users/mcah5a/Desktop/projects/slabStreetview-repo/streetviewInterface/mySite'+ '/media/matt_black-owned-business.csv'
+    csv_file = 'media/matt_black-owned-business.csv'
     with open(csv_file) as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
