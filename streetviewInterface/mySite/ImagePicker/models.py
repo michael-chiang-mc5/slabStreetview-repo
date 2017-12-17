@@ -200,6 +200,13 @@ class MapPoint(models.Model):
             total_area += boundingBox.area()
         return total_area
 
+    def get_CTPN_boundingBoxes(self):
+        boundingBoxes = BoundingBox.objects.filter(streetviewImage__mapPoint=self, is_nil=False, method="CTPN").distinct()
+        return boundingBoxes
+    def get_GoogleOCR(self):
+        googleOCRs = GoogleOCR.objects.filter(streetviewImage__mapPoint=self).distinct()
+        return googleOCRs
+
 
 class MapTag(models.Model):
     mapPoint = models.ForeignKey(MapPoint)

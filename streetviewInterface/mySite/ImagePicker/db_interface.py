@@ -42,11 +42,109 @@ def boundingBox(latitudeInDegrees, longitudeInDegrees, halfSideInKm):
     lonMax = lon + halfSide/pradius
     return (rad2deg(latMin), rad2deg(lonMin), rad2deg(latMax), rad2deg(lonMax))
 
+# bb = [x1,x2,y1,y2]
+def overlappingBoundingBox(bb1,bb2):
+    x1 = bb1[0]
+    x2 = bb1[1]
+    y1 = bb1[2]
+    y2 = bb1[3]
+    xx1 = bb2[0]
+    xx2 = bb2[1]
+    yy1 = bb2[2]
+    yy2 = bb2[3]
+
+    if x1 > xx2:
+        return False
+    elif x2 < xx1:
+        return False
+    elif y1 > yy2:
+        return False
+    elif y2 < yy1:
+        return False
+    else:
+        return True
+
+
+def write_csv_bob():
+    """
+    Write text file after high-priority data has been downloaded
+    """
+
+    with open('media/matt_black-owned-business.csv') as csv_input , open('media/matt-black-owned-business_ctpn.csv', 'w') as csv_output, open('media/matt-black-owned-business_googleOCR.csv', 'w') as csv_output2:
+        reader = csv.DictReader(csv_input)
+        # set up ctpn csv output
+        fieldnames = ['ctpn_pk','boundingBox','image_url','overlay_url','black_owned_business_address']
+        writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+        # swet up googleOCR csv output
+        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk']
+        writer2 = csv.DictWriter(csv_output2, fieldnames=fieldnames2, delimiter='\t')
+        writer2.writeheader()
 
 
 
-def temp():
-    csv_file = '/home/michaelc/dev/slabStreetview-repo/streetviewInterface/mySite/media/matt_black-owned-business.csv'
+        count=0
+        for row in reader:
+            bob_address = row['Address'] + ', ' + row['City'] + ', ' + row['State']
+            if row['City']!='Los Angeles':
+                continue
+            print(bob_address)
+            address_str = bob_address.replace(' ','+')
+            lnglat = geocode(address_str)
+            if lnglat is False:
+                print('geocode of '+address_str+' failed')
+                continue
+            mapPoints = filter_db(lnglat)
+
+            for mapPoint in mapPoints:
+                boundingBoxes = mapPoint.get_CTPN_boundingBoxes()
+                for boundingBox in boundingBoxes:
+                    if boundingBox.is_nil:
+                        continue
+                    writer.writerow({'ctpn_pk': boundingBox.pk, \
+                                     'boundingBox': [boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2], \
+                                     'image_url': boundingBox.streetviewImage.image_url(), \
+                                     'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (boundingBox.streetviewImage.pk,boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2) , \
+                                     'black_owned_business_address': bob_address, \
+                                     })
+
+                googleOCRs = mapPoint.get_GoogleOCR()
+                for googleOCR in googleOCRs:
+                    words = googleOCR.naive_words()
+                    for word in words:
+                        count = count + 1
+                        boundingBoxes = BoundingBox.objects.filter(streetviewImage=googleOCR.streetviewImage)
+                        ctpn_pk = 'na'
+                        for boundingBox in boundingBoxes:
+                            overlap = overlappingBoundingBox(word['boundingBox'],[boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2])
+                            if overlap:
+                                ctpn_pk = boundingBox.pk
+                                break
+
+                        writer2.writerow({'pk': count, \
+                                         'googleOCR_pk':   googleOCR.pk, \
+                                         'image_url':       googleOCR.streetviewImage.image_url(), \
+                                         'image_fov':       googleOCR.streetviewImage.fov * 3, \
+                                         'boundingBox':    word['boundingBox'], \
+                                         'locale':         word['locale'], \
+                                         'text':         word['text'], \
+                                         'heading':      googleOCR.streetviewImage.heading, \
+                                         'longitude':    googleOCR.streetviewImage.mapPoint.longitude, \
+                                         'latitude':    googleOCR.streetviewImage.mapPoint.latitude, \
+                                         'address':     googleOCR.streetviewImage.mapPoint.address, \
+                                         'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (googleOCR.streetviewImage.pk,word['boundingBox'][0], word['boundingBox'][1], word['boundingBox'][2], word['boundingBox'][3]) , \
+                                         'ctpn_pk':     ctpn_pk, \
+                                        })
+
+
+
+
+def set_priority_bob():
+    """
+    Marks mapPoints high-priority based on Matt's dataset on black-owned business
+    """
+    print(settings.BASE_DIR)
+    csv_file = '/Users/mcah5a/Desktop/projects/slabStreetview-repo/streetviewInterface/mySite'+ '/media/matt_black-owned-business.csv'
     with open(csv_file) as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
