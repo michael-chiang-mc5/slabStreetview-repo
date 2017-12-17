@@ -43,8 +43,11 @@ def main():
         text_file.flush()
         print(interface_url+"ImagePicker/image_saver_metadata/")
         with urllib.request.urlopen(interface_url+"ImagePicker/image_saver_metadata/") as url:
-            data = json.loads(url.read().decode())
-
+            try:
+                data = json.loads(url.read().decode())
+            except:
+                print("all done")
+                exit(0)
             # human-like timer
             sleep(randint(0,timer_max))
             if count_timer > 50 + randint(0,40):
