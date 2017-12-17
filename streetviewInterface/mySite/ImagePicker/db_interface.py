@@ -83,7 +83,6 @@ def write_csv_bob():
 
 
 
-        count=0
         for row in reader:
             bob_address = row['Address'] + ', ' + row['City'] + ', ' + row['State']
             if row['City']!='Los Angeles':
@@ -112,7 +111,6 @@ def write_csv_bob():
                 for googleOCR in googleOCRs:
                     words = googleOCR.naive_words()
                     for word in words:
-                        count = count + 1
                         boundingBoxes = BoundingBox.objects.filter(streetviewImage=googleOCR.streetviewImage)
                         ctpn_pk = 'na'
                         for boundingBox in boundingBoxes:
@@ -121,7 +119,7 @@ def write_csv_bob():
                                 ctpn_pk = boundingBox.pk
                                 break
 
-                        writer2.writerow({'pk': count, \
+                        writer2.writerow({
                                          'googleOCR_pk':   googleOCR.pk, \
                                          'image_url':       googleOCR.streetviewImage.image_url(), \
                                          'image_fov':       googleOCR.streetviewImage.fov * 3, \
@@ -137,13 +135,85 @@ def write_csv_bob():
                                         })
 
 
+def set_priority_julia(box):
+    """
+    Marks mapPoints high priority based on whether they are within bounding box
+    Ex:
+        lon1 = -118.3100831509
+        lat1 = 34.0634478683
+        lon2 = -118.2936894894
+        lat2 = 34.0637256166
+    """
+    lon1 = box['lon1']
+    lon2 = box['lon2']
+    lat1 = box['lat1']
+    lat2 = box['lat2']
+    print('num high priority ', MapPoint.objects.filter(high_priority=True).count())
+    mapPoints = MapPoint.objects.filter(longitude__gte=min(lon1,lon2)).filter(longitude__lte=max(lon1,lon2)).filter(latitude__gte=min(lat1,lat2)).filter(latitude__lte=max(lat1,lat2))
+    print('num mapPoints in bb = ', len(mapPoints))
+    set_priority_mapPoints(mapPoints)
+    print('num high priority ', MapPoint.objects.filter(high_priority=True).count())
+
+def write_csv_julia(box,name):
+    lon1 = box['lon1']
+    lon2 = box['lon2']
+    lat1 = box['lat1']
+    lat2 = box['lat2']
+    mapPoints = MapPoint.objects.filter(longitude__gte=min(lon1,lon2)).filter(longitude__lte=max(lon1,lon2)).filter(latitude__gte=min(lat1,lat2)).filter(latitude__lte=max(lat1,lat2))
+
+    with open('media/'+name+'_ctpn.csv', 'w') as csv_output, open('media/'+name+'_googleOCR.csv', 'w') as csv_output2:
+        # set up ctpn csv output
+        fieldnames = ['ctpn_pk','boundingBox','image_url','overlay_url']
+        writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+        # swet up googleOCR csv output
+        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk']
+        writer2 = csv.DictWriter(csv_output2, fieldnames=fieldnames2, delimiter='\t')
+        writer2.writeheader()
+
+        for mapPoint in mapPoints:
+            boundingBoxes = mapPoint.get_CTPN_boundingBoxes()
+            for boundingBox in boundingBoxes:
+                if boundingBox.is_nil:
+                    continue
+                writer.writerow({'ctpn_pk': boundingBox.pk, \
+                                 'boundingBox': [boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2], \
+                                 'image_url': boundingBox.streetviewImage.image_url(), \
+                                 'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (boundingBox.streetviewImage.pk,boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2) , \
+                                 })
+
+            googleOCRs = mapPoint.get_GoogleOCR()
+            for googleOCR in googleOCRs:
+                words = googleOCR.naive_words()
+                for word in words:
+                    boundingBoxes = BoundingBox.objects.filter(streetviewImage=googleOCR.streetviewImage)
+                    ctpn_pk = 'na'
+                    for boundingBox in boundingBoxes:
+                        overlap = overlappingBoundingBox(word['boundingBox'],[boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2])
+                        if overlap:
+                            ctpn_pk = boundingBox.pk
+                            break
+
+                    writer2.writerow({
+                                     'googleOCR_pk':   googleOCR.pk, \
+                                     'image_url':       googleOCR.streetviewImage.image_url(), \
+                                     'image_fov':       googleOCR.streetviewImage.fov * 3, \
+                                     'boundingBox':    word['boundingBox'], \
+                                     'locale':         word['locale'], \
+                                     'text':         word['text'], \
+                                     'heading':      googleOCR.streetviewImage.heading, \
+                                     'longitude':    googleOCR.streetviewImage.mapPoint.longitude, \
+                                     'latitude':    googleOCR.streetviewImage.mapPoint.latitude, \
+                                     'address':     googleOCR.streetviewImage.mapPoint.address, \
+                                     'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (googleOCR.streetviewImage.pk,word['boundingBox'][0], word['boundingBox'][1], word['boundingBox'][2], word['boundingBox'][3]) , \
+                                     'ctpn_pk':     ctpn_pk, \
+                                    })
 
 
 def set_priority_bob():
     """
     Marks mapPoints high-priority based on Matt's dataset on black-owned business
     """
-    print(settings.BASE_DIR)
     csv_file = 'media/matt_black-owned-business.csv'
     with open(csv_file) as csvfile:
         reader = csv.DictReader(csvfile)
@@ -161,7 +231,7 @@ def set_priority_bob():
                 print('geocode of '+address_str+' failed')
                 continue
             mapPoints = filter_db(lnglat)
-            process_mapPoints(mapPoints)
+            set_priority_mapPoints(mapPoints)
 
     # number of high_priority mapPoints
     mapPoints = MapPoint.objects.filter(high_priority=True)
@@ -169,7 +239,7 @@ def set_priority_bob():
 
 
 
-def process_mapPoints(mapPoints):
+def set_priority_mapPoints(mapPoints):
     """
     set mapPoint priority to high if the underlying data (CTPN, images, googleOCR)
     is not complete

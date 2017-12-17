@@ -26,7 +26,7 @@ from io import BytesIO
 from django.db.models import Count
 
 # bb = [x1,x2,y1,y2]
-def overlappingBoundingBox(bb1,bb2):
+def overlappingBoundingBox_deprecated(bb1,bb2):
     x1 = bb1[0]
     x2 = bb1[1]
     y1 = bb1[2]
@@ -48,7 +48,7 @@ def overlappingBoundingBox(bb1,bb2):
         return True
 
 
-def julia_harten_csv():
+def julia_harten_csv_deprecated():
     lon1 = -118.3100831509
     lat1 = 34.0634478683
     lon2 = -118.2936894894
