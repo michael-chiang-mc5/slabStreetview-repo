@@ -569,6 +569,7 @@ def run_google_ocr(max_api_calls=None):
     runs google ocr on streetview images
     prioritize high_priority images
     set priority low if appropriate
+    only does high_priority
     """
     if max_api_calls is None:
         max_api_calls=1000
@@ -594,6 +595,7 @@ def run_google_ocr(max_api_calls=None):
                 print("running google ocr on streetviewImage ", streetviewImage.pk)
                 google_ocr_api(settings.GOOGLE_OCR_API_KEY, streetviewImage)
                 api_count += 1
+                print('api count = ', api_count)
             else:
                 print("previous google ocr found for streetviewImage " , streetviewImage.pk)
         # set priority back to low if appropriate

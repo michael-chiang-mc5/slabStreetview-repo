@@ -60,6 +60,16 @@ def postBoundingBox(request):
     for box in boxes:
         boundingBox = BoundingBox(streetviewImage=StreetviewImage.objects.get(pk=pk),x1=box[0], y1=box[1], x2=box[2], y2=box[3], score=box[4],method=method)
         boundingBox.save()
+
+
+    # set priority
+    mapPoint = MapPoint.objects.filter(streetviewimage__pk=pk).first()
+    mapPoint_complete,reason = mapPoint.complete()
+    if mapPoint_complete == True:
+        mapPoint.high_priority = False
+        mapPoint.save()
+
+    # return
     return HttpResponse("done")
 
 def list_CTPN_metadata(request):
@@ -125,7 +135,7 @@ def set_image_uploaded(request):
     streetviewImage.save()
     return HttpResponse('set streetviewImage.pk='+str(pk)+' to image_is_set=True')
 
-
+# TODO: move save_iamges into manage.py
 def image_saver_metadata(request):
     """
 
@@ -150,9 +160,6 @@ def image_saver_metadata(request):
                                      'name':streetviewImage.image_name(),'pk':streetviewImage.pk})
 
     # if no high priority images to download, just get a random one
-    if StreetviewImage.valid_set().filter(image_is_set=False).count() == 0:
-        return HttpResponse("done")
-
     streetviewImage = StreetviewImage.valid_set().filter(image_is_set=False).first()
     streetviewImage.set_pending(True)
     mapPoint = streetviewImage.mapPoint

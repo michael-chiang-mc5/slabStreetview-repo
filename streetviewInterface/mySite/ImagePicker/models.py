@@ -46,7 +46,7 @@ class MapPoint(models.Model):
             self.streetviewimage_set.all().delete()
             self.createStreetviewImages()
             print("MapPoint ",self.pk, " streetviewImage objects not set")
-            return False
+            return False,'streetview object'
 
         # check whether streetview images are set
         for streetviewImage in streetviewImages:
@@ -56,25 +56,25 @@ class MapPoint(models.Model):
                 image_is_set = treetviewImage.check_if_image_is_set()
             if image_is_set is False:
                 print("MapPoint ",self.pk, " images not downloaded")
-                return False
+                return False,'image'
 
         # check whether CTPN is run
         for streetviewImage in streetviewImages:
             boundingBoxes = BoundingBox.objects.filter(streetviewImage=streetviewImage)
             if len(boundingBoxes)==0:
                 print("MapPoint ",self.pk, " CTPN bounding box not generated")
-                return False
+                return False,'ctpn'
 
         # check whether google OCR is run
         for streetviewImage in streetviewImages:
             googleOCRs = GoogleOCR.objects.filter(streetviewImage=streetviewImage)
             if len(googleOCRs)==0:
                 print("MapPoint ",self.pk, " googleOCR bounding box not generated")
-                return False
+                return False,'ocr'
 
         # set high_prioritity to false if two streetviewImage objects, images downloaded, CTPN run, and googleOCR run
         print("MapPoint ",self.pk, " data complete")
-        return True
+        return True,'complete'
 
     def count_language_total():
         # initailize output
