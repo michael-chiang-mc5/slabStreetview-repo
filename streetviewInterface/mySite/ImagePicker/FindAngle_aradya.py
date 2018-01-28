@@ -20,6 +20,6 @@ def calculate_projected_line(image_fov,boundingBox,heading,lat_camera,lon_camera
     # given: lat1, lon1, b = bearing in degrees, d = distance in kilometers
     origin = geopy.Point(lat_camera, lon_camera)
     projected_line_endpoint = VincentyDistance(kilometers=1).destination(origin, angle_projectedLine)
-    lat_projectedLine, lon_projectedLine = projected_line_endpoint.latitude, destination.longitude
+    lat_projectedLine, lon_projectedLine = projected_line_endpoint.latitude, projected_line_endpoint.longitude
 
     return lat_projectedLine, lon_projectedLine, angle_projectedLine
