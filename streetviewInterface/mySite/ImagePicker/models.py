@@ -13,7 +13,7 @@ class CrawlerQueueEntry(models.Model):
 class MapPoint(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
-    photographerHeading = models.FloatField()
+    photographerHeading = models.FloatField() # 0 = north, 90 = E, 180 = S, 270 = W
     panoID = models.TextField(blank=True) # unstable across browser sessions
     tag = models.TextField(blank=True)
     num_links = models.IntegerField(null=True,blank=True)
