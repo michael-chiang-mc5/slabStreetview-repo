@@ -70,7 +70,7 @@ def write_csv_bob():
     Write text file after high-priority data has been downloaded
     """
 
-    with open('media/matt_black-owned-business.csv') as csv_input , open('media/matt-black-owned-business_ctpn.csv', 'w') as csv_output, open('media/matt-black-owned-business_googleOCR.csv', 'w') as csv_output2:
+    with open('media/matt_black-owned-business_input.csv') as csv_input , open('media/matt-black-owned-business_ctpn.csv', 'w') as csv_output, open('media/matt-black-owned-business_googleOCR.csv', 'w') as csv_output2:
         reader = csv.DictReader(csv_input)
         # set up ctpn csv output
         fieldnames = ['ctpn_pk','boundingBox','image_url','overlay_url','black_owned_business_address']
