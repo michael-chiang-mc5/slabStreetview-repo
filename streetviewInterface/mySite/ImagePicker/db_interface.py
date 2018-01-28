@@ -6,7 +6,7 @@ from django.conf import settings
 import urllib.request, json, requests
 from .models import *
 import math
-
+from .FindAngle_aradya import calculate_projected_line
 
 # degrees to radians
 def deg2rad(degrees):
@@ -77,7 +77,7 @@ def write_csv_bob():
         writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         # swet up googleOCR csv output
-        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk']
+        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk','angle_projectedLine']
         writer2 = csv.DictWriter(csv_output2, fieldnames=fieldnames2, delimiter='\t')
         writer2.writeheader()
 
@@ -119,6 +119,7 @@ def write_csv_bob():
                                 ctpn_pk = boundingBox.pk
                                 break
 
+                        lat_projectedLine, lon_projectedLine, angle_projectedLine = calculate_projected_line(googleOCR.streetviewImage.fov * 3,word['boundingBox'],googleOCR.streetviewImage.heading,googleOCR.streetviewImage.mapPoint.latitude,googleOCR.streetviewImage.mapPoint.longitude)
                         writer2.writerow({
                                          'googleOCR_pk':   googleOCR.pk, \
                                          'image_url':       googleOCR.streetviewImage.image_url(), \
@@ -132,6 +133,7 @@ def write_csv_bob():
                                          'address':     googleOCR.streetviewImage.mapPoint.address, \
                                          'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (googleOCR.streetviewImage.pk,word['boundingBox'][0], word['boundingBox'][1], word['boundingBox'][2], word['boundingBox'][3]) , \
                                          'ctpn_pk':     ctpn_pk, \
+                                         'angle_projectedLine': angle_projectedLine, \
                                         })
 
 
@@ -167,7 +169,7 @@ def write_csv_julia(box,name):
         writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         # swet up googleOCR csv output
-        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk']
+        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk','angle_projectedLine']
         writer2 = csv.DictWriter(csv_output2, fieldnames=fieldnames2, delimiter='\t')
         writer2.writeheader()
 
@@ -194,6 +196,7 @@ def write_csv_julia(box,name):
                             ctpn_pk = boundingBox.pk
                             break
 
+                    lat_projectedLine, lon_projectedLine, angle_projectedLine = calculate_projected_line(googleOCR.streetviewImage.fov * 3,word['boundingBox'],googleOCR.streetviewImage.heading,googleOCR.streetviewImage.mapPoint.latitude,googleOCR.streetviewImage.mapPoint.longitude)
                     writer2.writerow({
                                      'googleOCR_pk':   googleOCR.pk, \
                                      'image_url':       googleOCR.streetviewImage.image_url(), \
@@ -207,6 +210,7 @@ def write_csv_julia(box,name):
                                      'address':     googleOCR.streetviewImage.mapPoint.address, \
                                      'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (googleOCR.streetviewImage.pk,word['boundingBox'][0], word['boundingBox'][1], word['boundingBox'][2], word['boundingBox'][3]) , \
                                      'ctpn_pk':     ctpn_pk, \
+                                     'angle_projectedLine': angle_projectedLine, \
                                     })
 
 
