@@ -77,7 +77,7 @@ def write_csv_bob():
         writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         # swet up googleOCR csv output
-        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk','angle_projectedLine']
+        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk']
         writer2 = csv.DictWriter(csv_output2, fieldnames=fieldnames2, delimiter='\t')
         writer2.writeheader()
 
@@ -133,7 +133,6 @@ def write_csv_bob():
                                          'address':     googleOCR.streetviewImage.mapPoint.address, \
                                          'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (googleOCR.streetviewImage.pk,word['boundingBox'][0], word['boundingBox'][1], word['boundingBox'][2], word['boundingBox'][3]) , \
                                          'ctpn_pk':     ctpn_pk, \
-                                         'angle_projectedLine': angle_projectedLine, \
                                         })
 
 
@@ -169,7 +168,7 @@ def write_csv_julia(box,name):
         writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         # swet up googleOCR csv output
-        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk','angle_projectedLine']
+        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk']
         writer2 = csv.DictWriter(csv_output2, fieldnames=fieldnames2, delimiter='\t')
         writer2.writeheader()
 
@@ -210,7 +209,6 @@ def write_csv_julia(box,name):
                                      'address':     googleOCR.streetviewImage.mapPoint.address, \
                                      'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (googleOCR.streetviewImage.pk,word['boundingBox'][0], word['boundingBox'][1], word['boundingBox'][2], word['boundingBox'][3]) , \
                                      'ctpn_pk':     ctpn_pk, \
-                                     'angle_projectedLine': angle_projectedLine, \
                                     })
 
 
