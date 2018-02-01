@@ -6,6 +6,29 @@ import statistics
 import json
 import ast
 
+class ParcelBoundarySegment(models.Model):
+    endpoint1_lat = models.FloatField() # A.x
+    endpoint1_lng = models.FloatField() # A.y
+    endpoint2_lat = models.FloatField() # B.x
+    endpoint2_lng = models.FloatField() # B.y
+    AIN = models.IntegerField()
+
+    def __str__(self):
+        return str(self.lnglat())
+
+    def lnglat(self):
+        return {'endpoint1_lat':self.endpoint1_lat, \
+                'endpoint1_lng':self.endpoint1_lng, \
+                'endpoint2_lat':self.endpoint2_lat, \
+                'endpoint2_lng':self.endpoint2_lng, \
+               }
+
+    def A(self):
+        return endpoint1_lat,endpoint1_lng
+    def B(self):
+        return endpoint2_lat,endpoint2_lng
+
+
 class CrawlerQueueEntry(models.Model):
     panoID = models.TextField()
     time = models.DateTimeField(auto_now_add=True)
