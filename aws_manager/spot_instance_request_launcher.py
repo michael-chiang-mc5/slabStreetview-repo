@@ -17,7 +17,7 @@ if open_or_active_request == 0:
     print("no open/active requests, opening new request")
     response = client.request_spot_instances(
         InstanceCount=1,
-        SpotPrice='0.21',
+        SpotPrice='0.36',
         Type='one-time',
         LaunchSpecification={
             'ImageId': 'ami-289fb148',
