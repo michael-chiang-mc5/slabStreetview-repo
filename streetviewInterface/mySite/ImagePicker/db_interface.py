@@ -78,7 +78,7 @@ def write_csv_bob():
         writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         # swet up googleOCR csv output
-        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk']
+        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk','AIN']
         writer2 = csv.DictWriter(csv_output2, fieldnames=fieldnames2, delimiter='\t')
         writer2.writeheader()
 
@@ -121,6 +121,10 @@ def write_csv_bob():
                                 break
 
                         lat_projectedLine, lon_projectedLine, angle_projectedLine = calculate_projected_line(googleOCR.streetviewImage.fov * 3,word['boundingBox'],googleOCR.streetviewImage.heading,googleOCR.streetviewImage.mapPoint.latitude,googleOCR.streetviewImage.mapPoint.longitude)
+                        lat_camera = googleOCR.streetviewImage.mapPoint.latitude
+                        lon_camera = googleOCR.streetviewImage.mapPoint.longitude
+                        AIN = get_intersecting_AIN(lat_camera,lon_camera,lat_projectedLine,lon_projectedLine)
+
                         writer2.writerow({
                                          'googleOCR_pk':   googleOCR.pk, \
                                          'image_url':       googleOCR.streetviewImage.image_url(), \
@@ -136,6 +140,7 @@ def write_csv_bob():
                                          'ctpn_pk':     ctpn_pk, \
                                          'lat_projectedLine': lat_projectedLine, \
                                          'lon_projectedLine': lon_projectedLine, \
+                                         'AIN': AIN, \
                                         })
 
 

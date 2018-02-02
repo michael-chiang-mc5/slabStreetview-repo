@@ -13,7 +13,7 @@ from time import sleep
 
 #interface_url = "http://127.0.0.1:8000/"
 #AWS_BUCKET_NAME = 'slab-streetview-debug'
-interface_url = "http://104.131.145.75/"
+interface_url = "http://104.131.145.75:8888/"
 AWS_BUCKET_NAME = 'slab-streetview'
 text_file = open("log.txt", "w")
 
