@@ -3,7 +3,7 @@ import geopy
 from geopy.distance import VincentyDistance
 
 def calculate_projected_line(image_fov,boundingBox,heading,lat_camera,lon_camera):
-    distance = 70 # length of search line
+    distance = 200 # length of search line
     referencePixel = 960 # dimX / 2
 
     FOV = int(image_fov/2)

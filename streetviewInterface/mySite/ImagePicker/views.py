@@ -310,6 +310,56 @@ def dumpDB():
                                 })
 
 def write_mapPoint():
+    with open('media/MapPoints.csv', 'w') as csvfile:
+        fieldnames = ['pk', 'latitude', 'longitude', 'num_boundingboxes','size_boundingboxes','zone_code','census_tracts','en_count','es_count','ko_count','zh_count']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+        #mapPoints = MapPoint.objects.filter(streetviewimage__image_is_set=True).distinct()
+
+        # get mapPoints where:
+        #    mapPoint is associated with exactly two streetview images whose images are set
+        #    mapPoint is associated with at least 1 CTPN boundingBoxes object (nil is ok)
+        #mapPoints = MapPoint.objects.extra(  select={'image_count':       'SELECT COUNT(*) FROM imagepicker_streetviewimage WHERE imagepicker_streetviewimage.mappoint_id = imagepicker_mappoint.id AND imagepicker_streetviewimage.image_is_set = 1',},
+        #                                     where=['image_count = 2']
+        #                            ).filter(streetviewimage__boundingbox__method="CTPN").filter(censusblock__isnull=False).distinct()
+        mapPoints = MapPoint.objects.extra(  select={'image_count':       'SELECT COUNT(*) FROM imagepicker_streetviewimage WHERE imagepicker_streetviewimage.mappoint_id = imagepicker_mappoint.id AND imagepicker_streetviewimage.image_is_set = 1',},
+                                     where=['image_count = 2']).distinct()
+
+
+        for mapPoint in mapPoints:
+            #try:
+            #    en_count = mapPoint.count_language()['en']
+            #    es_count = mapPoint.count_language()['es']
+            #    ko_count = mapPoint.count_language()['ko']
+            #    zh_count = mapPoint.count_language()['zh']
+            #except:
+            #    en_count = ""
+            #    es_count = ""
+            #    ko_count = ""
+            #    zh_count = ""
+
+            writer.writerow({'pk':                  mapPoint.pk, \
+                             'latitude':            mapPoint.latitude, \
+                             'longitude':           mapPoint.longitude, \
+
+                             #'num_boundingboxes':   mapPoint.get_num_CTPN_boundingBoxes(), \
+                             #'size_boundingboxes':  mapPoint.get_size_CTPN_boundingBoxes(), \
+                             #'zone_code':           mapPoint.get_zone_code(), \
+                             #'census_tracts':       mapPoint.get_census_tracts(), \
+                             #'en_count':            en_count, \
+                             #'es_count':            es_count, \
+                             #'ko_count':            ko_count, \
+                             #'zh_count':            zh_count, \
+
+                             #'photographerHeading': mapPoint.photographerHeading, \
+                             #'panoID':              mapPoint.panoID, \
+                             #'tag':                 mapPoint.tag, \
+                             #'num_links':           mapPoint.num_links, \
+                             #'address':             mapPoint.address, \
+                             #'neighbors_panoID':      list(mapPoint.neighbors.all().values_list('panoID')) , \
+                            })
+
+def write_mapPoint_deprecated():
     with open('output/MapPoints.csv', 'w') as csvfile:
         fieldnames = ['pk', 'latitude', 'longitude', 'num_boundingboxes','size_boundingboxes','zone_code','census_tracts','en_count','es_count','ko_count','zh_count']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')

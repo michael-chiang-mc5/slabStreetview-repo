@@ -6,15 +6,36 @@ import statistics
 import json
 import ast
 
+class ParcelBoundary(models.Model):
+    AIN = models.IntegerField()
+    lng = models.FloatField(db_index=True) # A.x
+    lat = models.FloatField(db_index=True) # A.y
+    segments = models.TextField(null=True) # JSON-serialized (text) version of your list
+
+    def store_segments(self,l):
+        self.segments = json.dumps(l)
+    def decode_segments(self):
+        jsonDec = json.decoder.JSONDecoder()
+        return jsonDec.decode(self.segments)
+    def __str__(self):
+        return self.segments
+    def calculate_latlng(self):
+        segments_list = self.decode_segments()
+        average = [sum(y) / len(y) for y in zip(*segments_list)] # [lat,lng]
+        self.lat = average[0]
+        self.lng = average[1]
+
+
+
 class ParcelBoundarySegment(models.Model):
-    endpoint1_lat = models.FloatField() # A.x
-    endpoint1_lng = models.FloatField() # A.y
+    endpoint1_lat = models.FloatField(db_index=True) # A.x
+    endpoint1_lng = models.FloatField(db_index=True) # A.y
     endpoint2_lat = models.FloatField() # B.x
     endpoint2_lng = models.FloatField() # B.y
     AIN = models.IntegerField()
 
     def __str__(self):
-        return str(self.lnglat())
+        return "{},{} to {},{}".format(self.endpoint1_lat,self.endpoint1_lng,self.endpoint2_lat,self.endpoint2_lng)
 
     def lnglat(self):
         return {'endpoint1_lat':self.endpoint1_lat, \
@@ -24,9 +45,9 @@ class ParcelBoundarySegment(models.Model):
                }
 
     def A(self):
-        return endpoint1_lat,endpoint1_lng
+        return self.endpoint1_lat,self.endpoint1_lng
     def B(self):
-        return endpoint2_lat,endpoint2_lng
+        return self.endpoint2_lat,self.endpoint2_lng
 
 
 class CrawlerQueueEntry(models.Model):
