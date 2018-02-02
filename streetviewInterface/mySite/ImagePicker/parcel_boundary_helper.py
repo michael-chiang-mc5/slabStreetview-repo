@@ -54,53 +54,6 @@ def get_intersecting_AIN(lat1,lng1,lat2,lng2):
         print(best_pb.AIN)
         return best_pb.AIN
 
-# print out endpoint
-# lat1,lng1 = camera
-def adsf_deprecated(lng1,lat1,lng2,lat2):
-    print("starting...")
-    #print(ParcelBoundarySegment.objects.count())
-
-    eps = 0.01
-    # filter only on 1 endpoint for speed
-    pbss = ParcelBoundarySegment.objects.filter(endpoint1_lng__lt=eps+lng1 , \
-                                         endpoint1_lng__gt=-eps+lng1, \
-                                         endpoint1_lat__lt=eps+lat1 , \
-                                         endpoint1_lat__gt=-eps+lat1, \
-                                         )
-    #print(pbss.count())
-    print("done with filter")
-    line_projection = ParcelBoundarySegment(endpoint1_lng=lng1, \
-                                            endpoint1_lat=lat1, \
-                                            endpoint2_lng=lng2, \
-                                            endpoint2_lat=lat2, \
-                                            )
-
-
-
-    bf = [] # store distance and AIN
-    max_d = 99999999999
-    best_pbs = None
-    for pbs in pbss:
-        lines_intersect = intersect(pbs.A(),pbs.B(),line_projection.A(),line_projection.B())
-        if lines_intersect:
-            print(pbs.endpoint1_lat,',',pbs.endpoint1_lng)
-            print(pbs.endpoint2_lat,',',pbs.endpoint2_lng)
-            # calculate intersection point
-            px,py = calculate_intersection_point(lat1,lng1,lat2,lng2, \
-                                                 pbs.endpoint1_lat,pbs.endpoint1_lng,pbs.endpoint2_lat,pbs.endpoint2_lng)
-
-            #print('px,py=',px,py)
-            # calculate distance from camera to intersection
-            d = vincenty( (lat1,lng1), (px,py)).miles
-            if d<max_d:
-                max_d = d
-                best_pbs = pbs
-    print("****")
-    print(best_pbs.endpoint1_lat,',',best_pbs.endpoint1_lng)
-    print(best_pbs.endpoint2_lat,',',best_pbs.endpoint2_lng)
-    print(best_pbs.AIN)
-    return best_pbs.AIN
-
 
 def calculate_intersection_point(x1,y1,x2,y2,x3,y3,x4,y4):
     px =  ((x1*y2 - y1*x2)*(x3-x4) - (x1-x2)*(x3*y4 - y3*x4)) / ( (x1-x2)*(y3-y4) - (y1-y2)*(x3-x4) )
@@ -186,89 +139,10 @@ def import_parcel_boundary_to_db(csv_path=None):
         print('cnt=',cnt)
         print(ParcelBoundary.objects.count())
 
-# Deletes all previous parcel boundary line segments
-# Imports new parcel boundary line segments from csv to db
-def import_parcel_boundary_to_db_deprecated(csv_path=None):
-    print('starting import...')
-    ParcelBoundarySegment.objects.all().delete()
-    if csv_path is None:
-        csv_path = 'media/PARCELS2015.csv'
-    if not os.path.isfile(csv_path):
-       print("File path {} does not exist. Exiting...".format(csv_path))
-       sys.exit()
-
-    with open(csv_path) as fp:
-        next(fp) # skip csv header on first line
-        cnt = 1
-        pbs_bf = []
-
-        t = time.time()
-        for line in fp:
-            # make sure multipolygon is formatted in a way we can reader
-            if not 'MULTIPOLYGON (((' in line:
-                print('{} not formatted correctly in {} (line {})'.format(line,csv_path,cnt))
-                continue
-            if not ')))"' in line:
-                print('{} not formatted correctly in {} (line {})'.format(line,csv_path,cnt))
-                continue
-
-
-            multipolygon_str = line.split('",')[0] # extract multipolygon
-            try:
-                AIN = int(line.split('",')[1].split(',')[0])
-            except:
-                continue
-            # get nested polygons
-            bf = ''
-            for ch in multipolygon_str:
-                if ch is '(':
-                    bf = ''
-                    continue
-                if ch is ')':
-                    if len(bf) is 0:
-                        continue
-                    pbs_list = parse_bf_helper(bf,AIN) # get list of pbs in str buffer
-                    pbs_bf += pbs_list # concatenate
-                    if len(pbs_bf) > 99999:
-                        print('writing to db, cnt' , cnt)
-                        ParcelBoundarySegment.objects.bulk_create(pbs_bf)
-                        print(time.time() - t)
-                        t=time.time()
-                        #print(bf)
-                        #print(ParcelBoundarySegment.objects.filter(AIN=AIN).count())
-                        pbs_bf = []
-                    bf = ''
-                    continue
-                bf += ch
-
-            cnt += 1
-        ParcelBoundarySegment.objects.bulk_create(pbs_bf)
-        print('cnt=',cnt)
-        print(ParcelBoundarySegment.objects.count())
-
 def parse_bf_helper(bf):
     s = bf.split(',')
     rn = []
     for point_str in s:
         point_float = [ float(point_str.split(' ')[-1]),  float(point_str.split(' ')[-2])   ]   # [lat,lng]
         rn.append(point_float)
-    return rn
-
-def parse_bf_helper_deprecated(bf,AIN):
-    s = bf.split(',')
-    rn = []
-    for idx in range(len(s)-1):
-        endpoint1 = s[idx]
-        endpoint1_lng = float(endpoint1.split(' ')[-2])
-        endpoint1_lat = float(endpoint1.split(' ')[-1])
-        endpoint2 = s[idx+1]
-        endpoint2_lng = float(endpoint2.split(' ')[-2])
-        endpoint2_lat = float(endpoint2.split(' ')[-1])
-        pbs = ParcelBoundarySegment(endpoint1_lng=endpoint1_lng, \
-                              endpoint1_lat=endpoint1_lat, \
-                              endpoint2_lng=endpoint2_lng, \
-                              endpoint2_lat=endpoint2_lat, \
-                              AIN=AIN, \
-                              )
-        rn.append(pbs)
     return rn
