@@ -78,7 +78,7 @@ def import_parcel_boundary_to_db(csv_path=None):
        max_lng = MapPoint.objects.filter().values_list('name').annotate(Min('longitude')).order_by('longitude')[0]
        bounding_box = [[min_lat,minlng],[max_lat,max_lng]]
 
-       bounding_box = [[33.954406,-118.385114],[34.163178,-117.966947]]
+       #bounding_box = [[33.954406,-118.385114],[34.163178,-117.966947]]
 
     with open(csv_path) as fp:
         next(fp) # skip csv header on first line
