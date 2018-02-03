@@ -66,7 +66,7 @@ def import_parcel_boundary_to_db(csv_path=None):
     ParcelBoundary.objects.all().delete()
     print('done with delete')
     if csv_path is None:
-        csv_path = 'media/temp.csv'
+        csv_path = 'media/PARCELS2015.csv'
     if not os.path.isfile(csv_path):
        print("File path {} does not exist. Exiting...".format(csv_path))
        sys.exit()
