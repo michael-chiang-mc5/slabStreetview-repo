@@ -66,16 +66,16 @@ def import_parcel_boundary_to_db(csv_path=None):
     ParcelBoundary.objects.all().delete()
     print('done with delete')
     if csv_path is None:
-        csv_path = 'media/PARCELS2015.csv'
+        csv_path = 'media/temp.csv'
     if not os.path.isfile(csv_path):
        print("File path {} does not exist. Exiting...".format(csv_path))
        sys.exit()
 
     # we will only read in parcels that fall within bounding box defined by MapPoints.
-    min_lat = MapPoint.objects.filter().values_list('latitude').annotate(Min('latitude')).order_by('latitude')[0]
-    min_lng = MapPoint.objects.filter().values_list('longitude').annotate(Min('longitude')).order_by('longitude')[0]
-    max_lat = MapPoint.objects.filter().values_list('latitude').annotate(Min('latitude')).order_by('latitude')[0]
-    max_lng = MapPoint.objects.filter().values_list('longitude').annotate(Min('longitude')).order_by('longitude')[0]
+    min_lat = MapPoint.objects.filter().values_list('latitude').annotate(Min('latitude')).order_by('latitude').first()[0]
+    min_lng = MapPoint.objects.filter().values_list('longitude').annotate(Min('longitude')).order_by('longitude').first()[0]
+    max_lat = MapPoint.objects.filter().values_list('latitude').annotate(Min('latitude')).order_by('latitude').last()[0]
+    max_lng = MapPoint.objects.filter().values_list('longitude').annotate(Min('longitude')).order_by('longitude').last()[0]
     bounding_box = [[min_lat,min_lng],[max_lat,max_lng]]
     print(bounding_box)
 
