@@ -78,7 +78,8 @@ def write_csv_bob():
         writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         # swet up googleOCR csv output
-        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk','AIN']
+        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', \
+                       'address','overlay_url','ctpn_pk','lon_projectedLine','lat_projectedLine','AIN']
         writer2 = csv.DictWriter(csv_output2, fieldnames=fieldnames2, delimiter='\t')
         writer2.writeheader()
 
