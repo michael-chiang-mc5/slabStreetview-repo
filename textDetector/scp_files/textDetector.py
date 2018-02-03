@@ -23,7 +23,6 @@ text_detector=TextDetector(text_proposals_detector)
 interface_url = "http://104.131.145.75:8888/"
 metadata = interface_url + "ImagePicker/list_CTPN_metadata/"
 data = urllib.urlopen(metadata)
-#data = ['81\thttp://104.131.145.75/media/81.jpg']
 
 for line in data: # each line is pk, image_url
     line = line.decode("utf-8").split('\t')

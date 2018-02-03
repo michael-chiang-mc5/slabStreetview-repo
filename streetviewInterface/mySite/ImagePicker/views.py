@@ -87,7 +87,7 @@ def julia_harten_csv_deprecated():
             writer.writerow({'ctpn_pk': boundingBox.pk, \
                              'boundingBox': [boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2], \
                              'image_url': boundingBox.streetviewImage.image_url(), \
-                             'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (boundingBox.streetviewImage.pk,boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2) , \
+                             'overlay_url': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (boundingBox.streetviewImage.pk,boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2) , \
                              })
 
     with open('media/googleOCR_koreatown.csv', 'w') as csvfile:
@@ -122,7 +122,7 @@ def julia_harten_csv_deprecated():
                                  'longitude':    googleOCR.streetviewImage.mapPoint.longitude, \
                                  'latitude':    googleOCR.streetviewImage.mapPoint.latitude, \
                                  'address':     googleOCR.streetviewImage.mapPoint.address, \
-                                 'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (googleOCR.streetviewImage.pk,word['boundingBox'][0], word['boundingBox'][1], word['boundingBox'][2], word['boundingBox'][3]) , \
+                                 'overlay_url': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (googleOCR.streetviewImage.pk,word['boundingBox'][0], word['boundingBox'][1], word['boundingBox'][2], word['boundingBox'][3]) , \
                                  'ctpn_pk':     ctpn_pk, \
                                 })
 
