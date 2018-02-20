@@ -170,8 +170,18 @@ def generate_signs():
         print('generating signs for googleOCR=',googleOCR.pk)
         googleOCR.generate_signs()
 
-def write_csv_sign():
-    with open('media/signs.csv', 'w') as csv_output:
+def write_csv_sign(box,name):
+    lon1 = box['lon1']
+    lon2 = box['lon2']
+    lat1 = box['lat1']
+    lat2 = box['lat2']
+
+    signs = Sign.objects.filter(boundingBox__streetviewImage__mapPoint__longitude__gte=min(lon1,lon2)) \
+                        .filter(boundingBox__streetviewImage__mapPoint__longitude__lte=max(lon1,lon2)) \
+                        .filter(boundingBox__streetviewImage__mapPoint__latitude__gte=min(lat1,lat2)) \
+                        .filter(boundingBox__streetviewImage__mapPoint__latitude__lte=max(lat1,lat2))
+
+    with open('media/'+name+'_signs.csv', 'w') as csv_output:
         # set up ctpn csv output
         fieldnames = ['overlay_oneBox' , 'overlay_allBoxes', \
                       'text', 'longitude', 'latitude', 'address', 'AIN', 'distance_to_AIN', \
@@ -179,7 +189,7 @@ def write_csv_sign():
         writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
 
-        for sign in Sign.objects.all():
+        for sign in signs:
             writer.writerow({
                              'overlay_oneBox': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d/' % (sign.boundingBox.streetviewImage.pk,sign.boundingBox.x1, sign.boundingBox.x2, sign.boundingBox.y1, sign.boundingBox.y2) , \
                              'overlay_allBoxes': 'http://104.131.145.75:8888/ImagePicker/listImage/%d/' % (sign.boundingBox.streetviewImage.pk), \
