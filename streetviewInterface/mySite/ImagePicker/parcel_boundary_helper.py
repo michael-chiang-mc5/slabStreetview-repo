@@ -43,16 +43,16 @@ def get_intersecting_AIN(lat1,lng1,lat2,lng2):
                                                      endpoint1[0],endpoint1[1],endpoint2[0],endpoint2[1])
                 #print('px,py=',px,py)
                 # calculate distance from camera to intersection
-                d = vincenty( (lat1,lng1), (px,py)).miles
+                d = vincenty( (lat1,lng1), (px,py)).feet
                 if d<max_d:
                     max_d = d
                     best_pb = pb
 
     if best_pb is None:
-        return None
+        return None,None
     else:
         print(best_pb.AIN)
-        return best_pb.AIN
+        return best_pb.AIN, max_d
 
 
 def calculate_intersection_point(x1,y1,x2,y2,x3,y3,x4,y4):

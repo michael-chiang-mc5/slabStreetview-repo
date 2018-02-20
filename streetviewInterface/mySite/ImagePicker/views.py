@@ -178,9 +178,15 @@ def boundingBox_expanded(request,boundingBox_pk):
     img.save(response, "JPEG")
     return response
 
-def listImage(request):
-    streetviewImages = StreetviewImage.objects.all()
+def listImage(request,streetviewImage_pk):
+    streetviewImage = StreetviewImage.objects.get(pk=streetviewImage_pk)
+    context = {'streetviewImage':streetviewImage}
+    return render(request, 'ImagePicker/listImage.html',context)
 
+
+
+def listImages(request):
+    streetviewImages = StreetviewImage.objects.all()
     page = request.GET.get('page', 1)
     paginator = Paginator(streetviewImages, 10)
     try:
@@ -191,8 +197,7 @@ def listImage(request):
         streetviewImages_page = paginator.page(paginator.num_pages)
 
     context = {'streetviewImages':streetviewImages_page}
-
-    return render(request, 'ImagePicker/listImage.html',context)
+    return render(request, 'ImagePicker/listImages.html',context)
 
 # Takes POST data
 # saves mapPoint

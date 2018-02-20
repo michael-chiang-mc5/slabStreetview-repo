@@ -5,6 +5,8 @@ import requests
 import statistics
 import json
 import ast
+from .FindAngle_aradya import calculate_projected_line
+
 
 class ParcelBoundary(models.Model):
     AIN = models.IntegerField()
@@ -337,15 +339,79 @@ class Pending(models.Model):
         if time_elapse.total_seconds() > 86400 and is_corrupted is not False: # one day
             self.delete()
 
+
+
 class GoogleOCR(models.Model):
     streetviewImage = models.ForeignKey(StreetviewImage)
     json_text = models.TextField()
+    signs_generated = models.BooleanField(default=False)
+
+    def generate_Sign(self):
+        """
+        creates appropriate Sign objects
+        """
+
     def __str__(self):
         return self.json_text
     def json(self):
         s = self.json_text
         json_data = ast.literal_eval(s)
         return json_data[0]
+
+    def generate_signs(self):
+        # don't generate signs if we already generated them before
+        if self.signs_generated:
+            return
+
+        data = self.json()
+        if len(data)==0:
+            return []
+
+        print('streetviewImage=',self.streetviewImage.pk)
+        textAnnotations = text = data['textAnnotations']
+        ctpns = BoundingBox.objects.filter(streetviewImage=self.streetviewImage)
+
+        sign_dict = {}
+
+
+        for textAnnotation in textAnnotations[1:]:
+            text = textAnnotation['description']
+            box = self.sanitize_vertices(textAnnotation['boundingPoly']['vertices'])
+            #print(text, box)
+            x_avg = (box[0] + box[1])/2
+            y_avg = (box[2] + box[3])/2
+
+            for ctpn in ctpns:
+                inside = ctpn.isInside(x_avg,y_avg)
+                if inside:
+                    if str(ctpn.pk) in sign_dict.keys():
+                        sign_dict[str(ctpn.pk)] += " " + text
+                    else:
+                        sign_dict[str(ctpn.pk)] = text
+                    break
+
+
+        # store in sign object
+        for key in sign_dict.keys():
+            boundingBox_pk = int(key)
+            text = sign_dict[key]
+            sign = Sign(text=text,boundingBox=BoundingBox.objects.get(pk=boundingBox_pk))
+            sign.set_AIN()
+            sign.save()
+            self.signs_generated = True
+            self.save()
+
+
+
+
+
+#        for ctpn in ctpns:
+#            inside = ctpn.isInside(x_avg,y_avg)
+            #print(x_avg,y_avg)
+            #print(ctpn.x1,ctpn.x2,ctpn.y1,ctpn.y2)
+            #print(inside)
+
+        return
 
     # helper function for words()
     def naive_words(self):
@@ -359,7 +425,7 @@ class GoogleOCR(models.Model):
         for block in blocks:
             words = block['paragraphs'][0]['words']
             for word in words:
-                boundingBox = GoogleOCR.sanitize_vertices(word['boundingBox']['vertices'])
+                boundingBox = self.sanitize_vertices(word['boundingBox']['vertices'])
                 locale = word['property']['detectedLanguages'][0]['languageCode']
                 if 'zh' in locale:
                     locale='zh'
@@ -405,7 +471,7 @@ class GoogleOCR(models.Model):
             rn[language] = len(asdf)
         return rn
 
-    def sanitize_vertices(vertices):
+    def sanitize_vertices(self, vertices):
         tmp = {}
         for idx in range(0,4):
             tmp.update({idx: {}})
@@ -422,6 +488,8 @@ class GoogleOCR(models.Model):
         return [x1,x2,y1,y2]
 
 
+
+from .parcel_boundary_helper import *
 class BoundingBox(models.Model):
     """
     CTPN bounding box
@@ -434,6 +502,33 @@ class BoundingBox(models.Model):
     y2 = models.IntegerField()
     score = models.FloatField(null=True, blank=True)
     is_nil = models.BooleanField(default=False)
+    AIN = models.IntegerField(null=True, blank=True)
+    distance_to_AIN = models.IntegerField(null=True, blank=True) # units = feet
+
+    def box(self):
+        return [self.x1, self.x2, self.y1, self.y2]
+
+    def set_AIN(self):
+        if self.AIN is None:
+            lat_projectedLine, lon_projectedLine, angle_projectedLine \
+                    = calculate_projected_line(self.streetviewImage.fov * 3, \
+                      [self.x1, self.x2, self.y1, self.y2], \
+                      self.streetviewImage.heading, \
+                      self.streetviewImage.mapPoint.latitude, \
+                      self.streetviewImage.mapPoint.longitude)
+            lat_camera = self.streetviewImage.mapPoint.latitude
+            lon_camera = self.streetviewImage.mapPoint.longitude
+            self.AIN,self.distance = get_intersecting_AIN(lat_camera,lon_camera,lat_projectedLine,lon_projectedLine)
+        else:
+            print("AIN already set")
+
+    def isInside(self,x,y):
+        if x >= self.x1 and x <= self.x2 and y>=self.y1 and y<=self.y2:
+            return True
+        else:
+            return False
+    def midpoint(self):
+        return (x1+x2)/2,(y1+y2)/2
 
     def area(self):
         return self.width()*self.height()
@@ -517,46 +612,22 @@ class BoundingBox(models.Model):
         # return
         return {'language_manual':language_manual,'language_ocr':language_ocr,'location':tag}
 
-    def benchmark_deprecated(self):
+class Sign(models.Model):
+    """
+    Corresponds to a single row in final csv file
+    """
+    text = models.TextField()
+    boundingBox = models.ForeignKey(BoundingBox)
 
-        # manual locale annotation
-        ocrText_manual = OcrText.objects.filter(boundingBox=self).filter(method="manual")
-        if len(ocrText_manual) == 1:
-            dictionary_manual = {'english':'english','spanish':'spanish', \
-                                 'chinese':'chinese','japanese':'japanese', \
-                                 'korean':'korean','thai':'thai'}
-            manual_locale = ocrText_manual[0].locale
-            try:
-                language_manual = dictionary_manual[manual_locale]
-            except:
-                language_manual = 'other'
-        else:
-            language_manual = None
+    def __str__(self):
+        return self.text
+    def set_AIN(self):
+        self.boundingBox.set_AIN()
+    def AIN(self):
+        return self.boundingBox.AIN
+    def distance_to_AIN(self):
+        return self.boundingBox.distance_to_AIN
 
-        # automatic google ocr annotation
-        ocrText_ocr    = OcrText.objects.filter(boundingBox=self).filter(method="google")
-        if len(ocrText_ocr) == 1:
-            dictionary_ocr    = {'locale=en':'english','locale=es':'spanish', \
-                                 'locale=zh':'chinese','locale=jp':'japanese', \
-                                 'locale=ko':'korean' ,'locale=th':'thai'}
-            ocr_locale    = ocrText_ocr[0].locale
-            if 'locale=zh' in ocr_locale:
-                ocr_locale = 'locale=zh'
-            try:
-                language_ocr = dictionary_ocr[ocr_locale]
-            except:
-                language_ocr = 'other'
-        else:
-            language_ocr = None
-
-        # location tag
-        try:
-            tag = self.streetviewImage.mapPoint.tag
-        except:
-            tag = None
-
-        # return
-        return {'language_manual':language_manual,'language_ocr':language_ocr,'location':tag}
 
 class OcrText(models.Model):
     boundingBox = models.ForeignKey(BoundingBox) # each image can have multiple bounding boxes

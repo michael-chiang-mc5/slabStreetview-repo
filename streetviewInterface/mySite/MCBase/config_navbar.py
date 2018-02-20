@@ -1,7 +1,5 @@
 website_name = "slabDB"
-#left_side_nav = ['crawler','imagePicker','routePicker','listImage','listBoundingBox','adminPanel','benchmarkingPanel']
-#left_side_href = ['ImagePicker:crawler','ImagePicker:picker','ImagePicker:routePicker','ImagePicker:listImage','ImagePicker:listBoundingBox','ImagePicker:adminPanel','ImagePicker:benchmarkingPanel']
-left_side_nav = ['crawler','listImage','listBoundingBox','adminPanel','benchmarkingPanel']
+left_side_nav = ['crawler','listImages','listBoundingBox','adminPanel','benchmarkingPanel']
 
-left_side_href = ['ImagePicker:crawler','ImagePicker:listImage','ImagePicker:listBoundingBox', \
+left_side_href = ['ImagePicker:crawler','ImagePicker:listImages','ImagePicker:listBoundingBox', \
 'ImagePicker:adminPanel','ImagePicker:benchmarkingPanel']

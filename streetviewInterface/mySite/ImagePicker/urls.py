@@ -14,7 +14,9 @@ urlpatterns = [
     url(r'^get_current_bfs_queue_item/$', views.get_current_bfs_queue_item, name='get_current_bfs_queue_item'),
     url(r'^initialize_bfs/$', views.initialize_bfs, name='initialize_bfs'),
     url(r'^savePoint/$', views.savePoint, name='savePoint'),
-    url(r'^listImage/$',  views.listImage, name='listImage'), #
+    url(r'^listImage/(?P<streetviewImage_pk>[0-9]+)/$',  views.listImage, name='listImage'), #
+    url(r'^listImages/$',  views.listImages, name='listImages'), #
+
     url(r'^read_mapPoint/$',  views.read_mapPoint, name='read_mapPoint'), #
 
     url(r'^list_CTPN_metadata/$',  views.list_CTPN_metadata, name='list_CTPN_metadata'), #

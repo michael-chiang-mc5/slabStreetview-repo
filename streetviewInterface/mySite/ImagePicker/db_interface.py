@@ -164,6 +164,42 @@ def set_priority_julia(box):
     set_priority_mapPoints(mapPoints)
     print('num high priority ', MapPoint.objects.filter(high_priority=True).count())
 
+
+def generate_signs():
+    for googleOCR in GoogleOCR.objects.all():
+        print('generating signs for googleOCR=',googleOCR.pk)
+        googleOCR.generate_signs()
+
+def write_csv_sign():
+    with open('media/signs.csv', 'w') as csv_output:
+        # set up ctpn csv output
+        fieldnames = ['overlay_oneBox' , 'overlay_allBoxes', \
+                      'text', 'longitude', 'latitude', 'address', 'AIN', 'distance_to_AIN', \
+                     ]
+        writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+
+        for sign in Sign.objects.all():
+            writer.writerow({
+                             'overlay_oneBox': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d/' % (sign.boundingBox.streetviewImage.pk,sign.boundingBox.x1, sign.boundingBox.x2, sign.boundingBox.y1, sign.boundingBox.y2) , \
+                             'overlay_allBoxes': 'http://104.131.145.75:8888/ImagePicker/listImage/%d/' % (sign.boundingBox.streetviewImage.pk), \
+                             'text':         sign.text, \
+                             'longitude':   sign.boundingBox.streetviewImage.mapPoint.longitude, \
+                             'latitude':    sign.boundingBox.streetviewImage.mapPoint.longitude, \
+                             'address':     sign.boundingBox.streetviewImage.mapPoint.address, \
+                             'AIN': sign.AIN(), \
+                             'distance_to_AIN': sign.distance_to_AIN(), \
+                            })
+
+
+
+
+
+
+
+
+
+
 def write_csv_julia(box,name):
     lon1 = box['lon1']
     lon2 = box['lon2']
