@@ -187,7 +187,8 @@ def write_csv_sign(box,name):
                       'text', 'longitude', 'latitude', 'address', 'AIN', 'distance_to_AIN', \
                       'language', \
                      ]
-        writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
+
+        writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter=',')
         writer.writeheader()
 
         for sign in signs:
@@ -195,13 +196,13 @@ def write_csv_sign(box,name):
             writer.writerow({
                              'overlay_oneBox': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d/' % (sign.boundingBox.streetviewImage.pk,sign.boundingBox.x1, sign.boundingBox.x2, sign.boundingBox.y1, sign.boundingBox.y2) , \
                              'overlay_allBoxes': 'http://104.131.145.75:8888/ImagePicker/listImage/%d/' % (sign.boundingBox.streetviewImage.pk), \
-                             'text':         sign.text, \
+                             'text':         sign.text.replace("\t","_").replace(",","_").replace(" ","_"), \
                              'longitude':   sign.boundingBox.streetviewImage.mapPoint.longitude, \
                              'latitude':    sign.boundingBox.streetviewImage.mapPoint.longitude, \
-                             'address':     sign.boundingBox.streetviewImage.mapPoint.address, \
+                             'address':     sign.boundingBox.streetviewImage.mapPoint.address.replace("\t","_").replace(",","_").replace(" ","_"), \
                              'AIN': sign.AIN(), \
                              'distance_to_AIN': sign.distance_to_AIN(), \
-                             'language': sign.language() \
+                             'language': sign.language().replace(" ","_") \
                             })
 
 
@@ -266,7 +267,7 @@ def write_csv_julia(box,name):
                                      'image_fov':       googleOCR.streetviewImage.fov * 3, \
                                      'boundingBox':    word['boundingBox'], \
                                      'locale':         word['locale'], \
-                                     'text':         word['text'], \
+                                     'text':         word['text'].replace(' ','_'), \
                                      'heading':      googleOCR.streetviewImage.heading, \
                                      'longitude':    googleOCR.streetviewImage.mapPoint.longitude, \
                                      'latitude':    googleOCR.streetviewImage.mapPoint.latitude, \
