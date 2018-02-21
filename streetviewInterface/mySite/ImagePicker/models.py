@@ -620,7 +620,7 @@ class Sign(models.Model):
     def __str__(self):
         return self.text
     def set_AIN(self):
-        self.boundingBox.set_AIN(force=True)
+        self.boundingBox.set_AIN()
         self.boundingBox.save()
     def AIN(self):
         return self.boundingBox.AIN
