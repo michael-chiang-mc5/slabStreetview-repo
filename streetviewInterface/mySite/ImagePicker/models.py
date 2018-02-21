@@ -360,8 +360,6 @@ class GoogleOCR(models.Model):
 
     def generate_signs(self):
         # don't generate signs if we already generated them before
-        if self.signs_generated:
-            return
 
         data = self.json()
         if len(data)==0:
@@ -623,6 +621,7 @@ class Sign(models.Model):
         return self.text
     def set_AIN(self):
         self.boundingBox.set_AIN()
+        self.boundingBox.save()
     def AIN(self):
         return self.boundingBox.AIN
     def distance_to_AIN(self):

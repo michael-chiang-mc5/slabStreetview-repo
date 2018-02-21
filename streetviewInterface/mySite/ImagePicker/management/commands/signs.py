@@ -23,5 +23,5 @@ class Command(BaseCommand):
         elif option == 'generate_signs':
             generate_signs()
         else:
-            print("Possible options: ")
+            print("Possible options: generate_signs, write_signs")
         sys.exit(0)

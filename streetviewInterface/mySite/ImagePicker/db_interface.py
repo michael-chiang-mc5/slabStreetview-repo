@@ -192,7 +192,7 @@ def write_csv_sign(box,name):
         writer.writeheader()
 
         for sign in signs:
-            #print(sign.text, sign.language())
+            print(sign.distance_to_AIN())
             writer.writerow({
                              'overlay_oneBox': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d/' % (sign.boundingBox.streetviewImage.pk,sign.boundingBox.x1, sign.boundingBox.x2, sign.boundingBox.y1, sign.boundingBox.y2) , \
                              'overlay_allBoxes': 'http://104.131.145.75:8888/ImagePicker/listImage/%d/' % (sign.boundingBox.streetviewImage.pk), \
