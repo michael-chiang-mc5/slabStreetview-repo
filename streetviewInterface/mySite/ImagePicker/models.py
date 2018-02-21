@@ -506,8 +506,8 @@ class BoundingBox(models.Model):
     def box(self):
         return [self.x1, self.x2, self.y1, self.y2]
 
-    def set_AIN(self):
-        if self.AIN is None:
+    def set_AIN(self,force=False):
+        if self.AIN is None or force is True:
             lat_projectedLine, lon_projectedLine, angle_projectedLine \
                     = calculate_projected_line(self.streetviewImage.fov * 3, \
                       [self.x1, self.x2, self.y1, self.y2], \
@@ -516,7 +516,7 @@ class BoundingBox(models.Model):
                       self.streetviewImage.mapPoint.longitude)
             lat_camera = self.streetviewImage.mapPoint.latitude
             lon_camera = self.streetviewImage.mapPoint.longitude
-            self.AIN,self.distance = get_intersecting_AIN(lat_camera,lon_camera,lat_projectedLine,lon_projectedLine)
+            self.AIN,self.distance_to_AIN = get_intersecting_AIN(lat_camera,lon_camera,lat_projectedLine,lon_projectedLine)
         else:
             print("AIN already set")
 
@@ -620,7 +620,7 @@ class Sign(models.Model):
     def __str__(self):
         return self.text
     def set_AIN(self):
-        self.boundingBox.set_AIN()
+        self.boundingBox.set_AIN(force=True)
         self.boundingBox.save()
     def AIN(self):
         return self.boundingBox.AIN
