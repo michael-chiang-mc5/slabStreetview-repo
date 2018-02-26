@@ -181,7 +181,7 @@ def write_csv_sign(box,name):
                         .filter(boundingBox__streetviewImage__mapPoint__latitude__gte=min(lat1,lat2)) \
                         .filter(boundingBox__streetviewImage__mapPoint__latitude__lte=max(lat1,lat2))
 
-    with open('media/'+name+'_signs.csv', 'w',1) as csv_output:
+    with open('media/'+name+'_signs.csv', 'w',50) as csv_output:
         # set up ctpn csv output
         fieldnames = ['overlay_oneBox' , 'overlay_allBoxes', \
                       'text', 'longitude', 'latitude', 'address', 'AIN', 'distance_to_AIN', \
