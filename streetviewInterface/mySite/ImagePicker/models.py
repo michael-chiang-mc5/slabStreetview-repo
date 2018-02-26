@@ -635,16 +635,21 @@ class Sign(models.Model):
         # check for korean/chinese letters
         count_ko = 0
         count_zh = 0
+        count_th = 0
         for c in list(self.text):
             lang = guess_language(c)
             if lang == 'ko':
                 count_ko += 1
             elif lang == 'zh':
                 count_zh += 1
+            elif lang == 'th':
+                count_th += 1
         if count_ko>=2:
             langs.append('ko')
         if count_zh>=2:
             langs.append('zh')
+        if count_th>=2:
+            langs.append('th')
 
         # check for english/spanish_match
         d = english_or_spanish(self.text,match_threshold=match_threshold)
