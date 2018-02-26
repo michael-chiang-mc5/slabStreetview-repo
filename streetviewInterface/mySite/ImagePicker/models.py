@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from .dictionary_search import *
 import requests
 import statistics
 import json
@@ -611,6 +610,7 @@ class BoundingBox(models.Model):
         return {'language_manual':language_manual,'language_ocr':language_ocr,'location':tag}
 
 from guess_language import guess_language
+from .dictionary_search import *
 class Sign(models.Model):
     """
     Corresponds to a single row in final csv file
@@ -626,28 +626,34 @@ class Sign(models.Model):
         return self.boundingBox.AIN
     def distance_to_AIN(self):
         return self.boundingBox.distance_to_AIN
-    def language(self):
+    def language(self,match_threshold=1):
         """
         https://stackoverflow.com/questions/39142778/python-how-to-determine-the-language
         """
-        #words = self.text.split(" ")
+        langs = []
 
+        # check for korean/chinese letters
         count_ko = 0
         count_zh = 0
-
         for c in list(self.text):
             lang = guess_language(c)
             if lang == 'ko':
                 count_ko += 1
             elif lang == 'zh':
                 count_zh += 1
-
-        langs = []
         if count_ko>=2:
             langs.append('ko')
-        elif count_zh>=2:
+        if count_zh>=2:
             langs.append('zh')
 
+        # check for english/spanish_match
+        d = english_or_spanish(self.text,match_threshold=match_threshold)
+        if d['english'] is True:
+            langs.append('en')
+        if d['spanish'] is True:
+            langs.append('es')
+
+        # return
         if len(langs)==0:
             return 'unknown'
         else:

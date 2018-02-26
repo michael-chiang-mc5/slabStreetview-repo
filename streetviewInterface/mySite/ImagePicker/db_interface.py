@@ -181,18 +181,18 @@ def write_csv_sign(box,name):
                         .filter(boundingBox__streetviewImage__mapPoint__latitude__gte=min(lat1,lat2)) \
                         .filter(boundingBox__streetviewImage__mapPoint__latitude__lte=max(lat1,lat2))
 
-    with open('media/'+name+'_signs.csv', 'w') as csv_output:
+    with open('media/'+name+'_signs.csv', 'w',1) as csv_output:
         # set up ctpn csv output
         fieldnames = ['overlay_oneBox' , 'overlay_allBoxes', \
                       'text', 'longitude', 'latitude', 'address', 'AIN', 'distance_to_AIN', \
-                      'language', \
+                      'language_worddist=0','language_worddist=1' \
                      ]
 
         writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter=',')
         writer.writeheader()
 
         for sign in signs:
-            print(sign.distance_to_AIN())
+            print(sign.text)
             writer.writerow({
                              'overlay_oneBox': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d/' % (sign.boundingBox.streetviewImage.pk,sign.boundingBox.x1, sign.boundingBox.x2, sign.boundingBox.y1, sign.boundingBox.y2) , \
                              'overlay_allBoxes': 'http://104.131.145.75:8888/ImagePicker/listImage/%d/' % (sign.boundingBox.streetviewImage.pk), \
@@ -202,7 +202,8 @@ def write_csv_sign(box,name):
                              'address':     sign.boundingBox.streetviewImage.mapPoint.address.replace("\t","_").replace(",","_").replace(" ","_"), \
                              'AIN': sign.AIN(), \
                              'distance_to_AIN': sign.distance_to_AIN(), \
-                             'language': sign.language().replace(" ","_") \
+                             'language_worddist=1': sign.language(), \
+                             'language_worddist=0': sign.language(match_threshold=0) \
                             })
 
 

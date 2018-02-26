@@ -19,7 +19,7 @@ def load_words(WORDLIST_FILENAME):
             for line in f:
                 # strip '\n', then append it to wordlist
                 wordlist.append(line.rstrip('\n'))
-       print(" ", len(wordlist), "words loaded.")
+      # print(" ", len(wordlist), "words loaded.")
        return wordlist
 
 
@@ -36,12 +36,11 @@ def load_words(WORDLIST_FILENAME):
 
 
 
-def filter_words(text_list):
-    MIN_LENGTH = 4
+def filter_words(text_list, word_min_length):
     out = []
     for text in text_list:
         omit = False
-        if len(text)<MIN_LENGTH:
+        if len(text)<word_min_length:
             omit = True
         for letter in text:
             if letter in '1234567890!@#$%^&*()':
@@ -53,36 +52,39 @@ def filter_words(text_list):
 
 # input:
 #     words: string
-def english_or_spanish(words):
-    words = re.split('&| |,|-',words)
-    words = filter_words(words)
+def english_or_spanish(words, word_min_length=4,match_threshold=1,word_count_threshold=1):
+    words = re.split('&| |,|-,|_|\n|\.',words) # split string
+    words = filter_words(words, word_min_length) # throw out words with numbers,
 
     dictionary_spanish = load_words('dictionaries/espanol_utf8.txt')
     dictionary_english = load_words('dictionaries/engmix.txt')
 
-    combined_spanish_distance = 0
-    combined_english_distance = 0
-    combined_spanish = "spanish = "
-    combined_english = "english = "
+    count_spanish = 0
+    count_english = 0
 
     for word in words:
+        # check if word is spanish
         spanish_match, spanish_distance = score_language(word,dictionary_spanish)
+        if spanish_distance<=match_threshold:
+            word_is_spanish = True
+        else:
+            word_is_spanish = False
+
+        # check if word is english
         english_match, english_distance = score_language(word,dictionary_english)
+        if english_distance<=match_threshold:
+            word_is_english = True
+        else:
+            word_is_english = False
 
-        combined_spanish_distance+=spanish_distance
-        combined_english_distance+=english_distance
-        combined_spanish+=spanish_match + '('+word+')* '
-        combined_english+=english_match + '('+word+')* '
+        if word_is_spanish and not word_is_english:
+            count_spanish += 1
+        if word_is_english and not word_is_spanish:
+            count_english += 1
 
-    if combined_spanish_distance<combined_english_distance:
-        best_language = 'spanish'
-    elif combined_spanish_distance>combined_english_distance:
-        best_language = 'english'
-    else:
-        best_language = 'equal english/spanish score'
-
-    notes = combined_spanish + " ////////////// " + combined_english
-    return best_language,notes
+    return {'english':count_english>=word_count_threshold, \
+            'spanish':count_spanish>=word_count_threshold, \
+            }
 
 def score_language(ocr_text,dictionary):
     start_time = time.time()
@@ -94,5 +96,5 @@ def score_language(ocr_text,dictionary):
             best_distance = d
             best_match    = word
     elapsed_time = time.time() - start_time
-    print(elapsed_time)
+    #print(elapsed_time)
     return best_match, best_distance
