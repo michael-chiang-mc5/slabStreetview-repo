@@ -16,7 +16,7 @@ class Command(BaseCommand):
         box_elmonte = {'lon1':-118.0633736043,'lat1':34.0625377556,'lon2':-118.0410432978,'lat2':34.0629210521}
 
         if option == 'write_signs':
-            #write_csv_sign(box_elmonte,'elmonte')
+            write_csv_sign(box_elmonte,'elmonte')
             write_csv_sign(box_thaitown,'thaitown')
             write_csv_sign(box_pico,'pico')
             write_csv_sign(box_koreatown,'koreatown')
