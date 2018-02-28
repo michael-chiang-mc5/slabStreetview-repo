@@ -2,18 +2,16 @@ from django.core.management.base import BaseCommand, CommandError
 from ImagePicker.views import *
 import sys
 class Command(BaseCommand):
-    help = 'deletes duplicate zone codes'
+    help = ''
 
     def handle(self, *args, **options):
 
-        #mapPoints = MapPoint.objects.all()
-        mapPoints = MapPoint.objects.filter(pk=69997)
-        for mapPoint in mapPoints:
-            try:
-                mapPoint.get_zone_code()
-            except:
-                tags = MapTag.objects.filter(mapPoint=mapPoint,tag_type="zoning")
-                tags.delete()
-                print(tags)
-                print(mapPoint.pk)
-        sys.exit(0)
+        # count the total number of signs
+        print('num sign=' , Sign.objects.count())
+
+        # Get the streetview images corresponding to signs
+        streetviewImages = Sign.objects.values_list('boundingBox__streetviewImage',flat=True).distinct()
+        print('num images=' , streetviewImages.count())
+
+        bb = BoundingBox.objects.filter(streetviewImage__in=streetviewImages)
+        print('num ctpn=', bb.count())
