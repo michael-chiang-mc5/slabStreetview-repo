@@ -671,7 +671,7 @@ def run_google_ocr_deprecated(max_api_calls):
     """
     Runs google ocr on 10 images with most CTPN boxes in each census tract
     """
-    max_count = 10 # max number of results per census tract
+    max_count = 30 # max number of results per census tract
     api_count = 0
 
     # get list of all census FIPS

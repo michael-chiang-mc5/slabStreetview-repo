@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from ImagePicker.views import run_google_ocr
 import sys
 class Command(BaseCommand):
-    help = 'python manage.py google_ocr maxCalls priority(1=True)'
+    help = 'python manage.py google_ocr maxCalls priority(0=False)\npython manage.py google_ocr 1000 0'
 
     def add_arguments(self, parser):
         parser.add_argument('max-api-calls', nargs=2, type=int)
