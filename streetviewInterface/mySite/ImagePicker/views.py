@@ -619,7 +619,7 @@ def deleteAllOcrLanguage(request):
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 
-def run_google_ocr(max_api_calls=None):
+def run_google_ocr(max_api_calls=None,priority=True):
     """
     runs google ocr on streetview images
     prioritize high_priority images
@@ -629,6 +629,11 @@ def run_google_ocr(max_api_calls=None):
     if max_api_calls is None:
         max_api_calls=1000
     api_count = 0
+
+    if priority is False:
+        run_google_ocr_deprecated(max_api_calls)
+        return
+
 
     mapPoints=MapPoint.objects.filter(high_priority=True)
     print(len(mapPoints), " high priority mapPoints")
