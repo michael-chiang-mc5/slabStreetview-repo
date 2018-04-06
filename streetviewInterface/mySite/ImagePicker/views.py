@@ -853,7 +853,7 @@ def bfs(request):
     if not request.user.is_superuser:
         return HttpResponse("you are not an admin")
     # TODO: check whether distance from start point exceeds a given limit
-    time.sleep(0.3)
+    time.sleep(0.1)
 
     panoID = str(request.POST.get("panoID"))
     links = request.POST.getlist("links[]")
