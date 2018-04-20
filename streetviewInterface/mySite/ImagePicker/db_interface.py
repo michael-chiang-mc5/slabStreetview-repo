@@ -212,6 +212,50 @@ def write_csv_sign(box,name):
 
 
 
+def write_csv_parcelVsLanguage(box,name):
+    lang = ['ko','en','es','th','zh']
+
+    lon1 = box['lon1']
+    lon2 = box['lon2']
+    lat1 = box['lat1']
+    lat2 = box['lat2']
+
+    boundingBoxes = BoundingBox.objects.filter(streetviewImage__mapPoint__longitude__gte=min(lon1,lon2)) \
+                        .filter(streetviewImage__mapPoint__longitude__lte=max(lon1,lon2)) \
+                        .filter(streetviewImage__mapPoint__latitude__gte=min(lat1,lat2)) \
+                        .filter(streetviewImage__mapPoint__latitude__lte=max(lat1,lat2))
+    ains = boundingBoxes.values_list('AIN',flat=True).distinct()
+    ains = list(ains)
+    ains.remove(None)
+    print(ains)
+
+    with open('media/'+name+'_parcelVsLanguage.csv', 'w') as csv_output:
+        fieldnames = ['AIN'] + lang
+        writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+
+        for ain in ains:
+            signs = Sign.objects.filter(boundingBox__AIN=ain)
+
+            # initialize dictionary to count lanagues
+            d = {'AIN':ain}
+            for l in lang:
+                d[l] = 0
+
+            # count languages in signs
+            for sign in signs:
+                break
+                languages = sign.language()
+                languages = languages.split(',')
+                for l in languages:
+                    for l2 in lang:
+                        if l==l2:
+                            d[l] = d[l] + 1
+
+            # write row
+            print(d)
+            writer.writerow(d)
+
 
 
 

@@ -614,6 +614,7 @@ from .dictionary_search import *
 class Sign(models.Model):
     """
     Corresponds to a single row in final csv file
+    Currently detects language ko (korean), zh (chinese), th (thai), es (english), es(spanish)
     """
     text = models.TextField()
     boundingBox = models.ForeignKey(BoundingBox)
