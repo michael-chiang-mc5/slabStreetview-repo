@@ -244,7 +244,6 @@ def write_csv_parcelVsLanguage(box,name):
 
             # count languages in signs
             for sign in signs:
-                break
                 languages = sign.language()
                 languages = languages.split(',')
                 for l in languages:
