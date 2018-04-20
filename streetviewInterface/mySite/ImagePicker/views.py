@@ -325,10 +325,8 @@ def write_mapPoint():
         #    mapPoint is associated with exactly two streetview images whose images are set
         #    mapPoint is associated with at least 1 CTPN boundingBoxes object (nil is ok)
         #mapPoints = MapPoint.objects.extra(  select={'image_count':       'SELECT COUNT(*) FROM imagepicker_streetviewimage WHERE imagepicker_streetviewimage.mappoint_id = imagepicker_mappoint.id AND imagepicker_streetviewimage.image_is_set = 1',},
-        #                                     where=['image_count = 2']
-        #                            ).filter(streetviewimage__boundingbox__method="CTPN").filter(censusblock__isnull=False).distinct()
-        mapPoints = MapPoint.objects.extra(  select={'image_count':       'SELECT COUNT(*) FROM imagepicker_streetviewimage WHERE imagepicker_streetviewimage.mappoint_id = imagepicker_mappoint.id AND imagepicker_streetviewimage.image_is_set = 1',},
-                                     where=['image_count = 2']).distinct()
+        #                             where=['image_count = 2']).distinct()
+        mapPoints = MapPoint.objects.all()
 
 
         for mapPoint in mapPoints:
