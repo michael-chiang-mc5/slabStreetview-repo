@@ -148,6 +148,8 @@ def write_csv_bob():
 def set_priority():
     mapPoints = MapPoint.objects.all()
 
+    print('num high priority mapPoint = ', mapPoints.filter(high_priority=True).count())
+
     count = 0
     for mapPoint in mapPoints:
         zone = mapPoint.get_zone_code(simple=True)
@@ -158,7 +160,7 @@ def set_priority():
             else:
                 print(mapPoint, 'incomplete')
                 count = count + 1
-                if count > 10000: # 184066
+                if count > 184066: # 184066
                     break
                 mapPoint.high_priority = not isComplete
                 mapPoint.save()
