@@ -158,7 +158,7 @@ def set_priority():
             if isComplete:
                 print(mapPoint.pk, 'complete')
             else:
-                print(mapPoint, 'incomplete')
+                print(mapPoint.pk, 'incomplete')
                 count = count + 1
                 if count > 184066: # 184066
                     break
