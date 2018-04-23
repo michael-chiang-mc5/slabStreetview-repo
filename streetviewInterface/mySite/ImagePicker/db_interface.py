@@ -145,6 +145,28 @@ def write_csv_bob():
                                         })
 
 
+def set_priority():
+    mapPoints = MapPoint.objects.all()
+
+    count = 0
+    for mapPoint in mapPoints:
+        zone = mapPoint.get_zone_code(simple=True)
+        if zone == 'C':
+            isComplete = mapPoint.complete()[0]
+            if isComplete:
+                print(mapPoint.pk, 'complete')
+            else:
+                print(mapPoint, 'incomplete')
+                count = count + 1
+                if count > 10000: # 184066
+                    break
+                mapPoint.high_priority = not isComplete
+                mapPoint.save()
+
+    #maptags = MapTag.objects.all()
+    #print(maptags[0])
+    #print(maptags[0].simple_zonecode())
+
 def set_priority_julia(box):
     """
     Marks mapPoints high priority based on whether they are within bounding box
