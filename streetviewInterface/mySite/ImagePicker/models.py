@@ -372,6 +372,11 @@ class GoogleOCR(models.Model):
         textAnnotations = text = data['textAnnotations']
         ctpns = BoundingBox.objects.filter(streetviewImage=self.streetviewImage)
 
+        # if ctpn has not been generated, then don't do anything
+        if ctpns.count() == 0:
+            print('ctpn not generated, skipping')
+            return
+
         sign_dict = {}
 
 
@@ -399,19 +404,9 @@ class GoogleOCR(models.Model):
             sign = Sign(text=text,boundingBox=BoundingBox.objects.get(pk=boundingBox_pk))
             sign.set_AIN()
             sign.save()
-            #self.signs_generated = True
-            #self.save()
 
-
-
-
-
-#        for ctpn in ctpns:
-#            inside = ctpn.isInside(x_avg,y_avg)
-            #print(x_avg,y_avg)
-            #print(ctpn.x1,ctpn.x2,ctpn.y1,ctpn.y2)
-            #print(inside)
-
+        self.signs_generated = True
+        self.save()
         return
 
     # helper function for words()
@@ -524,7 +519,7 @@ class BoundingBox(models.Model):
             print("AIN already set")
 
     def isInside(self,x,y):
-        if is_nil == True
+        if self.is_nil == True:
             return False
         elif x >= self.x1 and x <= self.x2 and y>=self.y1 and y<=self.y2:
             return True

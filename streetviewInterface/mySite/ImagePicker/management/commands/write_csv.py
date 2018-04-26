@@ -39,10 +39,11 @@ class Command(BaseCommand):
             write_csv_julia(box_pico,'pico')
             write_csv_julia(box_koreatown,'koreatown')
         elif option == 'parcelVsLanguage':
-            write_csv_parcelVsLanguage(box_elmonte,'elmonte')
-            write_csv_parcelVsLanguage(box_thaitown,'thaitown')
-            write_csv_parcelVsLanguage(box_pico,'pico')
-            write_csv_parcelVsLanguage(box_koreatown,'koreatown')
+            write_csv_parcelVsLanguage('all','all')
+            #write_csv_parcelVsLanguage(box_elmonte,'elmonte')
+            #write_csv_parcelVsLanguage(box_thaitown,'thaitown')
+            #write_csv_parcelVsLanguage(box_pico,'pico')
+            #write_csv_parcelVsLanguage(box_koreatown,'koreatown')
         else:
             print("Possible options: priority_matt, csv_matt, priority_julia, csv_julia, parcelVsLanguage")
         sys.exit(0)

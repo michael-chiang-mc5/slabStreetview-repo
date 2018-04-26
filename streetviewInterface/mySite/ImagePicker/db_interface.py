@@ -191,21 +191,25 @@ def set_priority_julia(box):
 
 def generate_signs():
     Sign.objects.all().delete()
+    print(GoogleOCR.objects.count(),' total googleOCR results')
     for googleOCR in GoogleOCR.objects.all():
         print('generating signs for googleOCR=',googleOCR.pk)
         googleOCR.generate_signs()
 
 
 def write_csv_sign(box,name):
-    lon1 = box['lon1']
-    lon2 = box['lon2']
-    lat1 = box['lat1']
-    lat2 = box['lat2']
 
-    signs = Sign.objects.filter(boundingBox__streetviewImage__mapPoint__longitude__gte=min(lon1,lon2)) \
-                        .filter(boundingBox__streetviewImage__mapPoint__longitude__lte=max(lon1,lon2)) \
-                        .filter(boundingBox__streetviewImage__mapPoint__latitude__gte=min(lat1,lat2)) \
-                        .filter(boundingBox__streetviewImage__mapPoint__latitude__lte=max(lat1,lat2))
+    if box == 'all':
+        signs = Sign.objects.all()
+    else:
+        lon1 = box['lon1']
+        lon2 = box['lon2']
+        lat1 = box['lat1']
+        lat2 = box['lat2']
+        signs = Sign.objects.filter(boundingBox__streetviewImage__mapPoint__longitude__gte=min(lon1,lon2)) \
+                            .filter(boundingBox__streetviewImage__mapPoint__longitude__lte=max(lon1,lon2)) \
+                            .filter(boundingBox__streetviewImage__mapPoint__latitude__gte=min(lat1,lat2)) \
+                            .filter(boundingBox__streetviewImage__mapPoint__latitude__lte=max(lat1,lat2))
 
     with open('media/'+name+'_signs.csv', 'w',50) as csv_output:
         # set up ctpn csv output
@@ -240,25 +244,31 @@ def write_csv_sign(box,name):
 def write_csv_parcelVsLanguage(box,name):
     lang = ['ko','en','es','th','zh']
 
-    lon1 = box['lon1']
-    lon2 = box['lon2']
-    lat1 = box['lat1']
-    lat2 = box['lat2']
+    if box == 'all':
+        signs = Sign.objects.all()
+        ains = Sign.objects.all().values_list('boundingBox__AIN',flat=True).distinct()
+        ains = list(ains)
+        ains.remove(None)
+    else:
+        lon1 = box['lon1']
+        lon2 = box['lon2']
+        lat1 = box['lat1']
+        lat2 = box['lat2']
+        boundingBoxes = BoundingBox.objects.filter(streetviewImage__mapPoint__longitude__gte=min(lon1,lon2)) \
+                            .filter(streetviewImage__mapPoint__longitude__lte=max(lon1,lon2)) \
+                            .filter(streetviewImage__mapPoint__latitude__gte=min(lat1,lat2)) \
+                            .filter(streetviewImage__mapPoint__latitude__lte=max(lat1,lat2))
+        ains = boundingBoxes.values_list('AIN',flat=True).distinct()
+        ains = list(ains)
+        ains.remove(None)
 
-    boundingBoxes = BoundingBox.objects.filter(streetviewImage__mapPoint__longitude__gte=min(lon1,lon2)) \
-                        .filter(streetviewImage__mapPoint__longitude__lte=max(lon1,lon2)) \
-                        .filter(streetviewImage__mapPoint__latitude__gte=min(lat1,lat2)) \
-                        .filter(streetviewImage__mapPoint__latitude__lte=max(lat1,lat2))
-    ains = boundingBoxes.values_list('AIN',flat=True).distinct()
-    ains = list(ains)
-    ains.remove(None)
-    print(ains)
 
     with open('media/'+name+'_parcelVsLanguage.csv', 'w') as csv_output:
         fieldnames = ['AIN'] + lang
         writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
 
+        count = 0
         for ain in ains:
             signs = Sign.objects.filter(boundingBox__AIN=ain)
 
@@ -277,7 +287,8 @@ def write_csv_parcelVsLanguage(box,name):
                             d[l] = d[l] + 1
 
             # write row
-            print(d)
+            count = count + 1
+            print(d, ' , ', count, '/', len(ains), ' complete')
             writer.writerow(d)
 
 
