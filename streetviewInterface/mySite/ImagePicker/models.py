@@ -44,7 +44,7 @@ class MapPoint(models.Model):
 
     def complete(self,lazy=None):
         """
-        Set high_priority = True if any of the following is False:
+            Return (False,'image') is any of the following is false:
             (1) Two associated streetview images
             (2) Streetview images set (i.e., downloaded)
             (3) CTPN run
@@ -202,10 +202,13 @@ class MapPoint(models.Model):
 
 
 
-    def get_zone_code(self):
+    def get_zone_code(self, simple=False):
         tags = MapTag.objects.filter(mapPoint=self,tag_type="zoning")
         if tags.count() == 1:
-            return tags[0]
+            if simple:
+                return tags[0].simple_zonecode()
+            else:
+                return tags[0]
         else:
             raise ValueError('MapPoint ' +  str(self.pk)  +' does not have exactly one zoning tag (' +  str(tags.count()) + ' !=1)')
 
@@ -243,6 +246,12 @@ class MapTag(models.Model):
                     'unknown':'U'}
     def __str__(self):
         return self.tag_text
+    def simple_zonecode(self):
+        try:
+            return self.zone_mapping[self.tag_text]
+        except:
+            print(self.tag_text, 'not found in MapTag.zone_mapping')
+            return False
 
 class CensusBlock(models.Model):
     mapPoint = models.ForeignKey(MapPoint)

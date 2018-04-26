@@ -147,7 +147,7 @@ def image_saver_metadata(request):
     for mapPoint in mapPoints:
         streetviewImages = mapPoint.streetviewimage_set.all()
         if len(streetviewImages)!=2:
-            mapPoint.createStreetviewImages()
+            mapPoint.createStreetviewImages() # deletes all previous images, creates two empty images
             streetviewImages = mapPoint.streetviewimage_set.all()
         for streetviewImage in streetviewImages:
             if streetviewImage.check_if_image_is_set_lazy():
