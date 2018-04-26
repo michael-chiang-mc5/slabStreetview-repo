@@ -171,6 +171,7 @@ def generate_signs():
         print('generating signs for googleOCR=',googleOCR.pk)
         googleOCR.generate_signs()
 
+
 def write_csv_sign(box,name):
     lon1 = box['lon1']
     lon2 = box['lon2']

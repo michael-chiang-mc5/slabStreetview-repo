@@ -343,12 +343,7 @@ class Pending(models.Model):
 class GoogleOCR(models.Model):
     streetviewImage = models.ForeignKey(StreetviewImage)
     json_text = models.TextField()
-    signs_generated = models.BooleanField(default=False)
-
-    def generate_Sign(self):
-        """
-        creates appropriate Sign objects
-        """
+    signs_generated = models.BooleanField(default=False) # deprecated for now
 
     def __str__(self):
         return self.json_text
@@ -395,8 +390,8 @@ class GoogleOCR(models.Model):
             sign = Sign(text=text,boundingBox=BoundingBox.objects.get(pk=boundingBox_pk))
             sign.set_AIN()
             sign.save()
-            self.signs_generated = True
-            self.save()
+            #self.signs_generated = True
+            #self.save()
 
 
 
@@ -520,7 +515,9 @@ class BoundingBox(models.Model):
             print("AIN already set")
 
     def isInside(self,x,y):
-        if x >= self.x1 and x <= self.x2 and y>=self.y1 and y<=self.y2:
+        if is_nil == True
+            return False
+        elif x >= self.x1 and x <= self.x2 and y>=self.y1 and y<=self.y2:
             return True
         else:
             return False
