@@ -369,7 +369,12 @@ class GoogleOCR(models.Model):
             return []
 
         print('streetviewImage=',self.streetviewImage.pk)
-        textAnnotations = text = data['textAnnotations']
+        try:
+            textAnnotations = data['textAnnotations']
+        except:
+            print("Warning: cannot read google ocr: ", data)
+            return
+        
         ctpns = BoundingBox.objects.filter(streetviewImage=self.streetviewImage)
 
         # if ctpn has not been generated, then don't do anything
