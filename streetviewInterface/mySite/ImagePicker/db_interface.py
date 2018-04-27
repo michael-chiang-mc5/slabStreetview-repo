@@ -144,6 +144,16 @@ def write_csv_bob():
                                          'AIN': AIN, \
                                         })
 
+def set_priority_fromJuliaBuffer():
+    with open('media/MapPoints_0425.csv') as f:
+        reader = csv.reader(f, delimiter=",")
+        next(reader)
+        for i in reader:
+            pk = i[1]
+            mapPoint = MapPoint.objects.get(pk=pk)
+            mapPoint.high_priority = True
+            mapPoint.save()
+
 
 def set_priority():
     mapPoints = MapPoint.objects.all()

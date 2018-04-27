@@ -32,7 +32,8 @@ class Command(BaseCommand):
             set_priority_julia(box_pico)
             set_priority_julia(box_koreatown)
         elif option == 'priority_commercial':
-            set_priority()
+            set_priority_fromJuliaBuffer()
+            #set_priority()
         elif option == 'csv_julia':
             write_csv_julia(box_elmonte,'elmonte')
             write_csv_julia(box_thaitown,'thaitown')
