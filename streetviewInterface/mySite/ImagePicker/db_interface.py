@@ -150,6 +150,7 @@ def set_priority_fromJuliaBuffer():
         next(reader)
         for i in reader:
             pk = i[1]
+            print(i)
             mapPoint = MapPoint.objects.get(pk=pk)
             mapPoint.high_priority = True
             mapPoint.save()
