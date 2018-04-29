@@ -202,10 +202,21 @@ def set_priority_julia(box):
 
 def generate_signs():
     Sign.objects.all().delete()
-    print(GoogleOCR.objects.count(),' total googleOCR results')
-    for googleOCR in GoogleOCR.objects.all().iterator():
-        print('generating signs for googleOCR=',googleOCR.pk)
-        googleOCR.generate_signs()
+    #print(GoogleOCR.objects.count(),' total googleOCR results')
+#    for googleOCR in GoogleOCR.objects.all().iterator():
+#        print('generating signs for googleOCR=',googleOCR.pk)
+#        googleOCR.generate_signs()
+    print("starting")
+    qs = GoogleOCR.objects.all()
+    counter = 0
+    count = qs.count()
+    print('num googleOCR = ', count)
+    chunk_size = 500
+    while counter < count:
+        for googleOCR in qs[counter:counter+count].iterator():
+            print('generating signs for googleOCR=',googleOCR.pk)
+            googleOCR.generate_signs()
+        counter += chunk_size
 
 
 def write_csv_sign(box,name):
