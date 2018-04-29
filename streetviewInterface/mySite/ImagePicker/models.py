@@ -352,7 +352,7 @@ class Pending(models.Model):
 class GoogleOCR(models.Model):
     streetviewImage = models.ForeignKey(StreetviewImage)
     json_text = models.TextField()
-    signs_generated = models.BooleanField(default=False) # deprecated for now
+    signs_generated = models.BooleanField(default=False)
 
     def __str__(self):
         return self.json_text
@@ -363,6 +363,8 @@ class GoogleOCR(models.Model):
 
     def generate_signs(self):
         # don't generate signs if we already generated them before
+        if signs_generated == True:
+            return
 
         data = self.json()
         if len(data)==0:
@@ -374,7 +376,7 @@ class GoogleOCR(models.Model):
         except:
             print("Warning: cannot read google ocr: ", data)
             return
-        
+
         ctpns = BoundingBox.objects.filter(streetviewImage=self.streetviewImage)
 
         # if ctpn has not been generated, then don't do anything
