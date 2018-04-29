@@ -203,7 +203,7 @@ def set_priority_julia(box):
 def generate_signs():
     Sign.objects.all().delete()
     print(GoogleOCR.objects.count(),' total googleOCR results')
-    for googleOCR in GoogleOCR.objects.all():
+    for googleOCR in GoogleOCR.objects.all().iterator():
         print('generating signs for googleOCR=',googleOCR.pk)
         googleOCR.generate_signs()
 
