@@ -363,7 +363,7 @@ class GoogleOCR(models.Model):
 
     def generate_signs(self):
         # don't generate signs if we already generated them before
-        if signs_generated == True:
+        if self.signs_generated == True:
             return
 
         data = self.json()
