@@ -213,7 +213,8 @@ def generate_signs():
 
     for pk in pks:
         g = GoogleOCR.objects.get(pk=pk)
-        googleOCR.generate_signs()
+        print('googleOCR pk = ', g.pk)
+        g.generate_signs()
 
 
 
