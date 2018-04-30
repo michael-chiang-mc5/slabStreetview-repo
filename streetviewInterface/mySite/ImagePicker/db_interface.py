@@ -213,7 +213,7 @@ def generate_signs():
     chunk_size = 500
     while counter < count:
         for googleOCR in qs[counter:counter+count].iterator():
-            #print('generating signs for googleOCR=',googleOCR.pk)
+            print('generating signs for googleOCR=',googleOCR.pk)
             googleOCR.generate_signs()
         counter += chunk_size
 
