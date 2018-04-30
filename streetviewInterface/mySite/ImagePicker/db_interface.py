@@ -269,8 +269,11 @@ def write_csv_parcelVsLanguage(box,name):
     if box == 'all':
         signs = Sign.objects.all()
         ains = Sign.objects.all().values_list('boundingBox__AIN',flat=True).distinct()
-        ains = list(ains)
-        ains.remove(None)
+        ains = sorted(list(ains))
+        try:
+            ains.remove(None)
+        except:
+            print('no nones in list')
     else:
         lon1 = box['lon1']
         lon2 = box['lon2']
@@ -284,15 +287,15 @@ def write_csv_parcelVsLanguage(box,name):
         ains = list(ains)
         ains.remove(None)
 
+    signs = Sign.objects.order_by('boundingBox__AIN')
+    count = 0
 
-    with open('media/'+name+'_parcelVsLanguage.csv', 'w') as csv_output:
+    with open('media/'+name+'_parcelVsLanguage.csv', 'w', 10) as csv_output:
         fieldnames = ['AIN'] + lang
         writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
 
-        count = 0
         for ain in ains:
-            signs = Sign.objects.filter(boundingBox__AIN=ain)
 
             # initialize dictionary to count lanagues
             d = {'AIN':ain}
@@ -300,8 +303,15 @@ def write_csv_parcelVsLanguage(box,name):
                 d[l] = 0
 
             # count languages in signs
-            for sign in signs:
-                languages = sign.language()
+            for idx in range(count,len(signs)):
+                sign = signs[idx]
+                print(idx, ain, sign.AIN())
+
+                if sign.AIN() != ain:
+                    break
+                count += 1
+
+                languages = sign.language(match_threshold=0)
                 languages = languages.split(',')
                 for l in languages:
                     for l2 in lang:
@@ -309,8 +319,7 @@ def write_csv_parcelVsLanguage(box,name):
                             d[l] = d[l] + 1
 
             # write row
-            count = count + 1
-            print(d, ' , ', count, '/', len(ains), ' complete')
+            print(d)
             writer.writerow(d)
 
 

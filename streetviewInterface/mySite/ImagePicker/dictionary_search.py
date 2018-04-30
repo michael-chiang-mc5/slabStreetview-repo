@@ -64,19 +64,27 @@ def english_or_spanish(words, word_min_length=4,match_threshold=1,word_count_thr
 
     for word in words:
         # check if word is spanish
-        spanish_match, spanish_distance = score_language(word,dictionary_spanish)
-        if spanish_distance<=match_threshold:
-            word_is_spanish = True
+        if match_threshold == 0:
+            word_is_spanish = score_language_fast(word,dictionary_spanish)
         else:
-            word_is_spanish = False
+            spanish_match, spanish_distance = score_language(word,dictionary_spanish)
+            if spanish_distance<=match_threshold:
+                word_is_spanish = True
+            else:
+                word_is_spanish = False
 
         # check if word is english
-        english_match, english_distance = score_language(word,dictionary_english)
-        if english_distance<=match_threshold:
-            word_is_english = True
+        if match_threshold == 0:
+            word_is_english = score_language_fast(word,dictionary_english)
         else:
-            word_is_english = False
-
+            english_match, english_distance = score_language(word,dictionary_english)
+            if english_distance<=match_threshold:
+                word_is_english = True
+            else:
+                word_is_english = False
+        #print(word_is_english)
+        #print(word)
+        #print(word.lower() == 'grill')
         if word_is_spanish and not word_is_english:
             count_spanish += 1
         if word_is_english and not word_is_spanish:
@@ -98,3 +106,9 @@ def score_language(ocr_text,dictionary):
     elapsed_time = time.time() - start_time
     #print(elapsed_time)
     return best_match, best_distance
+
+def score_language_fast(ocr_text,dictionary):
+    for word in dictionary:
+        if ocr_text.lower() == word:
+            return True
+    return False
