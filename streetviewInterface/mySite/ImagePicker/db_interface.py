@@ -329,7 +329,7 @@ def write_csv_parcelVsLanguage(box,name):
 
 def write_csv_final(name):
     signs = Sign.objects.all()
-    with open('media/'+name+'signs.csv', 'w', 10) as csv_output:
+    with open('media/'+name+'_signs.csv', 'w', 10) as csv_output:
 
 
         # set up ctpn csv output
@@ -345,6 +345,7 @@ def write_csv_final(name):
             ain = sign.AIN()
 
             writer.writerow({
+                             'sign_pk':         sign.pk, \
                              'image_url':       sign.image_url(), \
                              'boundingBox':    box, \
                              'text':         sign.text, \
