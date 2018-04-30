@@ -333,7 +333,7 @@ def write_csv_final(name):
 
 
         # set up ctpn csv output
-        fieldnames = ['image_url', 'boundingBox','text', 'longitude','latitude', 'address','overlay_url', 'AIN', 'distance_to_AIN','language_dist=0']
+        fieldnames = ['sign_pk','image_url', 'boundingBox','text', 'longitude','latitude', 'address','overlay_url', 'AIN', 'distance_to_AIN','language_dist=0']
         writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
 
