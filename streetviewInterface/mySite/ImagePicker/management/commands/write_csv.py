@@ -35,10 +35,11 @@ class Command(BaseCommand):
             set_priority_fromJuliaBuffer()
             #set_priority()
         elif option == 'csv_julia':
-            write_csv_julia(box_elmonte,'elmonte')
-            write_csv_julia(box_thaitown,'thaitown')
-            write_csv_julia(box_pico,'pico')
-            write_csv_julia(box_koreatown,'koreatown')
+            write_csv_julia(box_elmonte,'all')
+            #write_csv_julia(box_elmonte,'elmonte')
+            #write_csv_julia(box_thaitown,'thaitown')
+            #write_csv_julia(box_pico,'pico')
+            #write_csv_julia(box_koreatown,'koreatown')
         elif option == 'parcelVsLanguage':
             write_csv_parcelVsLanguage('all','all')
             #write_csv_parcelVsLanguage(box_elmonte,'elmonte')

@@ -330,11 +330,14 @@ def write_csv_parcelVsLanguage(box,name):
 
 
 def write_csv_julia(box,name):
-    lon1 = box['lon1']
-    lon2 = box['lon2']
-    lat1 = box['lat1']
-    lat2 = box['lat2']
-    mapPoints = MapPoint.objects.filter(longitude__gte=min(lon1,lon2)).filter(longitude__lte=max(lon1,lon2)).filter(latitude__gte=min(lat1,lat2)).filter(latitude__lte=max(lat1,lat2))
+    if box == 'all':
+        mapPoints = mapPoint.objects.all()
+    else:
+        lon1 = box['lon1']
+        lon2 = box['lon2']
+        lat1 = box['lat1']
+        lat2 = box['lat2']
+        mapPoints = MapPoint.objects.filter(longitude__gte=min(lon1,lon2)).filter(longitude__lte=max(lon1,lon2)).filter(latitude__gte=min(lat1,lat2)).filter(latitude__lte=max(lat1,lat2))
 
     with open('media/'+name+'_ctpn.csv', 'w') as csv_output, open('media/'+name+'_googleOCR.csv', 'w') as csv_output2:
         # set up ctpn csv output
@@ -348,6 +351,7 @@ def write_csv_julia(box,name):
         writer2.writeheader()
 
         for mapPoint in mapPoints:
+            print("mapPoint.pk = " ,mapPoint.pk)
             boundingBoxes = mapPoint.get_CTPN_boundingBoxes()
             for boundingBox in boundingBoxes:
                 if boundingBox.is_nil:
