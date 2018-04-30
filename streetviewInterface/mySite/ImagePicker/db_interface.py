@@ -290,7 +290,7 @@ def write_csv_parcelVsLanguage(box,name):
 
     print(ains)
 
-    signs = Sign.objects.order_by('boundingBox__AIN')
+    signs = Sign.objects.filter(boundingBox__AIN__isnull=False).order_by('boundingBox__AIN')
     count = 0
 
     with open('media/'+name+'_parcelVsLanguage.csv', 'w', 10) as csv_output:
