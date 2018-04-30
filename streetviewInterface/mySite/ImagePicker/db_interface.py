@@ -269,11 +269,12 @@ def write_csv_parcelVsLanguage(box,name):
     if box == 'all':
         signs = Sign.objects.all()
         ains = Sign.objects.all().values_list('boundingBox__AIN',flat=True).distinct()
-        ains = sorted(list(ains))
+        ains = list(ains)
         try:
             ains.remove(None)
         except:
             print('no nones in list')
+        ains = sorted(ains)
     else:
         lon1 = box['lon1']
         lon2 = box['lon2']
@@ -305,7 +306,6 @@ def write_csv_parcelVsLanguage(box,name):
             # count languages in signs
             for idx in range(count,len(signs)):
                 sign = signs[idx]
-                print(idx, ain, sign.AIN())
 
                 if sign.AIN() != ain:
                     break
