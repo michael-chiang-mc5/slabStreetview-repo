@@ -327,11 +327,42 @@ def write_csv_parcelVsLanguage(box,name):
 
 
 
+def write_csv_final(name):
+    signs = Sign.objects.all()
+    with open('media/'+name+'signs.csv', 'w', 10) as csv_output:
+
+
+        # set up ctpn csv output
+        fieldnames = ['image_url', 'boundingBox','text', 'longitude','latitude', 'address','overlay_url', 'AIN', 'distance_to_AIN','language_dist=0']
+        writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+
+        for sign in signs:
+            print("sign.pk = " ,sign.pk)
+
+            streetviewImage = sign.boundingBox.streetviewImage
+            box = sign.boundingBox.box()
+            ain = sign.AIN()
+
+            writer.writerow({
+                             'image_url':       sign.image_url(), \
+                             'boundingBox':    box, \
+                             'text':         sign.text, \
+                             'longitude':    streetviewImage.mapPoint.longitude, \
+                             'latitude':     streetviewImage.mapPoint.latitude, \
+                             'address':      streetviewImage.mapPoint.address, \
+                             'overlay_url': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (streetviewImage.pk,box[0], box[1], box[2], box[3]) , \
+                             'AIN': ain, \
+                             'distance_to_AIN': sign.distance_to_AIN(), \
+                             'language_dist=0': sign.language(), \
+                            })
+
+
 
 
 def write_csv_julia(box,name):
     if box == 'all':
-        mapPoints = mapPoint.objects.all()
+        mapPoints = MapPoint.objects.all()
     else:
         lon1 = box['lon1']
         lon2 = box['lon2']
@@ -349,6 +380,9 @@ def write_csv_julia(box,name):
                        'latitude', 'address','overlay_url','ctpn_pk', 'lon_projectedLine', 'lat_projectedLine', 'AIN']
         writer2 = csv.DictWriter(csv_output2, fieldnames=fieldnames2, delimiter='\t')
         writer2.writeheader()
+
+        numMapPoints = len(mapPoints)
+        print(numMapPoints)
 
         for mapPoint in mapPoints:
             print("mapPoint.pk = " ,mapPoint.pk)

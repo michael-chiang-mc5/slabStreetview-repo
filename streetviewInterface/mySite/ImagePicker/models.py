@@ -525,6 +525,8 @@ class BoundingBox(models.Model):
         else:
             print("AIN already set")
 
+    def image_url(self):
+        return self.streetviewImage.image_url()
     def isInside(self,x,y):
         if self.is_nil == True:
             return False
@@ -631,6 +633,8 @@ class Sign(models.Model):
     def set_AIN(self):
         self.boundingBox.set_AIN()
         self.boundingBox.save()
+    def image_url(self):
+        return self.boundingBox.image_url()
     def AIN(self):
         return self.boundingBox.AIN
     def distance_to_AIN(self):
