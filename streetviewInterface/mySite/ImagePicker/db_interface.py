@@ -288,6 +288,8 @@ def write_csv_parcelVsLanguage(box,name):
         ains = list(ains)
         ains.remove(None)
 
+    print(ains)
+
     signs = Sign.objects.order_by('boundingBox__AIN')
     count = 0
 
@@ -306,6 +308,7 @@ def write_csv_parcelVsLanguage(box,name):
             # count languages in signs
             for idx in range(count,len(signs)):
                 sign = signs[idx]
+                print(idx, ain, sign.AIN())
 
                 if sign.AIN() != ain:
                     break
