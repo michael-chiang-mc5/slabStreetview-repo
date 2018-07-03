@@ -7,6 +7,11 @@
       position:relative;
       margin-bottom: 20px;
   }
+
+  td {
+    vertical-align:top !important;
+  }
+
   .tag_green {
       float: left;
       position: absolute;
@@ -80,6 +85,12 @@
           ~~~~~ Google bounding box ~~~~~
           <br />
            {{ streetviewImage.notes }} <br />
+          ~~~~ google ocr ~~~
+          <br />
+          {% for ocr in streetviewImage.googleocr_set.all %}
+            {{ ocr }}
+          {% endfor %}
+          <br />
           ~~~~ Admin ~~~~
           <!--
           <br />

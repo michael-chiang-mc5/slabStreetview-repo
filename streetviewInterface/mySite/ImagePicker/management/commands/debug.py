@@ -6,6 +6,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        num_high_priority = MapPoint.objects.filter(high_priority = True).count()
+        print('num_high_priority=' , num_high_priority)
+
+        numGoogleOCR = GoogleOCR.objects.all().count()
+        print('numGoogleOCR=' , numGoogleOCR)
+
+
+
         # count the total number of signs
         print('num sign=' , Sign.objects.count())
 
