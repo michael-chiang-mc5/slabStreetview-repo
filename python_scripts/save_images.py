@@ -11,9 +11,9 @@ from time import sleep
 # https://s3-us-west-1.amazonaws.com/slab-streetview/1.jpg
 
 
-#interface_url = "http://127.0.0.1:8000/"
+interface_url = "http://127.0.0.1:8000/"
 #AWS_BUCKET_NAME = 'slab-streetview-debug'
-interface_url = "http://104.131.145.75:8888/"
+#interface_url = "http://104.131.145.75:8888/"
 AWS_BUCKET_NAME = 'slab-streetview'
 text_file = open("log.txt", "w")
 
@@ -23,20 +23,7 @@ def main():
     count_timer = 0
     timer_max = 6
 
-    r = requests.get('https://api.ipify.org/')
-    if r.text == '172.249.49.159':
-        GOOGLE_KEY = secret_keys.GOOGLE_KEY_BRIDGEPORT
-        text_file.write("Running on "+r.text+"\n")
-    elif r.text == '104.131.145.75':
-        GOOGLE_KEY = secret_keys.GOOGLE_KEY_VPS
-        text_file.write("Running on "+r.text+"\n")
-        sleep(randint(0,0))
-    elif r.text == '68.190.247.186':
-        GOOGLE_KEY = secret_keys.GOOGLE_KEY_CORDOVA
-        text_file.write("Running on "+r.text+"\n")
-    else:
-        text_file.write("No key for " + r.text+"\n")
-        return
+    GOOGLE_KEY = secret_keys.GOOGLE_KEY
 
     while(1):
         # get metadata

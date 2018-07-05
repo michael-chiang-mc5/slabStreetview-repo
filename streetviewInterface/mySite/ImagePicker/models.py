@@ -293,6 +293,14 @@ class StreetviewImage(models.Model):
                 count += 1
         return count
 
+    def is_pending(self):
+        n = Pending.objects.filter(streetviewImage=self).count()
+        if n>0:
+            return True
+        else:
+            return False
+
+
     def set_pending(self,trueOrFalse):
         if trueOrFalse is True:
             Pending.objects.filter(streetviewImage=self).delete()
