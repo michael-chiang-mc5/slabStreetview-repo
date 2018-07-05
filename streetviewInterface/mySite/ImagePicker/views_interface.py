@@ -162,7 +162,9 @@ def image_saver_metadata(request):
     #                                 'name':streetviewImage.image_name(),'pk':streetviewImage.pk})
 
     # if no high priority images to download, just get a random one
-    streetviewImages = StreetviewImage.valid_set().filter(image_is_set=False)
+    streetviewImages = StreetviewImage.valid_set().filter(image_is_set=False,mapPoint__high_priority=True)
+    if streetviewImages.count() == 0:
+        streetviewImages = StreetviewImage.valid_set().filter(image_is_set=False)
     for streetviewImage in streetviewImages:
         if streetviewImage.is_pending() is False:
             streetviewImage.set_pending(True)
