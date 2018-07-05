@@ -10,9 +10,9 @@ from random import randint
 # https://s3-us-west-1.amazonaws.com/slab-streetview/1.jpg
 
 
-interface_url = "http://127.0.0.1:8000/"
+#interface_url = "http://127.0.0.1:8000/"
 #AWS_BUCKET_NAME = 'slab-streetview-debug'
-#interface_url = "http://104.131.145.75:8888/"
+interface_url = "http://104.131.145.75:8888/"
 AWS_BUCKET_NAME = 'slab-streetview'
 text_file = open("log.txt", "w")
 
@@ -34,6 +34,7 @@ def main():
             except:
                 print("all done")
                 exit(0)
+            print(data)
 
 
 
