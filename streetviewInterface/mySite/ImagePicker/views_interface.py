@@ -161,6 +161,9 @@ def image_saver_metadata(request):
     #                                 'fov':streetviewImage.fov,'heading':streetviewImage.heading, 'pitch':streetviewImage.pitch,\
     #                                 'name':streetviewImage.image_name(),'pk':streetviewImage.pk})
 
+    print(   'n=',     StreetviewImage.valid_set().filter(image_is_set=False).count())
+
+
     # if no high priority images to download, just get a random one
     streetviewImages = StreetviewImage.valid_set().filter(image_is_set=False,mapPoint__high_priority=True)
     if streetviewImages.count() == 0:

@@ -5,7 +5,6 @@ from PIL import Image
 import os
 from math import sqrt
 from random import randint
-from time import sleep
 
 # Example url:
 # https://s3-us-west-1.amazonaws.com/slab-streetview/1.jpg
@@ -35,15 +34,6 @@ def main():
             except:
                 print("all done")
                 exit(0)
-            # human-like timer
-            sleep(randint(0,timer_max))
-            if count_timer > 50 + randint(0,40):
-                timer_max = randint(3,10)
-                count_timer = 0
-                text_file.write("changing to a new timer, timer_max = " + str(timer_max)+"\n")
-            if randint(0,1000)>998:
-                text_file.write("taking a long rest"+"\n")
-                sleep(randint(200,500))
 
 
 
