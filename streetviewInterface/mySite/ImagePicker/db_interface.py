@@ -66,83 +66,6 @@ def overlappingBoundingBox(bb1,bb2):
         return True
 
 
-def write_csv_bob():
-    """
-    Write text file after high-priority data has been downloaded
-    """
-
-    with open('media/matt_black-owned-business_input.csv') as csv_input , open('media/matt-black-owned-business_ctpn.csv', 'w') as csv_output, open('media/matt-black-owned-business_googleOCR.csv', 'w') as csv_output2:
-        reader = csv.DictReader(csv_input)
-        # set up ctpn csv output
-        fieldnames = ['ctpn_pk','boundingBox','image_url','overlay_url','black_owned_business_address']
-        writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
-        writer.writeheader()
-        # swet up googleOCR csv output
-        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', \
-                       'address','overlay_url','ctpn_pk','lon_projectedLine','lat_projectedLine','AIN']
-        writer2 = csv.DictWriter(csv_output2, fieldnames=fieldnames2, delimiter='\t')
-        writer2.writeheader()
-
-
-
-        for row in reader:
-            bob_address = row['Address'] + ', ' + row['City'] + ', ' + row['State']
-            if row['City']!='Los Angeles':
-                continue
-            print(bob_address)
-            address_str = bob_address.replace(' ','+')
-            lnglat = geocode(address_str)
-            if lnglat is False:
-                print('geocode of '+address_str+' failed')
-                continue
-            mapPoints = filter_db(lnglat)
-
-            for mapPoint in mapPoints:
-                boundingBoxes = mapPoint.get_CTPN_boundingBoxes()
-                for boundingBox in boundingBoxes:
-                    if boundingBox.is_nil:
-                        continue
-                    writer.writerow({'ctpn_pk': boundingBox.pk, \
-                                     'boundingBox': [boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2], \
-                                     'image_url': boundingBox.streetviewImage.image_url(), \
-                                     'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (boundingBox.streetviewImage.pk,boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2) , \
-                                     'black_owned_business_address': bob_address, \
-                                     })
-
-                googleOCRs = mapPoint.get_GoogleOCR()
-                for googleOCR in googleOCRs:
-                    words = googleOCR.naive_words()
-                    for word in words:
-                        boundingBoxes = BoundingBox.objects.filter(streetviewImage=googleOCR.streetviewImage)
-                        ctpn_pk = 'na'
-                        for boundingBox in boundingBoxes:
-                            overlap = overlappingBoundingBox(word['boundingBox'],[boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2])
-                            if overlap:
-                                ctpn_pk = boundingBox.pk
-                                break
-
-                        lat_projectedLine, lon_projectedLine, angle_projectedLine = calculate_projected_line(googleOCR.streetviewImage.fov * 3,word['boundingBox'],googleOCR.streetviewImage.heading,googleOCR.streetviewImage.mapPoint.latitude,googleOCR.streetviewImage.mapPoint.longitude)
-                        lat_camera = googleOCR.streetviewImage.mapPoint.latitude
-                        lon_camera = googleOCR.streetviewImage.mapPoint.longitude
-                        AIN = get_intersecting_AIN(lat_camera,lon_camera,lat_projectedLine,lon_projectedLine)
-
-                        writer2.writerow({
-                                         'googleOCR_pk':   googleOCR.pk, \
-                                         'image_url':       googleOCR.streetviewImage.image_url(), \
-                                         'image_fov':       googleOCR.streetviewImage.fov * 3, \
-                                         'boundingBox':    word['boundingBox'], \
-                                         'locale':         word['locale'], \
-                                         'text':         word['text'], \
-                                         'heading':      googleOCR.streetviewImage.heading, \
-                                         'longitude':    googleOCR.streetviewImage.mapPoint.longitude, \
-                                         'latitude':    googleOCR.streetviewImage.mapPoint.latitude, \
-                                         'address':     googleOCR.streetviewImage.mapPoint.address, \
-                                         'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (googleOCR.streetviewImage.pk,word['boundingBox'][0], word['boundingBox'][1], word['boundingBox'][2], word['boundingBox'][3]) , \
-                                         'ctpn_pk':     ctpn_pk, \
-                                         'lat_projectedLine': lat_projectedLine, \
-                                         'lon_projectedLine': lon_projectedLine, \
-                                         'AIN': AIN, \
-                                        })
 
 def set_priority_fromJuliaBuffer():
     with open('media/MapPoints_0425.csv') as f:
@@ -213,48 +136,6 @@ def generate_signs(fresh=False):
         g = GoogleOCR.objects.get(pk=pk)
         print('googleOCR pk = ', g.pk)
         g.generate_signs()
-
-
-def write_csv_sign(box,name):
-
-    if box == 'all':
-        signs = Sign.objects.all()
-    else:
-        lon1 = box['lon1']
-        lon2 = box['lon2']
-        lat1 = box['lat1']
-        lat2 = box['lat2']
-        signs = Sign.objects.filter(boundingBox__streetviewImage__mapPoint__longitude__gte=min(lon1,lon2)) \
-                            .filter(boundingBox__streetviewImage__mapPoint__longitude__lte=max(lon1,lon2)) \
-                            .filter(boundingBox__streetviewImage__mapPoint__latitude__gte=min(lat1,lat2)) \
-                            .filter(boundingBox__streetviewImage__mapPoint__latitude__lte=max(lat1,lat2))
-
-    with open('media/'+name+'_signs.csv', 'w',50) as csv_output:
-        # set up ctpn csv output
-        fieldnames = ['overlay_oneBox' , 'overlay_allBoxes', \
-                      'text', 'longitude', 'latitude', 'address', 'AIN', 'distance_to_AIN', \
-                      'language_worddist=0','language_worddist=1' \
-                     ]
-
-        writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter=',')
-        writer.writeheader()
-
-        for sign in signs:
-            print(sign.text)
-            writer.writerow({
-                             'overlay_oneBox': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d/' % (sign.boundingBox.streetviewImage.pk,sign.boundingBox.x1, sign.boundingBox.x2, sign.boundingBox.y1, sign.boundingBox.y2) , \
-                             'overlay_allBoxes': 'http://104.131.145.75:8888/ImagePicker/listImage/%d/' % (sign.boundingBox.streetviewImage.pk), \
-                             'text':         sign.text.replace("\t","_").replace(",","_").replace(" ","_"), \
-                             'longitude':   sign.boundingBox.streetviewImage.mapPoint.longitude, \
-                             'latitude':    sign.boundingBox.streetviewImage.mapPoint.longitude, \
-                             'address':     sign.boundingBox.streetviewImage.mapPoint.address.replace("\t","_").replace(",","_").replace(" ","_"), \
-                             'AIN': sign.AIN(), \
-                             'distance_to_AIN': sign.distance_to_AIN(), \
-                             'language_worddist=1': sign.language(), \
-                             'language_worddist=0': sign.language(match_threshold=0) \
-                            })
-
-
 
 
 
@@ -336,9 +217,9 @@ def write_csv_final(name):
         for sign in signs:
             print("sign.pk = " ,sign.pk)
 
-            streetviewImage = sign.boundingBox.streetviewImage
-            box = sign.boundingBox.box()
-            ain = sign.AIN()
+            streetviewImage = sign.streetviewImage
+            box = [sign.x1, sign.x2, sign.y1, sign.y2]
+            ain = sign.AIN
 
             writer.writerow({
                              'sign_pk':         sign.pk, \
@@ -350,7 +231,7 @@ def write_csv_final(name):
                              'address':      streetviewImage.mapPoint.address, \
                              'overlay_url': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (streetviewImage.pk,box[0], box[1], box[2], box[3]) , \
                              'AIN': ain, \
-                             'distance_to_AIN': sign.distance_to_AIN(), \
+                             'distance_to_AIN': sign.distance_to_AIN, \
                              'language_dist=0': sign.language(), \
                             })
 

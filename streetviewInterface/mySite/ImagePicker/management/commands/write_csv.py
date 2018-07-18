@@ -24,16 +24,15 @@ class Command(BaseCommand):
 
         if option == 'priority_matt':
             set_priority_bob()
-        elif option == 'csv_matt':
-            write_csv_bob()
-        elif option == 'priority_julia':
-            set_priority_julia(box_elmonte)
-            set_priority_julia(box_thaitown)
-            set_priority_julia(box_pico)
-            set_priority_julia(box_koreatown)
+        #elif option == 'csv_matt':
+        #    write_csv_bob()
+        #elif option == 'priority_julia':
+        #    set_priority_julia(box_elmonte)
+        #    set_priority_julia(box_thaitown)
+        #    set_priority_julia(box_pico)
+        #    set_priority_julia(box_koreatown)
         elif option == 'priority_commercial':
             set_priority_fromJuliaBuffer()
-            #set_priority()
         elif option == 'csv_julia':
             write_csv_final('all')
             #write_csv_julia(box_elmonte,'elmonte')

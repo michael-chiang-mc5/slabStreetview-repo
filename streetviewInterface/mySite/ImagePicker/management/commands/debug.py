@@ -7,4 +7,4 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         s = Sign.objects.all()
-        print(s[0])
+        print(s[0].)

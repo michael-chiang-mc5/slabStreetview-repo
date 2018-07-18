@@ -711,6 +711,7 @@ class Sign(models.Model):
     x2 = models.IntegerField()
     y1 = models.IntegerField()
     y2 = models.IntegerField()
+    distance_to_AIN = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.text
@@ -726,8 +727,6 @@ class Sign(models.Model):
         self.AIN,self.distance_to_AIN = get_intersecting_AIN(lat_camera,lon_camera,lat_projectedLine,lon_projectedLine)
     def image_url(self):
         return self.streetviewImage.image_url()
-    def distance_to_AIN(self):
-        pass
     def language(self,match_threshold=1):
         """
         https://stackoverflow.com/questions/39142778/python-how-to-determine-the-language
