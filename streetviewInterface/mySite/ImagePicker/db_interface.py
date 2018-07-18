@@ -206,7 +206,8 @@ def write_csv_parcelVsLanguage(box,name):
 
 def write_csv_final(name):
     signs = Sign.objects.all()
-    print('num signs = ', signs.count())
+    num_signs = signs.count()
+
     with open('media/'+name+'_signs.csv', 'w', 10) as csv_output:
 
 
@@ -215,9 +216,8 @@ def write_csv_final(name):
         writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
 
+        count = 0
         for sign in signs:
-            print("sign.pk = " ,sign.pk)
-
             streetviewImage = sign.streetviewImage
             box = [sign.x1, sign.x2, sign.y1, sign.y2]
             ain = sign.AIN
@@ -235,6 +235,9 @@ def write_csv_final(name):
                              'distance_to_AIN': sign.distance_to_AIN, \
                              'language_dist=0': sign.language(match_threshold=0), \
                             })
+
+            count += 1
+            print("sign.pk = " ,sign.pk, '    ,    %=',count,'/',num_signs)
 
 
 
