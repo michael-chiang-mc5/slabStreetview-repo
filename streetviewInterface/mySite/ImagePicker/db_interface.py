@@ -206,6 +206,7 @@ def write_csv_parcelVsLanguage(box,name):
 
 def write_csv_final(name):
     signs = Sign.objects.all()
+    print('num signs = ', signs.count())
     with open('media/'+name+'_signs.csv', 'w', 10) as csv_output:
 
 
@@ -238,7 +239,7 @@ def write_csv_final(name):
 
 
 
-def write_csv_julia(box,name):
+def write_csv_julia_deprecated(box,name):
     if box == 'all':
         mapPoints = MapPoint.objects.all()
     else:

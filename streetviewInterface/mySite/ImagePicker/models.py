@@ -738,6 +738,7 @@ class Sign(models.Model):
 
         # check for korean/chinese letters
         possible_codes = ['ko','zh','th','ja','zh_TW','vi','te','ta','so','pa','he','ar','fa','hy']
+        counter = {}
         for code in possible_codes:
             counter[code] = 0
 
