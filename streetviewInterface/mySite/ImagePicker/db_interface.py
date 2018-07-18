@@ -200,23 +200,19 @@ def set_priority_julia(box):
     print('num high priority ', MapPoint.objects.filter(high_priority=True).count())
 
 
-def generate_signs():
-    print(GoogleOCR.objects.count(),' total googleOCR results')
-#    for googleOCR in GoogleOCR.objects.all().iterator():
-#        print('generating signs for googleOCR=',googleOCR.pk)
-#        googleOCR.generate_signs() # 97505
+def generate_signs(fresh=False):
     print("starting")
-    Sign.objects.all().delete()
-    print("Signs deleted")
+    if fresh:
+        Sign.objects.all().delete()
+        GoogleOCR.objects.all().update(signs_generated=False)
+        print("Signs deleted")
 
+    print("getting pk")
     pks = list(GoogleOCR.objects.all().order_by('pk').values_list('pk',flat=True))
-
     for pk in pks:
         g = GoogleOCR.objects.get(pk=pk)
         print('googleOCR pk = ', g.pk)
         g.generate_signs()
-
-
 
 
 def write_csv_sign(box,name):

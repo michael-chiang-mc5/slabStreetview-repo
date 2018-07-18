@@ -18,7 +18,7 @@ def intersect(A,B,C,D):
 # lat1,lng1 = camera
 # lat2,lng2 = projected line
 def get_intersecting_AIN(lat1,lng1,lat2,lng2):
-    eps = 0.01
+    eps = 0.001
     # filter only on 1 endpoint for speed
     pbs = ParcelBoundary.objects.filter(lng__lt=eps+lng1 , \
                                        lng__gt=-eps+lng1, \

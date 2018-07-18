@@ -369,7 +369,77 @@ class GoogleOCR(models.Model):
         json_data = ast.literal_eval(s)
         return json_data[0]
 
+
+
+    # returns [sign1,sign2,sign3,...]
+    #   sign1 = (text,[x1,y1,width,height])
+    def parse(self):
+        rn = []
+
+        data = self.json()
+        if len(data)==0:
+            return
+        blocks = data['fullTextAnnotation']['pages'][0]['blocks'] # each block corresponds to a sign
+        for block in blocks:
+            words = block['paragraphs'][0]['words']
+            text = ""
+
+            x1 = 9999999999
+            x2 = -9999999999
+            y1 = 9999999999
+            y2 = -9999999999
+
+            for word in words:
+                for symbol in word['symbols']:
+                    text += symbol['text']
+                text += ' '
+
+                boundingBox = self.sanitize_vertices(word['boundingBox']['vertices'])
+
+                x1 = min(x1,boundingBox[0])
+                x2 = max(x2,boundingBox[1])
+                y1 = min(y1,boundingBox[2])
+                y2 = max(y2,boundingBox[3])
+
+            text = text[0:-1]
+            box = [x1,y1,x2-x1,y2-y1]
+            rn.append((text,box))
+        return rn
+
+
+
+
     def generate_signs(self):
+        if self.signs_generated == True:
+            return
+        if len(self.json())==0:
+            return
+
+        signs = self.parse()
+
+
+        # store sign object
+        for sign in signs: # sign = (text, [x1,y1,width,height])
+            sign_obj = Sign(text=sign[0],
+                            streetviewImage=self.streetviewImage,
+                            x1=sign[1][0],
+                            x2=sign[1][0]+sign[1][2],
+                            y1=sign[1][1],
+                            y2=sign[1][1]+sign[1][3],
+                            )
+
+            sign_obj.set_AIN()
+            sign_obj.save()
+
+        self.signs_generated = True
+        self.save()
+        return
+
+
+
+
+    # this old way of generating signs uses ctpn boxes
+    def generate_signs_deprecated(self):
         # don't generate signs if we already generated them before
         #if self.signs_generated == True:
         #    return
@@ -630,6 +700,74 @@ class BoundingBox(models.Model):
 from guess_language import guess_language
 from .dictionary_search import *
 class Sign(models.Model):
+    """
+    Corresponds to a single row in final csv file
+    Currently detects language ko (korean), zh (chinese), th (thai), es (english), es(spanish)
+    """
+    text = models.TextField()
+    streetviewImage = models.ForeignKey(StreetviewImage)
+    AIN = models.IntegerField(null=True, blank=True)
+    x1 = models.IntegerField()
+    x2 = models.IntegerField()
+    y1 = models.IntegerField()
+    y2 = models.IntegerField()
+
+    def __str__(self):
+        return self.text
+    def set_AIN(self):
+        lat_projectedLine, lon_projectedLine, angle_projectedLine \
+                = calculate_projected_line(self.streetviewImage.fov * 3, \
+                  [self.x1, self.x2, self.y1, self.y2], \
+                  self.streetviewImage.heading, \
+                  self.streetviewImage.mapPoint.latitude, \
+                  self.streetviewImage.mapPoint.longitude)
+        lat_camera = self.streetviewImage.mapPoint.latitude
+        lon_camera = self.streetviewImage.mapPoint.longitude
+        self.AIN,self.distance_to_AIN = get_intersecting_AIN(lat_camera,lon_camera,lat_projectedLine,lon_projectedLine)
+    def image_url(self):
+        return self.streetviewImage.image_url()
+    def distance_to_AIN(self):
+        pass
+    def language(self,match_threshold=1):
+        """
+        https://stackoverflow.com/questions/39142778/python-how-to-determine-the-language
+        """
+        langs = []
+
+        # check for korean/chinese letters
+        count_ko = 0
+        count_zh = 0
+        count_th = 0
+        for c in list(self.text):
+            lang = guess_language(c)
+            if lang == 'ko':
+                count_ko += 1
+            elif lang == 'zh':
+                count_zh += 1
+            elif lang == 'th':
+                count_th += 1
+        if count_ko>=2:
+            langs.append('ko')
+        if count_zh>=2:
+            langs.append('zh')
+        if count_th>=2:
+            langs.append('th')
+
+        # check for english/spanish_match
+        d = english_or_spanish(self.text,match_threshold=match_threshold)
+        if d['english'] is True:
+            langs.append('en')
+        if d['spanish'] is True:
+            langs.append('es')
+
+        # return
+        if len(langs)==0:
+            return 'unknown'
+        else:
+            return ','.join(langs)
+
+# Uses CTPN
+class Sign_deprecated(models.Model):
     """
     Corresponds to a single row in final csv file
     Currently detects language ko (korean), zh (chinese), th (thai), es (english), es(spanish)

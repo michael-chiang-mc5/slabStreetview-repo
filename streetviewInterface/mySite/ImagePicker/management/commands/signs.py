@@ -20,6 +20,8 @@ class Command(BaseCommand):
             write_csv_sign(box_thaitown,'thaitown')
             write_csv_sign(box_pico,'pico')
             write_csv_sign(box_koreatown,'koreatown')
+        elif option == 'generate_signs_fresh':
+            generate_signs(fresh=True)
         elif option == 'generate_signs':
             generate_signs()
         else:
