@@ -6,20 +6,20 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        num_high_priority = MapPoint.objects.filter(high_priority = True).count()
-        print('num_high_priority=' , num_high_priority)
+        min_lat = ParcelBoundary.objects.order_by('lat').first().lat
+        max_lat = ParcelBoundary.objects.order_by('lat').last().lat
+        min_lng = ParcelBoundary.objects.order_by('lng').first().lng
+        max_lng = ParcelBoundary.objects.order_by('lng').last().lng
 
-        numGoogleOCR = GoogleOCR.objects.all().count()
-        print('numGoogleOCR=' , numGoogleOCR)
+        print(min_lat,max_lat)
+        print(min_lng,max_lng)
 
 
+        min_lat = MapPoint.objects.filter().values_list('latitude').annotate(Min('latitude')).order_by('latitude').first()[0]
+        min_lng = MapPoint.objects.filter().values_list('longitude').annotate(Min('longitude')).order_by('longitude').first()[0]
+        max_lat = MapPoint.objects.filter().values_list('latitude').annotate(Min('latitude')).order_by('latitude').last()[0]
+        max_lng = MapPoint.objects.filter().values_list('longitude').annotate(Min('longitude')).order_by('longitude').last()[0]
 
-        # count the total number of signs
-        print('num sign=' , Sign.objects.count())
+        print(min_lat,max_lat)
+        print(min_lng,max_lng)
 
-        # Get the streetview images corresponding to signs
-        streetviewImages = Sign.objects.values_list('boundingBox__streetviewImage',flat=True).distinct()
-        print('num images=' , streetviewImages.count())
-
-        bb = BoundingBox.objects.filter(streetviewImage__in=streetviewImages)
-        print('num ctpn=', bb.count())
