@@ -378,8 +378,11 @@ class GoogleOCR(models.Model):
 
         data = self.json()
         if len(data)==0:
-            return
-        blocks = data['fullTextAnnotation']['pages'][0]['blocks'] # each block corresponds to a sign
+            return []
+        try:
+            blocks = data['fullTextAnnotation']['pages'][0]['blocks'] # each block corresponds to a sign
+        except:
+            return [] # sometimes data is {'error': {'code': 1, 'message': 'Request cancelled.'}}
         for block in blocks:
             words = block['paragraphs'][0]['words']
             text = ""

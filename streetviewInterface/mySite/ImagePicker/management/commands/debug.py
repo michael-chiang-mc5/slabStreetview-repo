@@ -6,5 +6,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        s = Sign.objects.all()
-        print(s[0].)
+        g = GoogleOCR.objects.get(pk=48896)
+        print(g.generate_signs())

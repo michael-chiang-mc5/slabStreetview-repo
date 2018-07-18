@@ -232,7 +232,7 @@ def write_csv_final(name):
                              'overlay_url': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (streetviewImage.pk,box[0], box[1], box[2], box[3]) , \
                              'AIN': ain, \
                              'distance_to_AIN': sign.distance_to_AIN, \
-                             'language_dist=0': sign.language(), \
+                             'language_dist=0': sign.language(match_threshold=0), \
                             })
 
 
