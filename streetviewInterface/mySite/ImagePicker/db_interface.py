@@ -139,8 +139,7 @@ def generate_signs(fresh=False):
 
 
 
-
-def write_csv_parcelVsLanguage(box,name):
+def write_csv_parcelVsLanguage_deprecated(box,name):
     lang = ['ko','en','es','th','zh']
 
     if box == 'all':
@@ -204,6 +203,52 @@ def write_csv_parcelVsLanguage(box,name):
 
 
 
+
+def write_csv_parcelVsLanguage():
+    # these are the languages we can detect, should match sign.language()
+    possible_codes = ['ko','zh','th','ja','zh_TW','vi','te','ta','so','pa','he','ar','fa','hy','en','es','unknown']
+
+    # get unique ain values
+    with open('media/all_signs.csv', 'r') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter='\t', quotechar='|')
+        next(spamreader, None)  # skip the headers
+        unique_ain = set()
+        for row in spamreader:
+            ain = row[8]
+            unique_ain.add(ain)
+
+    # initiate storage dictionary
+    out = {}
+    for ain in unique_ain:
+        language_count = {}
+        for code in possible_codes:
+            language_count[code] = 0
+        out[str(ain)] = language_count
+
+    # get unique ain values
+    with open('media/all_signs.csv', 'r') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter='\t', quotechar='|')
+        next(spamreader, None)
+        for row in spamreader:
+            ain = row[8]
+            langs = row[10]
+            langs = langs.split(',')
+            for lang in langs:
+                out[ain][lang] += 1
+
+
+    with open('media/all_parcelVsLanguage.csv', 'w', 10) as csv_output:
+        fieldnames = ['AIN'] + possible_codes
+        writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
+        writer.writeheader()
+
+        for ain,langs in out.items():
+            langs['AIN'] = ain
+            writer.writerow(langs)
+
+
+
+
 def write_csv_final(name):
     signs = Sign.objects.all()
     num_signs = signs.count()
@@ -240,107 +285,6 @@ def write_csv_final(name):
             print("sign.pk = " ,sign.pk, '    ,    %=',count,'/',num_signs)
 
 
-
-
-def write_csv_julia_deprecated(box,name):
-    if box == 'all':
-        mapPoints = MapPoint.objects.all()
-    else:
-        lon1 = box['lon1']
-        lon2 = box['lon2']
-        lat1 = box['lat1']
-        lat2 = box['lat2']
-        mapPoints = MapPoint.objects.filter(longitude__gte=min(lon1,lon2)).filter(longitude__lte=max(lon1,lon2)).filter(latitude__gte=min(lat1,lat2)).filter(latitude__lte=max(lat1,lat2))
-
-    with open('media/'+name+'_ctpn.csv', 'w') as csv_output, open('media/'+name+'_googleOCR.csv', 'w') as csv_output2:
-        # set up ctpn csv output
-        fieldnames = ['ctpn_pk','boundingBox','image_url','overlay_url']
-        writer = csv.DictWriter(csv_output, fieldnames=fieldnames, delimiter='\t')
-        writer.writeheader()
-        # swet up googleOCR csv output
-        fieldnames2 = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', \
-                       'latitude', 'address','overlay_url','ctpn_pk', 'lon_projectedLine', 'lat_projectedLine', 'AIN']
-        writer2 = csv.DictWriter(csv_output2, fieldnames=fieldnames2, delimiter='\t')
-        writer2.writeheader()
-
-        numMapPoints = len(mapPoints)
-        print(numMapPoints)
-
-        for mapPoint in mapPoints:
-            print("mapPoint.pk = " ,mapPoint.pk)
-            boundingBoxes = mapPoint.get_CTPN_boundingBoxes()
-            for boundingBox in boundingBoxes:
-                if boundingBox.is_nil:
-                    continue
-                writer.writerow({'ctpn_pk': boundingBox.pk, \
-                                 'boundingBox': [boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2], \
-                                 'image_url': boundingBox.streetviewImage.image_url(), \
-                                 'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (boundingBox.streetviewImage.pk,boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2) , \
-                                 })
-
-            googleOCRs = mapPoint.get_GoogleOCR()
-            for googleOCR in googleOCRs:
-                words = googleOCR.naive_words()
-                for word in words:
-                    boundingBoxes = BoundingBox.objects.filter(streetviewImage=googleOCR.streetviewImage)
-                    ctpn_pk = 'na'
-                    for boundingBox in boundingBoxes:
-                        overlap = overlappingBoundingBox(word['boundingBox'],[boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2])
-                        if overlap:
-                            ctpn_pk = boundingBox.pk
-                            break
-
-                    lat_projectedLine, lon_projectedLine, angle_projectedLine = calculate_projected_line(googleOCR.streetviewImage.fov * 3,word['boundingBox'],googleOCR.streetviewImage.heading,googleOCR.streetviewImage.mapPoint.latitude,googleOCR.streetviewImage.mapPoint.longitude)
-                    lat_camera = googleOCR.streetviewImage.mapPoint.latitude
-                    lon_camera = googleOCR.streetviewImage.mapPoint.longitude
-                    AIN = get_intersecting_AIN(lat_camera,lon_camera,lat_projectedLine,lon_projectedLine)
-
-
-                    writer2.writerow({
-                                     'googleOCR_pk':   googleOCR.pk, \
-                                     'image_url':       googleOCR.streetviewImage.image_url(), \
-                                     'image_fov':       googleOCR.streetviewImage.fov * 3, \
-                                     'boundingBox':    word['boundingBox'], \
-                                     'locale':         word['locale'], \
-                                     'text':         word['text'].replace(' ','_'), \
-                                     'heading':      googleOCR.streetviewImage.heading, \
-                                     'longitude':    googleOCR.streetviewImage.mapPoint.longitude, \
-                                     'latitude':    googleOCR.streetviewImage.mapPoint.latitude, \
-                                     'address':     googleOCR.streetviewImage.mapPoint.address, \
-                                     'overlay_url': 'http://104.131.145.75/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (googleOCR.streetviewImage.pk,word['boundingBox'][0], word['boundingBox'][1], word['boundingBox'][2], word['boundingBox'][3]) , \
-                                     'ctpn_pk':     ctpn_pk, \
-                                     'lat_projectedLine': lat_projectedLine, \
-                                     'lon_projectedLine': lon_projectedLine, \
-                                     'AIN': AIN, \
-                                    })
-
-
-def set_priority_bob():
-    """
-    Marks mapPoints high-priority based on Matt's dataset on black-owned business
-    """
-    csv_file = 'media/matt_black-owned-business.csv'
-    with open(csv_file) as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            address_str = row['Address'] + ', ' + row['City'] + ', ' + row['State']
-            if row['City']!='Los Angeles':
-                continue
-            print(address_str)
-            #print(len(BoundingBox.objects.all()))
-            address_str = address_str.replace(' ','+')
-
-            lnglat = geocode(address_str)
-
-            if lnglat is False:
-                print('geocode of '+address_str+' failed')
-                continue
-            mapPoints = filter_db(lnglat)
-            set_priority_mapPoints(mapPoints)
-
-    # number of high_priority mapPoints
-    mapPoints = MapPoint.objects.filter(high_priority=True)
-    print("There are ", len(mapPoints), " total high-priority mapPoints")
 
 
 

@@ -22,29 +22,12 @@ class Command(BaseCommand):
         box_thaitown = {'lon1':-118.3126634746,'lat1':34.1015465926,'lon2':-118.2975653201,'lat2':34.1019508119}
         box_elmonte = {'lon1':-118.0633736043,'lat1':34.0625377556,'lon2':-118.0410432978,'lat2':34.0629210521}
 
-        if option == 'priority_matt':
-            set_priority_bob()
-        #elif option == 'csv_matt':
-        #    write_csv_bob()
-        #elif option == 'priority_julia':
-        #    set_priority_julia(box_elmonte)
-        #    set_priority_julia(box_thaitown)
-        #    set_priority_julia(box_pico)
-        #    set_priority_julia(box_koreatown)
-        elif option == 'priority_commercial':
+        if option == 'priority_commercial':
             set_priority_fromJuliaBuffer()
         elif option == 'csv_julia':
             write_csv_final('all')
-            #write_csv_julia(box_elmonte,'elmonte')
-            #write_csv_julia(box_thaitown,'thaitown')
-            #write_csv_julia(box_pico,'pico')
-            #write_csv_julia(box_koreatown,'koreatown')
         elif option == 'parcelVsLanguage':
-            write_csv_parcelVsLanguage('all','all')
-            #write_csv_parcelVsLanguage(box_elmonte,'elmonte')
-            #write_csv_parcelVsLanguage(box_thaitown,'thaitown')
-            #write_csv_parcelVsLanguage(box_pico,'pico')
-            #write_csv_parcelVsLanguage(box_koreatown,'koreatown')
+            write_csv_parcelVsLanguage()
         else:
             print("Possible options: priority_matt, csv_matt, priority_julia, csv_julia, parcelVsLanguage")
         sys.exit(0)
