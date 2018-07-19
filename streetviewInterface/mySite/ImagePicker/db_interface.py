@@ -210,7 +210,7 @@ def write_csv_parcelVsLanguage():
 
     # get unique ain values
     with open('media/all_signs.csv', 'r') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter='\t', quotechar='|')
+        spamreader = csv.reader(csvfile, delimiter='\t', quoting=csv.QUOTE_NONE)
         next(spamreader, None)  # skip the headers
         unique_ain = set()
         for row in spamreader:
@@ -225,9 +225,9 @@ def write_csv_parcelVsLanguage():
             language_count[code] = 0
         out[str(ain)] = language_count
 
-    # get unique ain values
+    # count language
     with open('media/all_signs.csv', 'r') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter='\t', quotechar='|')
+        spamreader = csv.reader(csvfile, delimiter='\t', quoting=csv.QUOTE_NONE)
         next(spamreader, None)
         for row in spamreader:
             ain = row[8]
