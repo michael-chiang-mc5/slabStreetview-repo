@@ -16,6 +16,6 @@ class Command(BaseCommand):
 
         gmap.scatter(lat, lng, '#3B0B39', size=40, marker=False)
         # Draw
-        gmap.draw("my_map.html")
+        gmap.draw("media/my_map.html")
 
         sys.exit(0)
