@@ -273,6 +273,11 @@ class StreetviewImage(models.Model):
     notes = models.TextField(blank=True)
     image_is_set = models.BooleanField(default=False)
 
+    def latitude(self):
+        return self.mapPoint.latitude
+    def longitude(self):
+        return self.mapPoint.longitude
+
     def get_left_or_right(self):
         if self.heading - self.mapPoint.photographerHeading < 0:
             return "left"
@@ -368,7 +373,10 @@ class GoogleOCR(models.Model):
         s = self.json_text
         json_data = ast.literal_eval(s)
         return json_data[0]
-
+    def latitude(self):
+        return self.streetviewImage.latitude()
+    def longitude(self):
+        return self.streetviewImage.longitude()
 
 
     # returns [sign1,sign2,sign3,...]
@@ -718,6 +726,10 @@ class Sign(models.Model):
 
     def __str__(self):
         return self.text
+    def latitude(self):
+        return self.streetviewImage.latitude()
+    def longitude(self):
+        return self.streetviewImage.longitude()
     def set_AIN(self):
         lat_projectedLine, lon_projectedLine, angle_projectedLine \
                 = calculate_projected_line(self.streetviewImage.fov * 3, \

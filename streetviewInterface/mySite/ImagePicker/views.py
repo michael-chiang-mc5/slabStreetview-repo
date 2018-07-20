@@ -241,173 +241,54 @@ def get_census_tracts():
             censusBlock.save()
             print(censusBlock)
 
-# write database to text file to transfer to Julia
-def dumpDB_deprecated():
-    # mapPoint
-    with open('media/mapPoint.csv', 'w') as csvfile:
-        fieldnames = ['mappoint_pk', 'latitude', 'longitude', 'address']
+def dumpDB(name,obj):
+    with open('media/' + name, 'w') as csvfile:
+        fieldnames = ['pk', 'latitude', 'longitude']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
-        mapPoints = MapPoint.objects.all()
-        for mapPoint in mapPoints:
-            writer.writerow({'mappoint_pk':                  mapPoint.pk, \
-                             'latitude':            mapPoint.latitude, \
-                             'longitude':           mapPoint.longitude, \
-                             'address':             mapPoint.address, \
+        print("starting dump of " + name)
+        rows = obj.objects.all()
+        for row in rows:
+            writer.writerow({'pk':                  row.pk, \
+                             'latitude':            row.latitude(), \
+                             'longitude':           row.longitude(), \
                             })
 
-    # streetviewImage
-    with open('media/images.csv', 'w') as csvfile:
-        fieldnames = ['image_pk', 'mappoint_pk', 'left_or_right', 'image_url']
+
+
+
+def adsfdsf():
+    with open('media/StreetviewImage.csv', 'w') as csvfile:
+        fieldnames = ['pk', 'latitude', 'longitude']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
-        streetviewImages = StreetviewImage.objects.all()
-        for streetviewImage in streetviewImages:
-            writer.writerow({'image_pk':          streetviewImage.pk, \
-                             'mappoint_pk':       streetviewImage.mapPoint.pk, \
-                             'left_or_right':     streetviewImage.get_left_or_right(), \
-                             'image_url':         streetviewImage.image_url_if_exists(), \
+        rows = StreetviewImage.objects.all()
+        for row in rows:
+            writer.writerow({'pk':                  row.pk, \
+                             'latitude':            row.mapPoint.latitude, \
+                             'longitude':           row.mapPoint.longitude, \
                             })
 
-    #
-    with open('media/googleOCR.csv', 'w') as csvfile:
-
-        fieldnames = ['googleOCR_pk', 'image_pk', 'boundingBox', 'locale', 'text']
+    with open('media/GoogleOCR.csv', 'w') as csvfile:
+        fieldnames = ['pk', 'latitude', 'longitude']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
-
-        googleOCRs = GoogleOCR.objects.all()
-        for googleOCR in googleOCRs:
-            words = googleOCR.words()
-            for word in words:
-                writer.writerow({'googleOCR_pk':   googleOCR.pk, \
-                                 'image_pk':       googleOCR.streetviewImage.pk, \
-                                 'boundingBox':    word['boundingBox'], \
-                                 'locale':         word['locale'], \
-                                 'text':         word['text'], \
-                                })
-
-
-def dumpDB():
-    with open('media/googleOCR.csv', 'w') as csvfile:
-
-        fieldnames = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
-        writer.writeheader()
-
-        count=0
-        googleOCRs = GoogleOCR.objects.all()
-        for googleOCR in googleOCRs:
-            words = googleOCR.words()
-            for word in words:
-                count = count + 1
-                writer.writerow({'pk': count, \
-                                 'googleOCR_pk':   googleOCR.pk, \
-                                 'image_url':       googleOCR.streetviewImage.image_url(), \
-                                 'image_fov':       googleOCR.streetviewImage.fov * 3, \
-                                 'boundingBox':    word['boundingBox'], \
-                                 'locale':         word['locale'], \
-                                 'text':         word['text'], \
-                                 'heading':      googleOCR.streetviewImage.heading, \
-                                 'longitude':    googleOCR.streetviewImage.mapPoint.longitude, \
-                                 'latitude':    googleOCR.streetviewImage.mapPoint.latitude, \
-                                 'address':     googleOCR.streetviewImage.mapPoint.address, \
-                                })
-
-def write_mapPoint():
-    with open('media/MapPoints.csv', 'w') as csvfile:
-        fieldnames = ['pk', 'latitude', 'longitude', 'num_boundingboxes','size_boundingboxes','zone_code','census_tracts','en_count','es_count','ko_count','zh_count']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
-        writer.writeheader()
-        #mapPoints = MapPoint.objects.filter(streetviewimage__image_is_set=True).distinct()
-
-        # get mapPoints where:
-        #    mapPoint is associated with exactly two streetview images whose images are set
-        #    mapPoint is associated with at least 1 CTPN boundingBoxes object (nil is ok)
-        #mapPoints = MapPoint.objects.extra(  select={'image_count':       'SELECT COUNT(*) FROM imagepicker_streetviewimage WHERE imagepicker_streetviewimage.mappoint_id = imagepicker_mappoint.id AND imagepicker_streetviewimage.image_is_set = 1',},
-        #                             where=['image_count = 2']).distinct()
-        mapPoints = MapPoint.objects.all()
-
-
-        for mapPoint in mapPoints:
-            #try:
-            #    en_count = mapPoint.count_language()['en']
-            #    es_count = mapPoint.count_language()['es']
-            #    ko_count = mapPoint.count_language()['ko']
-            #    zh_count = mapPoint.count_language()['zh']
-            #except:
-            #    en_count = ""
-            #    es_count = ""
-            #    ko_count = ""
-            #    zh_count = ""
-
-            writer.writerow({'pk':                  mapPoint.pk, \
-                             'latitude':            mapPoint.latitude, \
-                             'longitude':           mapPoint.longitude, \
-
-                             #'num_boundingboxes':   mapPoint.get_num_CTPN_boundingBoxes(), \
-                             #'size_boundingboxes':  mapPoint.get_size_CTPN_boundingBoxes(), \
-                             #'zone_code':           mapPoint.get_zone_code(), \
-                             #'census_tracts':       mapPoint.get_census_tracts(), \
-                             #'en_count':            en_count, \
-                             #'es_count':            es_count, \
-                             #'ko_count':            ko_count, \
-                             #'zh_count':            zh_count, \
-
-                             #'photographerHeading': mapPoint.photographerHeading, \
-                             #'panoID':              mapPoint.panoID, \
-                             #'tag':                 mapPoint.tag, \
-                             #'num_links':           mapPoint.num_links, \
-                             #'address':             mapPoint.address, \
-                             #'neighbors_panoID':      list(mapPoint.neighbors.all().values_list('panoID')) , \
+        rows = GoogleOCR.objects.all()
+        for row in rows:
+            writer.writerow({'pk':                  row.pk, \
+                             'latitude':            row.streetviewImage.mapPoint.latitude, \
+                             'longitude':           row.streetviewImage.mapPoint.longitude, \
                             })
 
-def write_mapPoint_deprecated():
-    with open('output/MapPoints.csv', 'w') as csvfile:
-        fieldnames = ['pk', 'latitude', 'longitude', 'num_boundingboxes','size_boundingboxes','zone_code','census_tracts','en_count','es_count','ko_count','zh_count']
+    with open('media/Sign.csv', 'w') as csvfile:
+        fieldnames = ['pk', 'latitude', 'longitude']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
-        #mapPoints = MapPoint.objects.filter(streetviewimage__image_is_set=True).distinct()
-
-        # get mapPoints where:
-        #    mapPoint is associated with exactly two streetview images whose images are set
-        #    mapPoint is associated with at least 1 CTPN boundingBoxes object (nil is ok)
-        mapPoints = MapPoint.objects.extra(  select={'image_count':       'SELECT COUNT(*) FROM imagepicker_streetviewimage WHERE imagepicker_streetviewimage.mappoint_id = imagepicker_mappoint.id AND imagepicker_streetviewimage.image_is_set = 1',},
-                                             where=['image_count = 2']
-                                    ).filter(streetviewimage__boundingbox__method="CTPN").filter(censusblock__isnull=False).distinct()
-
-
-        for mapPoint in mapPoints:
-            try:
-                en_count = mapPoint.count_language()['en']
-                es_count = mapPoint.count_language()['es']
-                ko_count = mapPoint.count_language()['ko']
-                zh_count = mapPoint.count_language()['zh']
-            except:
-                en_count = ""
-                es_count = ""
-                ko_count = ""
-                zh_count = ""
-
-            writer.writerow({'pk':                  mapPoint.pk, \
-                             'latitude':            mapPoint.latitude, \
-                             'longitude':           mapPoint.longitude, \
-                             'num_boundingboxes':   mapPoint.get_num_CTPN_boundingBoxes(), \
-                             'size_boundingboxes':  mapPoint.get_size_CTPN_boundingBoxes(), \
-                             'zone_code':           mapPoint.get_zone_code(), \
-                             'census_tracts':       mapPoint.get_census_tracts(), \
-                             'en_count':            en_count, \
-                             'es_count':            es_count, \
-                             'ko_count':            ko_count, \
-                             'zh_count':            zh_count, \
-
-
-                             #'photographerHeading': mapPoint.photographerHeading, \
-                             #'panoID':              mapPoint.panoID, \
-                             #'tag':                 mapPoint.tag, \
-                             #'num_links':           mapPoint.num_links, \
-                             #'address':             mapPoint.address, \
-                             #'neighbors_panoID':      list(mapPoint.neighbors.all().values_list('panoID')) , \
+        rows = Sign.objects.all()
+        for row in rows:
+            writer.writerow({'pk':                  row.pk, \
+                             'latitude':            row.streetviewImage.mapPoint.latitude, \
+                             'longitude':           row.streetviewImage.mapPoint.longitude, \
                             })
 
 def read_mapPoint(request):
