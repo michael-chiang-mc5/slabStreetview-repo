@@ -250,8 +250,8 @@ def dumpDB(name,obj):
         rows = obj.objects.all()
         for row in rows:
             writer.writerow({'pk':                  row.pk, \
-                             'latitude':            row.latitude(), \
-                             'longitude':           row.longitude(), \
+                             'latitude':            row.latitude_val(), \
+                             'longitude':           row.longitude_val(), \
                             })
 
 

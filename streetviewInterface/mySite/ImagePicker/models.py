@@ -42,6 +42,12 @@ class MapPoint(models.Model):
     high_priority = models.BooleanField(default=False)
 
 
+    def longitude_val(self):
+        return self.longitude
+    def latitude_val(self):
+        return self.latitude
+
+
     def complete(self,lazy=None):
         """
             Return (False,'image') is any of the following is false:
@@ -137,7 +143,7 @@ class MapPoint(models.Model):
         #s = ",".join(unique)
         return unique[0]
     def __str__(self):
-        return str('pk='+str(self.pk)+', lat='+str(self.latitude)+', long='+str(self.longitude)+', photographerHeading='+str(self.photographerHeading))
+        return str('pk='+str(self.pk))
     def serialize_csv(self):
         return str(self.pk)                      + '\t' + \
                str(self.latitude)                + '\t' + \
@@ -273,9 +279,9 @@ class StreetviewImage(models.Model):
     notes = models.TextField(blank=True)
     image_is_set = models.BooleanField(default=False)
 
-    def latitude(self):
+    def latitude_val(self):
         return self.mapPoint.latitude
-    def longitude(self):
+    def longitude_val(self):
         return self.mapPoint.longitude
 
     def get_left_or_right(self):
@@ -373,10 +379,10 @@ class GoogleOCR(models.Model):
         s = self.json_text
         json_data = ast.literal_eval(s)
         return json_data[0]
-    def latitude(self):
-        return self.streetviewImage.latitude()
-    def longitude(self):
-        return self.streetviewImage.longitude()
+    def latitude_val(self):
+        return self.streetviewImage.latitude_val()
+    def longitude_val(self):
+        return self.streetviewImage.longitude_val()
 
 
     # returns [sign1,sign2,sign3,...]
@@ -726,10 +732,10 @@ class Sign(models.Model):
 
     def __str__(self):
         return self.text
-    def latitude(self):
-        return self.streetviewImage.latitude()
-    def longitude(self):
-        return self.streetviewImage.longitude()
+    def latitude_val(self):
+        return self.streetviewImage.latitude_val()
+    def longitude_val(self):
+        return self.streetviewImage.longitude_val()
     def set_AIN(self):
         lat_projectedLine, lon_projectedLine, angle_projectedLine \
                 = calculate_projected_line(self.streetviewImage.fov * 3, \

@@ -7,5 +7,12 @@ class Command(BaseCommand):
     help = ''
 
     def handle(self, *args, **options):
+        print("writing MapPoint")
+        dumpDB('MapPoint.csv',MapPoint)
+
+        print("writing GoogleOCR")
+        dumpDB('GoogleOCR.csv',GoogleOCR)
+
+        print("writing Sign")
         dumpDB('Sign.csv',Sign)
         sys.exit(0)
