@@ -10,6 +10,9 @@ class Command(BaseCommand):
         print("writing MapPoint")
         dumpDB('MapPoint.csv',MapPoint)
 
+        print("writing StreetviewImage")
+        dumpDB('StreetviewImage.csv',StreetviewImage)
+
         print("writing GoogleOCR")
         dumpDB('GoogleOCR.csv',GoogleOCR)
 
