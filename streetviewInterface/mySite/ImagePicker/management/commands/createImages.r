@@ -1,17 +1,17 @@
+# run with Rscript createImages.r
+# requires R ver >=3.4
+
 # See https://github.com/dkahle/ggmap
-
-install.packages('ggmap', repos="http://cran.rstudio.com/", lib="Rpackages/")
-
-
 # installing requires R v3.4, see https://cran.rstudio.com/bin/linux/ubuntu/README.html
 #install.packages("ggmap", lib="Rpackages/")
 
-
+# specific to server
 library('crayon',lib.loc='Rpackages')
 library('withr',lib.loc='Rpackages')
 library('ggplot2',lib.loc='Rpackages')
 library('ggmap',lib.loc='Rpackages')
->>>>>>> 6caafc9bf57d48604f00a153374d98cb167462f3
+library('labeling',lib.loc='Rpackages')
+
 
 # read csv file
 MyData <- read.csv(file="../../../media/Sign.csv", header=TRUE, sep="\t",stringsAsFactors = FALSE)
