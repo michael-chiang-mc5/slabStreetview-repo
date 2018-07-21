@@ -1,5 +1,6 @@
 # See https://github.com/dkahle/ggmap
-library(ggmap)
+install.packages('ggmap', repos="http://cran.rstudio.com/", lib="Rpackages/")
+library(ggmap, lib.loc='Rpackages/')
 
 # read csv file
 MyData <- read.csv(file="../../../media/MapPoint.csv", header=TRUE, sep="\t",stringsAsFactors = FALSE)

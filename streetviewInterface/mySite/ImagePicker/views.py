@@ -249,6 +249,7 @@ def dumpDB(name,obj):
         print("starting dump of " + name)
         rows = obj.objects.all()
         for row in rows:
+            print(row.pk)
             writer.writerow({'pk':                  row.pk, \
                              'latitude':            row.latitude_val(), \
                              'longitude':           row.longitude_val(), \
