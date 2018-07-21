@@ -247,8 +247,10 @@ def dumpDB(name,obj):
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
         writer.writeheader()
         print("starting dump of " + name)
-        rows = obj.objects.all()
-        for row in rows:
+        pks = obj.objects.values_list('pk',flat=True)
+        for pk in pks:
+            print(pk)
+            row = obj.objects.get(pk=pk)
             writer.writerow({'pk':                  row.pk, \
                              'latitude':            row.latitude_val(), \
                              'longitude':           row.longitude_val(), \
