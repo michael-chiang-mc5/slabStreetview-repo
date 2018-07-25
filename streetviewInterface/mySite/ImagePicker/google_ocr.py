@@ -79,7 +79,20 @@ def google_ocr_boundingBox(api_key, boundingBox):
 def google_ocr_api(api_key, streetviewImage):
     image_url = streetviewImage.image_url()
     print("running google ocr on " + image_url)
-    urllib.request.urlretrieve(image_url, 'deleteMe_google_ocr_api.jpg')
+    #urllib.request.urlretrieve(image_url, 'deleteMe_google_ocr_api.jpg')
+    try:
+        request = urllib.request.urlopen(image_url,timeout=3)
+    except:
+        print("urlopen timeout")
+        return
+    with open('deleteMe_google_ocr_api.jpg','wb') as f:
+        try:
+            f.write(request.read())
+        except:
+            print("error writing image")
+            return
+
+    print("done retrieving image")
     image_filenames = ['deleteMe_google_ocr_api.jpg']
     response = request_ocr(api_key, image_filenames)
 
@@ -87,11 +100,13 @@ def google_ocr_api(api_key, streetviewImage):
         print(response.text)
         raise ValueError('google ocr api failed')
     else:
-
-
         responses = response.json()['responses']
         googleocr = GoogleOCR(streetviewImage=streetviewImage,json_text=responses)
         googleocr.save()
+        print("googleOCR generated")
+    #pint("deleting file")
+    #os.remove('deleteMe_google_ocr_api.jpg')
+    #print("file deleted")
 
 def google_ocr_streetviewImage(api_key, streetviewImage):
     image_url = join(settings.MEDIA_ROOT,streetviewImage.image.name)
