@@ -258,40 +258,6 @@ def dumpDB(name,obj):
 
 
 
-def adsfdsf():
-    with open('media/StreetviewImage.csv', 'w') as csvfile:
-        fieldnames = ['pk', 'latitude', 'longitude']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
-        writer.writeheader()
-        rows = StreetviewImage.objects.all()
-        for row in rows:
-            writer.writerow({'pk':                  row.pk, \
-                             'latitude':            row.mapPoint.latitude, \
-                             'longitude':           row.mapPoint.longitude, \
-                            })
-
-    with open('media/GoogleOCR.csv', 'w') as csvfile:
-        fieldnames = ['pk', 'latitude', 'longitude']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
-        writer.writeheader()
-        rows = GoogleOCR.objects.all()
-        for row in rows:
-            writer.writerow({'pk':                  row.pk, \
-                             'latitude':            row.streetviewImage.mapPoint.latitude, \
-                             'longitude':           row.streetviewImage.mapPoint.longitude, \
-                            })
-
-    with open('media/Sign.csv', 'w') as csvfile:
-        fieldnames = ['pk', 'latitude', 'longitude']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
-        writer.writeheader()
-        rows = Sign.objects.all()
-        for row in rows:
-            writer.writerow({'pk':                  row.pk, \
-                             'latitude':            row.streetviewImage.mapPoint.latitude, \
-                             'longitude':           row.streetviewImage.mapPoint.longitude, \
-                            })
-
 def read_mapPoint(request):
     with open('output/MapPoints.csv', 'r') as f:
         reader = csv.reader(f)
@@ -515,7 +481,7 @@ def run_google_ocr(max_api_calls=None,priority=True):
         return
 
 
-    mapPoints=MapPoint.objects.filter(high_priority=True)
+    mapPoints=MapPoint.objects.filter(high_priority=True).order_by('-pk')
     print(len(mapPoints), " high priority mapPoints")
     print(max_api_calls, " max api calls")
 
