@@ -25,107 +25,6 @@ from django.http import JsonResponse
 from io import BytesIO
 from django.db.models import Count
 
-# bb = [x1,x2,y1,y2]
-def overlappingBoundingBox_deprecated(bb1,bb2):
-    x1 = bb1[0]
-    x2 = bb1[1]
-    y1 = bb1[2]
-    y2 = bb1[3]
-    xx1 = bb2[0]
-    xx2 = bb2[1]
-    yy1 = bb2[2]
-    yy2 = bb2[3]
-
-    if x1 > xx2:
-        return False
-    elif x2 < xx1:
-        return False
-    elif y1 > yy2:
-        return False
-    elif y2 < yy1:
-        return False
-    else:
-        return True
-
-
-def julia_harten_csv_deprecated():
-    lon1 = -118.3100831509
-    lat1 = 34.0634478683
-    lon2 = -118.2936894894
-    lat2 = 34.0637256166
-
-    max_api_calls = 500
-
-    streetviewImages = StreetviewImage.objects.filter(mapPoint__longitude__gt=min(lon1,lon2)).filter(mapPoint__longitude__lt=max(lon1,lon2)).filter(mapPoint__latitude__gt=min(lat1,lat2)).filter(mapPoint__latitude__lt=max(lat1,lat2))
-
-    # run google ocr if necessary
-    api_count = 0
-    for streetviewImage in streetviewImages:
-        print("working on streetviewImage " + str(streetviewImage.pk))
-        print(str(streetviewImage.count_boundingBoxes()) + " bounding boxes found")
-        googleOCR = GoogleOCR.objects.filter(streetviewImage=streetviewImage)
-        if len(googleOCR) == 0:
-            print("running google ocr on streetviewImage " + str(streetviewImage.pk))
-            google_ocr_api(settings.GOOGLE_OCR_API_KEY, streetviewImage)
-            api_count += 1
-        else:
-            print("previous google ocr found for streetviewImage " + str(streetviewImage.pk) + ", doing nothing")
-        if api_count >= max_api_calls:
-            break
-
-
-    with open('media/ctpn_koreatown.csv', 'w') as csvfile:
-        fieldnames = ['ctpn_pk','boundingBox','image_url','overlay_url']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
-        writer.writeheader()
-
-        boundingBoxes = BoundingBox.objects.filter(streetviewImage__in=streetviewImages)
-        for boundingBox in boundingBoxes:
-            if boundingBox.is_nil:
-                continue
-            #print(boundingBox)
-            writer.writerow({'ctpn_pk': boundingBox.pk, \
-                             'boundingBox': [boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2], \
-                             'image_url': boundingBox.streetviewImage.image_url(), \
-                             'overlay_url': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (boundingBox.streetviewImage.pk,boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2) , \
-                             })
-
-    with open('media/googleOCR_koreatown.csv', 'w') as csvfile:
-
-        fieldnames = ['pk', 'googleOCR_pk', 'image_url', 'image_fov', 'boundingBox', 'locale', 'text', 'heading', 'longitude', 'latitude', 'address','overlay_url','ctpn_pk']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter='\t')
-        writer.writeheader()
-
-        count=0
-        googleOCRs = GoogleOCR.objects.filter(streetviewImage__in=streetviewImages)
-        for googleOCR in googleOCRs:
-            words = googleOCR.naive_words()
-            for word in words:
-                count = count + 1
-
-                boundingBoxes = BoundingBox.objects.filter(streetviewImage=googleOCR.streetviewImage)
-                ctpn_pk = 'na'
-                for boundingBox in boundingBoxes:
-                    overlap = overlappingBoundingBox(word['boundingBox'],[boundingBox.x1, boundingBox.x2, boundingBox.y1, boundingBox.y2])
-                    if overlap:
-                        ctpn_pk = boundingBox.pk
-                        break
-
-                writer.writerow({'pk': count, \
-                                 'googleOCR_pk':   googleOCR.pk, \
-                                 'image_url':       googleOCR.streetviewImage.image_url(), \
-                                 'image_fov':       googleOCR.streetviewImage.fov * 3, \
-                                 'boundingBox':    word['boundingBox'], \
-                                 'locale':         word['locale'], \
-                                 'text':         word['text'], \
-                                 'heading':      googleOCR.streetviewImage.heading, \
-                                 'longitude':    googleOCR.streetviewImage.mapPoint.longitude, \
-                                 'latitude':    googleOCR.streetviewImage.mapPoint.latitude, \
-                                 'address':     googleOCR.streetviewImage.mapPoint.address, \
-                                 'overlay_url': 'http://104.131.145.75:8888/ImagePicker/overlayBox/%d/%d/%d/%d/%d' % (googleOCR.streetviewImage.pk,word['boundingBox'][0], word['boundingBox'][1], word['boundingBox'][2], word['boundingBox'][3]) , \
-                                 'ctpn_pk':     ctpn_pk, \
-                                })
-
 
 
 def overlayBox(request,image_pk,x1,x2,y1,y2):
@@ -146,16 +45,6 @@ def deletePending(request):
         return HttpResponse("you are not an admin")
     Pending.objects.all().delete()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
-
-
-
-def saveImages(request):
-    #p = subprocess.Popen(['python', 'manage.py', 'saveImages'],
-    #                                    stdout=subprocess.PIPE,
-    #                                    stderr=subprocess.STDOUT)
-    #context = {'message':"Save Images running. DO NOT RE-RUN!!"}
-    #return render(request, 'ImagePicker/adminPanel.html',context)
-    return HttpResponse("deprecated")
 
 def boundingBox(request,boundingBox_pk):
     boundingBox = BoundingBox.objects.get(pk=boundingBox_pk)
@@ -477,13 +366,13 @@ def run_google_ocr(max_api_calls=None,priority=True):
     api_count = 0
 
     if priority is False:
-        run_google_ocr_deprecated(max_api_calls)
-        return
-
-
-    mapPoints=MapPoint.objects.filter(high_priority=True).order_by('-pk')
-    print(len(mapPoints), " high priority mapPoints")
-    print(max_api_calls, " max api calls")
+        mapPoints=MapPoint.objects.order_by('-pk')
+        print(len(mapPoints), " mapPoints")
+        print(max_api_calls, " max api calls")
+    else:
+        mapPoints=MapPoint.objects.filter(high_priority=True).order_by('-pk')
+        print(len(mapPoints), " high priority mapPoints")
+        print(max_api_calls, " max api calls")
 
     for mapPoint in mapPoints:
         # break if we exceed maximum number of google OCR api calls
@@ -511,65 +400,6 @@ def run_google_ocr(max_api_calls=None,priority=True):
 
 
 
-
-
-def run_google_ocr_deprecated(max_api_calls):
-    """
-    Runs google ocr on 10 images with most CTPN boxes in each census tract
-    """
-    max_count = 30 # max number of results per census tract
-    api_count = 0
-
-    # get list of all census FIPS
-    FIPS = [el.tract_code() for el in CensusBlock.objects.all()]
-    FIPS = list(set(FIPS))
-
-
-    for FIP in FIPS:
-        print("iterating through census tract " + FIP)
-        censusBlocks = CensusBlock.objects.filter(fips__startswith=FIP)
-        mapPoints = MapPoint.objects.filter(id__in=censusBlocks.values('mapPoint_id'))
-        mapPoints = mapPoints.exclude(streetviewimage__image_is_set=False)
-        mapPoints = mapPoints.filter(streetviewimage__boundingbox__isnull=False)
-        mapPoints = mapPoints.distinct()
-        mapPoints = sorted(mapPoints, key=lambda x: x.get_num_CTPN_boundingBoxes(), reverse=True)
-        print(str(len(mapPoints)) + " mapPoints")
-        count = 0
-        while(1):
-            if count >= len(mapPoints):
-                print("no more map points")
-                break
-            if api_count > max_api_calls:
-                print("Ran " + str(api_count) + " api calls, stopping")
-                return
-
-            mapPoint = mapPoints[count]
-            streetviewImages = StreetviewImage.objects.filter(mapPoint=mapPoint)
-
-            # check to see if both streetview images have image set
-            skip = False
-            for streetviewImage in streetviewImages:
-                if streetviewImage.image_is_set == False:
-                    print("image is not set, skipping")
-                    skip = True
-                    break
-            if skip == True:
-                continue
-
-            for streetviewImage in streetviewImages:
-                print("working on streetviewImage " + str(streetviewImage.pk))
-                print(str(streetviewImage.count_boundingBoxes()) + " bounding boxes found")
-                googleOCR = GoogleOCR.objects.filter(streetviewImage=streetviewImage)
-                if len(googleOCR) == 0:
-                    print("running google ocr on streetviewImage " + str(streetviewImage.pk))
-                    google_ocr_api(settings.GOOGLE_OCR_API_KEY, streetviewImage)
-                    api_count += 1
-                else:
-                    print("previous google ocr found for streetviewImage " + str(streetviewImage.pk) + ", doing nothing")
-            count += 1
-            if count >= max_count:
-                break
-        print("************")
 
 
 def runGoogleOCR_images(request):
