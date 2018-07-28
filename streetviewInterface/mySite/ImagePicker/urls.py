@@ -35,7 +35,6 @@ urlpatterns = [
     url(r'^deletePending/$',  views.deletePending, name='deletePending'), #
 
 
-    url(r'^saveImages/$',  views.saveImages, name='saveImages'), #
     url(r'^picker/$', views.picker, name='picker'),
 
     url(r'^deleteAllBoundingBox/$',  views.deleteAllBoundingBox, name='deleteAllBoundingBox'), #
