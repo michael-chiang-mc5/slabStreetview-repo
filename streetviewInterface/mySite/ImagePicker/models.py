@@ -851,6 +851,7 @@ class OcrText(models.Model):
     def __str__(self):
         return str(self.method)+': '+str(self.text)
 
+# This might be deprecated, need to check more closely
 class OcrLanguage(models.Model):
     ocrText = models.ForeignKey(OcrText)
     language = models.TextField(blank=True)

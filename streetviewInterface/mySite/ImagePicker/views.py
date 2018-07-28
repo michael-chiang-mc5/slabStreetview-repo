@@ -339,7 +339,7 @@ def runLanguageIdentifiction(request):
                                         stderr=subprocess.STDOUT)
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
-def runLanguageIdentifiction_async():
+def runLanguageIdentifiction_async_deprecated():
     if not request.user.is_superuser:
         return HttpResponse("you are not an admin")
     ocrTexts = OcrText.objects.filter(method='google', ocrlanguage__isnull=True)
