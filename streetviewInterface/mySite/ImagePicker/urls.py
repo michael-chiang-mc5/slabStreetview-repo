@@ -15,6 +15,8 @@ urlpatterns = [
     url(r'^initialize_bfs/$', views.initialize_bfs, name='initialize_bfs'),
     url(r'^savePoint/$', views.savePoint, name='savePoint'),
     url(r'^listImage/(?P<streetviewImage_pk>[0-9]+)/$',  views.listImage, name='listImage'), #
+    url(r'^listImage_AIN/(?P<streetviewImage_pk>[0-9]+)/$',  views.listImage_AIN, name='listImage_AIN'), #
+
     url(r'^listImages/$',  views.listImages, name='listImages'), #
 
     url(r'^read_mapPoint/$',  views.read_mapPoint, name='read_mapPoint'), #
@@ -53,6 +55,8 @@ urlpatterns = [
 
 
     url(r'^overlayBox/(?P<image_pk>[0-9]+)/(?P<x1>[0-9]+)/(?P<x2>[0-9]+)/(?P<y1>[0-9]+)/(?P<y2>[0-9]+)/$',  views.overlayBox, name='overlayBox'), #
+
+    url(r'^AIN_to_image/(?P<AIN>[0-9]+)/$',  views.AIN_to_image, name='AIN_to_image'), #
 
 
     url(r'^runGoogleOCR_image/(?P<pk>[0-9]+)/$',  views.runGoogleOCR_image, name='runGoogleOCR_image'), #

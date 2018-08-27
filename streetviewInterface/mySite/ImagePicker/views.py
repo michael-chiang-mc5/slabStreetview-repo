@@ -26,6 +26,12 @@ from io import BytesIO
 from django.db.models import Count
 
 
+def AIN_to_image(request, AIN):
+    signs = Sign.objects.filter(AIN=AIN)
+    streetviewImages = signs.values_list('streetviewImage__pk',flat=True).distinct()
+    context = {'streetviewImages':streetviewImages,'AIN':AIN}
+    return render(request, 'ImagePicker/AIN_to_image.html',context)
+    return HttpResponse(streetviewImages[0])
 
 def overlayBox(request,image_pk,x1,x2,y1,y2):
     width = int(x2)-int(x1)
@@ -71,6 +77,11 @@ def listImage(request,streetviewImage_pk):
     streetviewImage = StreetviewImage.objects.get(pk=streetviewImage_pk)
     context = {'streetviewImage':streetviewImage}
     return render(request, 'ImagePicker/listImage.html',context)
+
+def listImage_AIN(request,streetviewImage_pk):
+    streetviewImage = StreetviewImage.objects.get(pk=streetviewImage_pk)
+    context = {'streetviewImage':streetviewImage}
+    return render(request, 'ImagePicker/listImage_AIN.html',context)
 
 
 

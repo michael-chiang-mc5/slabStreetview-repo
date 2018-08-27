@@ -1,0 +1,21 @@
+{% extends "MCBase/base-extended.html" %}
+{% load staticfiles %}
+
+{% block javascript %}
+{% endblock %}
+
+{% block title %}
+  List of images
+{% endblock %}
+
+{% block body_block %}
+  <div class="content">
+    <h1>List of images corresponding to AIN {{ AIN }}</h1>
+
+    {% for streetviewImage in streetviewImages %}
+      <a href="/ImagePicker/listImage_AIN/{{ streetviewImage }}">http://127.0.0.1:8000/ImagePicker/listImage_AIN/{{ streetviewImage }}</a><br />
+    {% endfor %}
+
+
+  </div>
+{% endblock %}
