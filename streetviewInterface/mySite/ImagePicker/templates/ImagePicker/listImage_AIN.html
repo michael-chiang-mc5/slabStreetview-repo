@@ -47,6 +47,16 @@
   }
 
 
+
+  .tag_disappear:hover
+  {
+      opacity:0
+  }
+
+
+
+
+
 </style>
 
 {% endblock %}
@@ -106,7 +116,7 @@
             <div class="image_container">
               <!-- bounding box overlay -->
                 {% for sign in streetviewImage.sign_set.all %}
-                  <div style="left:{{ sign.x1 }}px;top:{{ sign.y1 }};width:{{ sign.width }}px;height:{{ sign.height }}px" class="tag_green">
+                  <div style="left:{{ sign.x1 }}px;top:{{ sign.y1 }};width:{{ sign.width }}px;height:{{ sign.height }}px" class="tag_green tag_disappear">
                     {{ sign.text}} , ain = {{ sign.AIN }}
                   </div>
                 {% endfor %}
