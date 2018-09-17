@@ -29,6 +29,7 @@ from django.db.models import Count
 def AIN_to_image(request, AIN):
     signs = Sign.objects.filter(AIN=AIN)
     streetviewImages = signs.values_list('streetviewImage__pk',flat=True).distinct()
+    streetviewImages = StreetviewImage.objects.filter(pk__in=streetviewImages)
     context = {'streetviewImages':streetviewImages,'AIN':AIN}
     return render(request, 'ImagePicker/AIN_to_image.html',context)
     return HttpResponse(streetviewImages[0])

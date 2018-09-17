@@ -2,6 +2,65 @@
 {% load staticfiles %}
 
 {% block javascript %}
+
+
+<style>
+  .image_container {
+      position:relative;
+      margin-bottom: 20px;
+  }
+
+  td {
+    vertical-align:top !important;
+  }
+
+  .tag_green {
+      float: left;
+      position: absolute;
+      background-color: green;
+      opacity: 0.5;
+      z-index: 1000;
+      color: yellow;
+      text-align: center;
+      font-weight: bold;
+      font-size: 10;
+
+
+  }
+
+  .tag_yellow {
+      float: left;
+      position: absolute;
+      background-color: yellow;
+      opacity: 0.5;
+      z-index: 1000;
+  }
+  .grayscale {
+  	filter: grayscale(100%);
+    position:relative;
+  }
+
+  .grayscale:hover {
+    filter: none;
+  }
+
+  .image_container:hover .tag {
+    opacity: 0.1;
+  }
+
+
+
+  .tag_disappear:hover
+  {
+      opacity:0
+  }
+
+
+
+
+
+</style>
+
 {% endblock %}
 
 {% block title %}
@@ -13,8 +72,38 @@
     <h1>List of images corresponding to AIN {{ AIN }}</h1>
 
     {% for streetviewImage in streetviewImages %}
-      <a href="/ImagePicker/listImage_AIN/{{ streetviewImage }}">http://104.131.145.75:8888/ImagePicker/listImage_AIN/{{ streetviewImage }}</a><br />
+      <a href="/ImagePicker/listImage_AIN/{{ streetviewImage.pk }}">http://104.131.145.75:8888/ImagePicker/listImage_AIN/{{ streetviewImage.pk }}</a><br />
     {% endfor %}
+
+
+    <br />
+    <h1>Images</h1>
+    <br />
+    <br />
+    <br />
+
+
+    {% for streetviewImage in streetviewImages %}
+      <div class="image_container">
+        {{ streetviewImage.image_ur }}
+        <!-- bounding box overlay -->
+          {% for sign in streetviewImage.sign_set.all %}
+            <div style="left:{{ sign.x1 }}px;top:{{ sign.y1 }};width:{{ sign.width }}px;height:{{ sign.height }}px" class="tag_green tag_disappear">
+              {{ sign.text}} , ain = {{ sign.AIN }}
+            </div>
+          {% endfor %}
+          <img class="grayscale" src="{{ streetviewImage.image_url }}"  >
+      </div>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+
+
+    {% endfor %}
+
 
 
   </div>
