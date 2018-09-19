@@ -84,6 +84,8 @@
 
 
     {% for streetviewImage in streetviewImages %}
+      <h2>image pk = {{ streetviewImage.pk }} </h2>
+      <h2>link = <a href="/ImagePicker/listImage_AIN/{{ streetviewImage.pk }}">http://104.131.145.75:8888/ImagePicker/listImage_AIN/{{ streetviewImage.pk }}</a> </h2>
       <div class="image_container">
         {{ streetviewImage.image_ur }}
         <!-- bounding box overlay -->
@@ -94,6 +96,7 @@
           {% endfor %}
           <img class="grayscale" src="{{ streetviewImage.image_url }}"  >
       </div>
+      <h2>~~~~~~~~~~~~~~~~~~~~~~~~</h2>
       <br />
       <br />
       <br />
