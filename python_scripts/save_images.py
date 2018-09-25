@@ -7,13 +7,13 @@ from math import sqrt
 from random import randint
 
 # Example url:
-# https://s3-us-west-1.amazonaws.com/slab-streetview/1.jpg
+# https://s3-us-west-1.amazonaws.com/slab-gsv/1.jpg
 
 
 #interface_url = "http://127.0.0.1:8000/"
-#AWS_BUCKET_NAME = 'slab-streetview-debug'
+#AWS_BUCKET_NAME = 'slab-gsv-debug'
 interface_url = "http://104.131.145.75:8888/"
-AWS_BUCKET_NAME = 'slab-streetview'
+AWS_BUCKET_NAME = 'slab-gsv'
 text_file = open("log.txt", "w")
 
 def main():
