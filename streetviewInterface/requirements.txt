@@ -14,7 +14,7 @@ networkx==1.11
 numpy==1.12.1
 oauthlib==2.0.0
 olefile==0.44
-Pillow==4.1.1
+Pillow==8.1.1
 PyJWT==1.4.2
 python-dateutil==2.7.3
 python-social-auth==0.2.21
